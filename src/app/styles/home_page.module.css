@@ -1,0 +1,48 @@
+.home {
+    background-color: var(--main-beige);
+    font-family: 'New Amsterdam', sans-serif;
+
+    --blob-pink: #FDBFBD;
+
+}
+
+/* 
+h2 {
+    font-family: 'Idiqlat', serif;
+} */
+
+.mainText {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 90vh;
+}
+
+.nameSection {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.blobMask {
+    position: absolute;
+    top: 52.5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.nameStack {
+    position: relative;
+    z-index: 1;
+    width: min(90vw, 900px);
+    height: auto;
+    overflow: visible;
+}
+
+.svgNameText {
+    font-family: 'New Amsterdam', sans-serif;
+    font-size: 160px;
+}
