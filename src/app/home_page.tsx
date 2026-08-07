@@ -24,7 +24,6 @@ export default function HomePage() {
                     <BlueOrb size='300px' style={{ filter: `drop-shadow(4px 6px ${sliderColors.blue.outline}` }} />
                 </div>
             </div>
-            <GreenSlider width="400px" height="187.5px" />
             <div className={styles.mainText}>
                 <div className={styles.nameSection}>
                     <div className={styles.blobMask}>
