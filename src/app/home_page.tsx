@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 
 import styles from './styles/home_page.module.css'
 import { clipToShape, TintedVector } from './mask_functions'
-import { sliderColors, GreenOrb, RedOrb, YellowOrb, BlueOrb } from './sliders'
+import { sliderColors, GreenOrb, RedOrb, YellowOrb, BlueOrb, RedSliderRect, RedSlider, YellowSlider, GreenSlider, BlueSlider } from './sliders'
 
 export default function HomePage() {
 
@@ -24,6 +24,7 @@ export default function HomePage() {
                     <BlueOrb size='300px' style={{ filter: `drop-shadow(4px 6px ${sliderColors.blue.outline}` }} />
                 </div>
             </div>
+            <GreenSlider width="400px" height="187.5px" />
             <div className={styles.mainText}>
                 <div className={styles.nameSection}>
                     <div className={styles.blobMask}>

@@ -1,0 +1,15 @@
+.sliderRect {
+    position: relative;
+}
+
+.sliderLabel{
+    position: absolute;
+    display: flex;
+    align-items: center;
+    /* justify-content: center; */
+    text-align: center;
+}
+
+.sliderLabelText {
+    position: relative;
+}

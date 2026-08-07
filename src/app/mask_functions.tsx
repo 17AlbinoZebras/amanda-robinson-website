@@ -77,6 +77,11 @@ type TintedVectorProps = {
   // vectors are wider than they are tall — sizing off height keeps that default
   // from immediately overshooting the frame's width.
   maskSizeAxis?: "width" | "height";
+  // Tile the vector as a repeating pattern instead of showing it once. Only
+  // meaningful when maskSize is smaller than the box (e.g. a fraction of the
+  // frame) — at the default "contain", the single image already fills the box,
+  // so there's no room for a second copy to repeat into.
+  repeat?: boolean | "x" | "y";
   // The size of the shape this vector is clipped to (e.g. a circular frame's
   // bounding box, or a rectangle's own width/height) — each must be a plain pixel
   // value. When given, they do two things: (1) become the vector's own default
@@ -134,6 +139,7 @@ export function TintedVector({
   height,
   maskSize,
   maskSizeAxis = "height",
+  repeat,
   frameWidth,
   frameHeight,
   top,
@@ -201,6 +207,11 @@ export function TintedVector({
   const yToken = resolveAxisPosition(top, "top", bottom, "bottom", yReference);
   const maskPosition = (xToken !== "center" || yToken !== "center") ? `${xToken} ${yToken}` : undefined;
 
+  const maskRepeatCss = repeat === true ? "repeat"
+    : repeat === "x" ? "repeat-x"
+    : repeat === "y" ? "repeat-y"
+    : undefined;
+
   return (
     <div
       className={[styles.tinted, className].filter(Boolean).join(" ")}
@@ -210,6 +221,7 @@ export function TintedVector({
         "--mask": `url(${src})`,
         ...(maskSizeCss && { "--mask-size": maskSizeCss }),
         ...(maskPosition && { "--mask-position": maskPosition }),
+        ...(maskRepeatCss && { "--mask-repeat": maskRepeatCss }),
         ...style,
       } as CSSProperties}
     />
@@ -243,6 +255,16 @@ type ClippedVectorProps = Omit<TintedVectorProps, "frameWidth" | "frameHeight"> 
   // clip is applied after the filter), so a shadow/effect on a clipped shape only
   // renders correctly from a non-clipped ancestor.
   frameStyle?: CSSProperties;
+  // A uniform outline around the shape. There's no filter/box-shadow equivalent of
+  // box-shadow's spread-radius for a clipped shape (drop-shadow only offsets and
+  // blurs, it can't grow the shape's edge; border/outline/box-shadow all get cut off
+  // by clip-path same as anything else). So this renders a second, larger copy of
+  // the same shape in strokeColor behind the fill — the classic clip-path outline
+  // technique. Needs frameWidth/frameHeight to be plain pixel values to work; grows
+  // the outer wrapper's box by strokeWidth on every side, so anything positioning
+  // this component by its old frameWidth/frameHeight needs to account for that.
+  strokeWidth?: SizeValue;
+  strokeColor?: string;
 };
 
 // TintedVector + clipToShape are almost always used together as "a colored,
@@ -257,6 +279,8 @@ export function ClippedVector({
   frameHeight,
   shape,
   shapeColor,
+  strokeWidth,
+  strokeColor,
   frameClassName,
   frameStyle,
   ...vectorProps
@@ -264,14 +288,40 @@ export function ClippedVector({
   const widthLength = typeof frameWidth === "number" ? `${frameWidth}px` : frameWidth;
   const heightLength = typeof frameHeight === "number" ? `${frameHeight}px` : frameHeight;
 
+  const widthPx = parsePixels(frameWidth);
+  const heightPx = parsePixels(frameHeight);
+  const strokePx = strokeWidth !== undefined ? parsePixels(strokeWidth) : undefined;
+  if (strokeWidth !== undefined && strokePx === undefined && process.env.NODE_ENV !== "production") {
+    console.warn(`ClippedVector: strokeWidth must be a plain pixel value (e.g. 4 or "4px"), got "${strokeWidth}" — ignoring.`);
+  }
+  const hasStroke = strokePx !== undefined && strokePx > 0 && widthPx !== undefined && heightPx !== undefined;
+
+  const outerWidth = hasStroke ? `${widthPx! + 2 * strokePx!}px` : widthLength;
+  const outerHeight = hasStroke ? `${heightPx! + 2 * strokePx!}px` : heightLength;
+
   return (
     <div
       className={[styles.frameWrapper, frameClassName].filter(Boolean).join(" ")}
-      style={{ width: widthLength, height: heightLength, ...frameStyle }}
+      style={{ width: outerWidth, height: outerHeight, position: "relative", ...frameStyle }}
     >
+      {hasStroke && (
+        <div style={{ position: "absolute", inset: 0, ...clipToShape(shape, strokeColor) }} />
+      )}
       <div
         className={styles.clippedFrame}
-        style={{ width: "100%", height: "100%", ...clipToShape(shape, shapeColor) }}
+        style={{
+          // With no stroke layer, size relative to the parent's own content box (not
+          // a literal copy of frameWidth/frameHeight) — so if frameStyle adds a
+          // border/padding that shrinks the parent's content area (e.g. a top/bottom
+          // border under box-sizing: border-box), this shrinks with it instead of
+          // overflowing past it. With a stroke layer, the parent is deliberately
+          // larger than the frame (grown by strokePx on each side), so this needs to
+          // stay at the literal frame size and get inset, not stretch to fill it.
+          width: hasStroke ? widthLength : "100%",
+          height: hasStroke ? heightLength : "100%",
+          ...(hasStroke && { position: "absolute", top: `${strokePx}px`, left: `${strokePx}px` }),
+          ...clipToShape(shape, shapeColor),
+        }}
       >
         <TintedVector frameWidth={frameWidth} frameHeight={frameHeight} {...vectorProps} />
       </div>
