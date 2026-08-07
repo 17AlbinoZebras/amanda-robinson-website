@@ -6,6 +6,8 @@ import styles from "./styles/page.module.css";
 
 import '@fontsource/new-amsterdam';
 import '@fontsource/idiqlat';
+import '@fontsource-variable/afacad-flux/wght.css';
+
 
 export default function Home() {
   return (

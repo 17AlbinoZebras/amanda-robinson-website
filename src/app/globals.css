@@ -1,4 +1,8 @@
 :root {
+  --font-new-amsterdam: 'New Amsterdam', sans-serif;
+  --font-idiqlat: 'Idiqlat', serif;
+  --font-afacad-flux: 'Afacad Flux Variable', sans-serif;
+
   --background: #F6EEE4;
   --foreground: #171717;
   
