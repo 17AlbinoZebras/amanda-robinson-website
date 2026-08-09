@@ -5,6 +5,52 @@ import styles from './styles/home_page.module.css'
 import { clipToShape, TintedVector } from './mask_functions'
 import { GreenOrb, RedOrb, YellowOrb, BlueOrb, RedSliderRect, RedSlider, YellowSlider, GreenSlider, BlueSlider, AllSliders } from './sliders'
 
+function AboutSection() {
+    
+    return (
+        <div className={styles.about}>
+            <div className={styles.upperSection}>
+                <div className={styles.blurb}>
+                    <span>Hi! I&#39;m a full-stack web developer.<br/>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span>
+                </div>
+                <div className={styles.headshotContainer}><img src="headshot.jpg" className={styles.headshot}/></div>
+            </div>
+            <div className={styles.lowerSection}>
+                <div className={styles.techStacks}>
+                    <span className={styles.sectionTitle}>Technology Stacks</span>
+                    <br/>
+                    <div className={styles.bodyText}>
+                        <b>Languages: </b>
+                        <p>Java, Python, TypeScript, HTML/CSS, SQL, C++, C</p>
+                        <b>Frameworks/Libraries: </b>
+                        <p>React, Bootstrap, Next.js, Node.js/Express, PySide6</p>
+                        <b>Tools: </b>
+                        <p>Git, VS Code, Claude Code, Warp, Linux</p>
+                        <b>Other: </b>
+                        <p>MySQL, PostgreSQL, SQL Server, AWS</p>
+                    </div>
+                </div>
+                <div className={styles.hobbies}>
+                    <span className={styles.sectionTitle}>Hobbies & Interests</span>
+                    <br/>
+                    <div className={styles.bodyText}>
+                        <ul>
+                            <li>Photography</li>
+                            <li>Theater</li>
+                            <li>Logic Puzzles</li>
+                            <li>Board Games</li>
+                            <li>Crafts</li>
+                            <li>Learning new skills</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <AllSliders height="250px"/>
+        </div>
+    )
+}
+
+
 // The width the px sizes below were originally tuned at. Used both as the
 // SSR-safe default (before the client can measure the real window) and as the
 // basis for converting each reference px size into an equivalent vw fraction.
@@ -56,9 +102,9 @@ export default function HomePage() {
                     <BlueOrb size={`${clampPx(300, 195, 410)}px`} className={styles.orbShadowBlue} />
                 </div>
             </div>
-            <div className={styles.sliders}>
+            {/* <div className={styles.sliders}>
                 <AllSliders height='285px'/>
-            </div>
+            </div> */}
             <div className={styles.mainText}>
                 <div className={styles.nameSection}>
                     <div className={styles.blobMask}>
@@ -89,6 +135,7 @@ export default function HomePage() {
                     <span className={styles.subtitle}>I sure do code.<br/>Lorem ipsum, Etc.</span>
                 </div>
             </div>
+            <AboutSection/>
         </div>
     )
 }

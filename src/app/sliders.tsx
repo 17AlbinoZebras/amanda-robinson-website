@@ -32,7 +32,7 @@ const sliderPaths = {
 
 export const sliderColors = {
     red: {base: "var(--main-red)", mask: "var(--main-blue)", outline: "#B4CAC1", label: "#FFB2B3"},
-    yellow: {base: "var(--main-yellow)", mask: "var(--main-red)", outline: "var(--main-light)", label: "#F5DFB4"},
+    yellow: {base: "var(--main-yellow)", mask: "var(--main-red)", outline: "var(--main-light)", label: "#FFE8BA"},
     // For green and blue sliderRects, swap base and label colors
     green: {base: "var(--main-green)", mask: "var(--main-light)", outline: "#A9ACD6", label: "#A6BFB8"},
     blue: {base: "var(--main-blue)", mask: "#FFE8BA", outline: "#FFB2B3", label: "#A9ACD6"}
