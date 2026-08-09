@@ -11,7 +11,7 @@
     font-family: var(--font-afacad-flux);
 
     flex-direction: column;
-    gap: 6.5%;
+    gap: 7.5%;
 }
 
 .upperSection {
@@ -41,7 +41,7 @@
     position: relative;
 
     border-radius: 50%;
-    border: 12px solid #88AA9C;
+    border: 12px solid #92B8A9;
     box-sizing: content-box;
 
     position: absolute;
@@ -74,6 +74,10 @@
     height: 100%;
 }
 
+.techStacks p {
+    margin: -2px auto 4px;
+}
+
 .hobbies {
     background-color: #A9ACD6;
     color: #FEFAF0;
@@ -90,11 +94,7 @@
 }
 
 .bodyText {
-    font-size: 26px;
-}
-
-.bodyText p {
-    margin: -2px auto 4px;
+    font-size: 24px;
 }
 
 .bodyText ul {

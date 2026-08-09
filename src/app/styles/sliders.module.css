@@ -55,7 +55,7 @@
 }
 
 .labelOrbLeft {
-    left: 50cqh;
+    left: 55cqh;
 }
 
 .labelOrbRight {
@@ -65,7 +65,7 @@
 /* Idiqlat's font-size is a plain fraction of the label's own height. New
    Amsterdam can't be — see .labelFontNewAmsterdam below. */
 .labelFontIdiqlat {
-    font-size: 26cqh;
+    font-size: 25cqh;
 }
 
 /* New Amsterdam is unicase (x-height ~= cap-height), while Idiqlat's x-height
@@ -185,4 +185,26 @@
 
 .slideRight:hover {
     transform: translateX(0%);
+}
+
+
+
+@keyframes slider-bounce {
+  0%, 55%, 100% {
+    transform: translateX(-100%);
+  }
+  10% {
+    transform: translateX(-97.5%);
+  }
+  20% {
+    transform: translateX(-100%);
+  }
+  40% {
+    transform: translateX(-95%);
+  }
+}
+
+.bounceSlider {
+    display: inline-block;
+    animation: slider-bounce 3s ease infinite;
 }

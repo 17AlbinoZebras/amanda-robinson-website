@@ -31,23 +31,23 @@ function AboutSection() {
                     </div>
                 </div>
                 <div className={styles.hobbies}>
-                    <span className={styles.sectionTitle}>Hobbies & Interests</span>
+                    <span className={styles.sectionTitle}>Education</span>
                     <br/>
                     <div className={styles.bodyText}>
-                        <ul>
-                            <li>Photography</li>
-                            <li>Theater</li>
-                            <li>Logic Puzzles</li>
-                            <li>Board Games</li>
-                            <li>Crafts</li>
-                            <li>Learning new skills</li>
-                        </ul>
+                        <b>Worcester Polytechnic Institute</b>
+                        <p>Expected Graduation: May 2028</p>
+                        <p>B.S. Computer Science</p>
+                        <p>Minor in Economics</p>
                     </div>
                 </div>
             </div>
             <AllSliders height="250px"/>
         </div>
     )
+}
+
+function Footer() {
+
 }
 
 

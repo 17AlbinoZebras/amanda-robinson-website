@@ -1,5 +1,5 @@
 'use client'
-import React, { CSSProperties } from 'react'
+import React, { CSSProperties, useState } from 'react'
 
 import { ClippedVector, SizeValue } from './mask_functions';
 
@@ -268,10 +268,11 @@ export function AllSliders({height, className, style}: AllSlidersProps) {
     const heightVal = parseFloat(heightParts[0])
     const heightUnits = heightParts[1]
     const width = `${heightVal * SLIDER_WIDTH_RATIO}${heightUnits}`
+    const [neverHovered, setNeverHovered] = useState(true);
 
     return (
-        <div className={styles.allSliders} style={{height}}>
-            <RedSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideLeft}`}/>
+        <div className={styles.allSliders} style={{height}} onMouseOver={() => setNeverHovered(false)}>
+            <RedSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideLeft} ${neverHovered ? styles.bounceSlider : ''}`}/>
             <GreenSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.bottomSlider} ${styles.slideLeft}`}/>
             <YellowSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideRight}`}/>
             <BlueSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.bottomSlider} ${styles.slideRight}`}/>
