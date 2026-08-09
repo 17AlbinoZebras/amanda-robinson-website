@@ -82,6 +82,13 @@ type TintedVectorProps = {
   // frame) — at the default "contain", the single image already fills the box,
   // so there's no room for a second copy to repeat into.
   repeat?: boolean | "x" | "y";
+  // When true, forces the mask to exactly fill width/height (mask-size: 100% 100%)
+  // instead of the default mask-size: contain, which always preserves the vector's
+  // own aspect ratio and would otherwise letterbox rather than distort. Only has a
+  // visible effect if width/height give the box a different ratio than the
+  // vector's natural one, and only applies when maskSize isn't also explicitly set
+  // (an explicit maskSize always wins over stretch).
+  stretch?: boolean;
   // The size of the shape this vector is clipped to (e.g. a circular frame's
   // bounding box, or a rectangle's own width/height) — each must be a plain pixel
   // value. When given, they do two things: (1) become the vector's own default
@@ -140,6 +147,7 @@ export function TintedVector({
   maskSize,
   maskSizeAxis = "height",
   repeat,
+  stretch,
   frameWidth,
   frameHeight,
   top,
@@ -196,6 +204,8 @@ export function TintedVector({
     } else {
       maskSizeCss = typeof maskSize === "number" ? `${maskSize}px` : maskSize;
     }
+  } else if (stretch) {
+    maskSizeCss = "100% 100%";
   }
 
   // Position percentages resolve against the vector's real rendered width/height

@@ -24,6 +24,11 @@
     top: -2.5vh;
     right: 25vh;
 }
+@media (max-width: 1200px) {
+    .yellowOrb {
+        right: 15vh;
+    }
+}
 
 .greenOrb {
     position: absolute;
@@ -35,6 +40,69 @@
     position: absolute;
     bottom: 3vh;
     right: 15vh;
+}
+
+/* Drop-shadow colors match each orb's own outline color (sliderColors.X.outline
+   in sliders.tsx) — kept as literal values here since drop-shadow has to live on
+   this unclipped wrapper (see ClippedVector's frameStyle docs in
+   mask_functions.tsx), not on the orb component itself. */
+.orbShadowRed {
+    filter: drop-shadow(-6px -5px #B4CAC1);
+}
+
+.orbShadowYellow {
+    filter: drop-shadow(6px -4px var(--main-light));
+}
+
+.orbShadowGreen {
+    filter: drop-shadow(-7px 4px #A9ACD6);
+}
+
+.orbShadowBlue {
+    filter: drop-shadow(4px 6px #FFB2B3);
+}
+
+/* Below this width, right/bottom-anchored orbs (yellow, blue) stop scaling in step
+   with left/top-anchored ones (red, green) — vh-based right/bottom offsets don't
+   track viewport width at all, so as width shrinks the right-anchored orbs drift
+   left relative to the left-anchored ones, eventually overlapping and even
+   inverting order (verified directly: at 400px wide, yellow's left edge ends up
+   left of red's). Switching everything to left/top here keeps left-to-right and
+   top-to-bottom order guaranteed by construction instead of by accident.
+   Throughout this whole range the orbs are already pinned at their minimum sizes
+   (home_page.tsx's clampPx floors — 180px red, 280px yellow, 230px green, 195px
+   blue — kick in at 700px already), so each pair's combined width (180+12+280=472px
+   for red+yellow, 230+12+195=437px for green+blue) is a fixed constant here, not
+   just a value that happens to hold at one width. Centering each pair as a unit —
+   rather than pinning to a fixed left margin — means any overflow past a narrow
+   viewport's edges (the pair widths themselves can exceed very small screens, e.g.
+   phones under ~470px) is split evenly on both sides instead of piling up on the
+   right, which reads as more intentional than a lopsided cutoff. */
+@media (max-width: 700px) {
+    .redOrb {
+        left: calc((100vw - 472px) / 2);
+        top: 2vh;
+    }
+    .yellowOrb {
+        top: -2.5vh;
+        right: auto;
+        left: calc((100vw - 472px) / 2 + 192px);
+    }
+    .greenOrb {
+        bottom: 8vh;
+        left: calc((100vw - 437px) / 2);
+    }
+    .blueOrb {
+        bottom: 3vh;
+        right: auto;
+        left: calc((100vw - 437px) / 2 + 242px);
+    }
+}
+
+.sliders {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
 }
 
 .mainText {
@@ -51,6 +119,11 @@
     align-items: center;
     justify-content: center;
     margin-top: 23.5vh;
+    /* Single source of truth for the text block's responsive width — .nameStack
+       uses it directly, and the blob's width (set in home_page.tsx) derives from
+       it too, so the two stay proportionally consistent at every viewport size
+       instead of scaling on two separate, driftable formulas. */
+    --text-block-width: clamp(320px, 90vw, 900px);
 }
 
 .blobMask {
@@ -65,20 +138,23 @@
 .nameStack {
     position: relative;
     z-index: 1;
-    width: min(90vw, 900px);
+    width: var(--text-block-width);
     height: auto;
     overflow: visible;
 }
 
 .svgNameText {
     font-family: var(--font-new-amsterdam);
+    /* This is an SVG user-space size (matching the 900-wide viewBox above), not a
+       real CSS px value — it already scales with .nameStack's own responsive width,
+       so it doesn't need a clamp() of its own. */
     font-size: 160px;
 }
 
 .subtitleSection {
     position: relative;
     display: flex;
-    margin-top: 40px;
+    margin-top: clamp(24px, 2.5vw, 56px);
 }
 
 .subtitle {
@@ -86,5 +162,5 @@
     color: var(--main-green);
     text-align: center;
 
-    font-size: 40px;
+    font-size: clamp(24px, 2.5vw, 48px);
 }

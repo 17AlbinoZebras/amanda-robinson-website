@@ -2,14 +2,187 @@
     position: relative;
 }
 
-.sliderLabel{
+/* container-type: size lets every child below use cqw/cqh (% of THIS element's
+   own rendered width/height) instead of JS computing pixel values from the
+   width/height props — sizing stays correct at any width/height passed in,
+   with no recalculation needed. */
+.slider {
+    position: absolute;
+    container-type: size;
+}
+
+/* --stroke-width is set inline (per slider instance, since it depends on that
+   slider's own stroke calibration) on .slider itself and inherited down to
+   these three. It has to stay a real px value computed in JS rather than a
+   fixed cqh fraction because ClippedVector's own stroke rendering (the rect's
+   border width, and the orb's clip-path outline) needs a literal pixel number
+   — see mask_functions.tsx. Reading that same value back here via var() keeps
+   this positioning math and ClippedVector's own sizing using one source of
+   truth instead of two independently-maintained numbers. */
+.rectWrapper {
+    position: absolute;
+    top: calc(-1 * var(--stroke-width));
+}
+
+.orbWrapper {
+    position: absolute;
+    top: calc(-1 * var(--stroke-width));
+}
+
+.orbWrapperLeft {
+    left: calc(-50cqh - var(--stroke-width));
+}
+
+.orbWrapperRight {
+    left: calc(100cqw - 50cqh - var(--stroke-width));
+}
+
+.sliderLabel {
     position: absolute;
     display: flex;
     align-items: center;
-    /* justify-content: center; */
     text-align: center;
+    width: 100%;
+    height: 80cqh;
+    /* Centers the 80cqh-tall label in the 100cqh-tall slider — the remaining
+       20cqh split evenly, 10cqh above and below. */
+    top: 10cqh;
 }
 
 .sliderLabelText {
     position: relative;
+    width: calc(100cqw - 50cqh - var(--stroke-width));
+}
+
+.labelOrbLeft {
+    left: 50cqh;
+}
+
+.labelOrbRight {
+    left: 0;
+}
+
+/* Idiqlat's font-size is a plain fraction of the label's own height. New
+   Amsterdam can't be — see .labelFontNewAmsterdam below. */
+.labelFontIdiqlat {
+    font-size: 26cqh;
+}
+
+/* New Amsterdam is unicase (x-height ~= cap-height), while Idiqlat's x-height
+   is only ~75% of its cap-height — so New Amsterdam needs a size boost to read
+   as the same visual size as Idiqlat at a given px. Calibrated by eye at three
+   (Idiqlat-equivalent px, New Amsterdam px) pairs: (50, 65), (96, 352/3),
+   (128, 512/3). The boost isn't one line across all three points — the
+   (50,65)-to-(96,352/3) slope is 157/138, but (96,352/3)-to-(128,512/3) is a
+   steeper 5/3 — so this is two line segments joined at 96px:
+     seg1(x) = (157/138)x + 560/69   (fits (50,65) and (96, 352/3))
+     seg2(x) = (5/3)x - 128/3        (fits (96, 352/3) and (128, 512/3))
+   Since seg2 is the steeper of the two and they're equal at x=96, max(seg1(x),
+   seg2(x)) is exactly the original piecewise selection for every x — no
+   conditional needed, just their max(). x is Idiqlat's own font-size (26cqh,
+   see .labelFontIdiqlat above), substituted into both segments: */
+.labelFontNewAmsterdam {
+    font-size: max(calc(29.57971cqh + 8.11594px), calc(43.33333cqh - 42.66667px));
+}
+
+/* ORBS — mask-size is a straightforward % of the orb's own box (CSS resolves
+   this the plain way, box_dimension * percent), so these numbers are identical
+   to the old maskSize props. mask-position isn't as direct: CSS resolves a
+   position percentage as pct * (box_size - image_size), the "aligned point"
+   formula, rather than pct * image_size like the old JS math did — so these
+   are NOT the old left/bottom percentages, they're the equivalent native
+   values, derived from the rendered result so the look is pixel-identical. */
+.orbRed {
+    --mask-size: auto 130%;
+    --mask-position: 24.3757% 100%;
+}
+
+.orbYellow {
+    --mask-size: auto 125%;
+}
+
+.orbGreen {
+    --mask-size: auto 128.5%;
+    --mask-position: 6.5289% 66.1842%;
+}
+
+.orbBlue {
+    --mask-size: auto 150%;
+}
+
+/* RECTANGLES — red/yellow need no class, they use the default mask-size: contain. */
+.rectGreen {
+    --mask-size: auto 105%;
+}
+
+.rectBlue {
+    --mask-size: auto 100%;
+    --mask-repeat: repeat-x;
+}
+
+/* BORDERS — width comes from --stroke-width (see .rectWrapper above), so it
+   always matches the orb's own stroke thickness for the same slider instance. */
+.sliderBorder {
+    box-sizing: content-box;
+    border-top: var(--stroke-width) solid var(--outline-color);
+    border-bottom: var(--stroke-width) solid var(--outline-color);
+}
+
+.borderRed {
+    --outline-color: #B4CAC1;
+}
+
+.borderYellow {
+    --outline-color: var(--main-light);
+}
+
+.borderGreen {
+    --outline-color: #A9ACD6;
+}
+
+.borderBlue {
+    --outline-color: #FFB2B3;
+}
+
+.topSlider {
+    top: 10vh;
+}
+
+.bottomSlider {
+    bottom: 10vh;
+}
+
+/* No position: relative here on purpose — .allSliders is only 285px tall
+   (its own height prop), while .topSlider/.bottomSlider's top/bottom: 10vh is
+   meant to be measured from the viewport, not from this box. Leaving
+   .allSliders unpositioned lets .slider fall through to the next positioned
+   ancestor up (.sliders in home_page.module.css, which spans the full
+   viewport) as its containing block, same as before this file's slideLeft/
+   slideRight change. */
+
+/* Docks the slider flush against the edge, then shifts it fully past that edge
+   by its own width via transform — translateX's percentage is relative to the
+   element's own box (unlike left/right, which resolve against the containing
+   block), so this hides it off-screen without any JS needing to know the
+   slider's actual pixel width. The same property is what a later :hover rule
+   (e.g. transform: translateX(0)) would use to slide it back into view, for
+   the same reason. */
+.slideLeft {
+    left: 0;
+    transform: translateX(-100%);
+    transition: all 300ms;
+}
+
+.slideLeft:hover {
+    transform: translateX(0%);
+}
+
+.slideRight {
+    right: 0;
+    transform: translateX(100%);
+    transition: all 400ms;
+}
+
+.slideRight:hover {
+    transform: translateX(0%);
 }

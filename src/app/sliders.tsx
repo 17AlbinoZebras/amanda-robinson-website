@@ -17,12 +17,10 @@ type MaskProps = {
     shapeColor?: string;
     src: string;
     maskColor: string;
-    maskSize?: string;
-    top?: SizeValue;
-    right?: SizeValue;
-    bottom?: SizeValue;
-    left?: SizeValue;
-    repeat?: boolean | "x" | "y";
+    // Applied to the tinted vector itself — sets --mask-size/--mask-position/
+    // --mask-repeat via CSS (see the .orbRed/.rectGreen-style classes in
+    // sliders.module.css) instead of computing them as inline styles.
+    maskClassName?: string;
 };
 
 const sliderPaths = {
@@ -30,19 +28,6 @@ const sliderPaths = {
     yellow: "/masks/Yellow-Memphis.svg",
     green: "/masks/Green-Memphis.svg",
     blue: "/masks/Blue-Squiggles.svg"
-}
-
-// Calibrated by eye at three (Idiqlat, New Amsterdam) px sizes: (128, 512/3) and
-// (96, 352/3) from the 96pt/128pt and 72pt/88pt pairs, plus (50, 65). The slope
-// between the first two (5/3) doesn't match the slope down to the third (157/138)
-// — New Amsterdam needs proportionally less of a boost at smaller sizes — so this
-// is two line segments, each exact through its pair of points and joined
-// continuously at Idiqlat=96px, rather than one line forced through all three.
-// Below 50px / above 128px, each segment just continues its own slope.
-function newAmsterdamFontSize(idiqlatPx: number): number {
-  return idiqlatPx <= 96
-    ? (157 / 138) * idiqlatPx + 560 / 69  // fits (50, 65) and (96, 352/3)
-    : (5 / 3) * idiqlatPx - 128 / 3       // fits (96, 352/3) and (128, 512/3)
 }
 
 export const sliderColors = {
@@ -55,7 +40,7 @@ export const sliderColors = {
 
 // ORBS
 
-function Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor, src, maskColor, ...vectorProps}}: {orbProps: OrbProps, maskProps: MaskProps}) {
+function Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor, src, maskColor, maskClassName}}: {orbProps: OrbProps, maskProps: MaskProps}) {
     return (
         <ClippedVector
             shape="circle(50% at 50% 50%)"
@@ -66,32 +51,32 @@ function Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, mask
             strokeColor={strokeColor}
             src={src}
             color={maskColor}
+            className={maskClassName}
             frameClassName={className}
             frameStyle={style}
-            {...vectorProps}
         />
     )
 }
 
 export function RedOrb({size, className, style, strokeWidth, strokeColor}: OrbProps) {
     const colors = sliderColors.red
-    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.base, src: sliderPaths.red, maskColor: colors.mask, maskSize: "130%", left: "-15%", bottom: "0%" }})
+    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.base, src: sliderPaths.red, maskColor: colors.mask, maskClassName: styles.orbRed}})
 }
 
 export function YellowOrb({size, className, style, strokeWidth, strokeColor}: OrbProps) {
     const colors = sliderColors.yellow
-    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.base, src: sliderPaths.yellow, maskColor: colors.mask, maskSize: "125%" }})
+    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.base, src: sliderPaths.yellow, maskColor: colors.mask, maskClassName: styles.orbYellow}})
 }
 
 export function GreenOrb({size, className, style, strokeWidth, strokeColor}: OrbProps) {
     const colors = sliderColors.green
-    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.base, src: sliderPaths.green, maskColor: colors.mask, maskSize: "128.5%", left: "-4%", bottom: "-7.5%" }})
+    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.base, src: sliderPaths.green, maskColor: colors.mask, maskClassName: styles.orbGreen}})
 }
 
 export function BlueOrb({size, className, style, strokeWidth, strokeColor}: OrbProps) {
     const colors = sliderColors.blue
     // repeat intentionally omitted — the orb stays as-is even when the rect tiles.
-    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: { shapeColor: colors.base, src: sliderPaths.blue, maskColor: colors.mask, maskSize: "150%" }})
+    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.base, src: sliderPaths.blue, maskColor: colors.mask, maskClassName: styles.orbBlue}})
 }
 
 type RectProps = {
@@ -103,13 +88,8 @@ type RectProps = {
     strokeColor?: string;
 };
 
-type LabelProps = {
-    labelText?: string;
-    labelStyle?: CSSProperties;
-}
-
 // RECTANGLES
-function SliderRect({rectProps: {width, height, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor, src, maskColor, ...vectorProps}}: {rectProps: RectProps, maskProps: MaskProps}) {
+function SliderRect({rectProps: {width, height, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor, src, maskColor, maskClassName}}: {rectProps: RectProps, maskProps: MaskProps}) {
     return (
         <div className={styles.sliderRect}>
             <ClippedVector
@@ -121,9 +101,9 @@ function SliderRect({rectProps: {width, height, className, style, strokeWidth, s
                 strokeColor={strokeColor}
                 src={src}
                 color={maskColor}
+                className={maskClassName}
                 frameClassName={className}
                 frameStyle={style}
-                {...vectorProps}
             />
         </div>
     )
@@ -141,64 +121,64 @@ export function YellowSliderRect({width, height, className, style, strokeWidth, 
 
 export function GreenSliderRect({width, height, className, style, strokeWidth, strokeColor}: RectProps) {
     const colors = sliderColors.green
-    return SliderRect({rectProps: {width, height, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.label, src: sliderPaths.green, maskColor: colors.mask, maskSize: "105%"}})
+    return SliderRect({rectProps: {width, height, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.label, src: sliderPaths.green, maskColor: colors.mask, maskClassName: styles.rectGreen}})
 }
 
 export function BlueSliderRect({width, height, className, style, strokeWidth, strokeColor}: RectProps) {
     const colors = sliderColors.blue
-    // repeat: "x" is baked in here — a fixed characteristic of this rect's own look,
-    // same as maskSize is for the orbs above, not something callers configure.
-    return SliderRect({rectProps: {width, height, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.label, src: sliderPaths.blue, maskColor: colors.mask, maskSize: "100%", repeat: "x"}})
+    // repeat-x is baked into .rectBlue — a fixed characteristic of this rect's own
+    // look, same as maskSize is for the orbs above, not something callers configure.
+    return SliderRect({rectProps: {width, height, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.label, src: sliderPaths.blue, maskColor: colors.mask, maskClassName: styles.rectBlue}})
 }
 
 
-function Slider(width: string, height: string, rect: any, orb: any, orbSide: string, orbStrokeWidth: number, { labelText, labelStyle }: LabelProps) {
-    // split string after last number digit
-    const heightParts = height.split(/(?<=\d)(?!\d|\.)|(?<=\d\.\d)(?!\d)/)
-    // heightParts[0] is the number
-    const heightVal = parseFloat(heightParts[0])
-    // heightParts[1] is the units
-    const heightUnits = heightParts[1]
-    const labelHeight = (heightVal*0.8)
-    const baseFontHeight = (labelHeight*0.325) // calibrated for Idiqlat; New Amsterdam is derived from this below
-    const fontHeight = labelStyle?.fontFamily === "var(--font-new-amsterdam)"
-        ? newAmsterdamFontSize(baseFontHeight)
-        : baseFontHeight
-    const labelStyles = {
-        ...labelStyle,
-        width: width,
-        height: labelHeight + heightUnits,
-        fontSize: fontHeight + heightUnits,
-        top: heightVal * 0.15
-    }
-    
-    const widthVal = parseFloat(width.split(/(?<=\d)(?!\d|\.)|(?<=\d\.\d)(?!\d)/)[0])
-    const orbRadius = heightVal/2
-    // position the center of the circle at the edge of the slider rectangle
-    let orbPosition = 0 - orbRadius
-    let labelTextMargin = orbRadius
-    if (orbSide === "right") {
-        orbPosition += widthVal
-        labelTextMargin = 0
-    }
-    // The orb's stroke grows its box by orbStrokeWidth on every side without moving
-    // where its left edge is anchored, which shifts its visual center by that same
-    // amount. Shifting the anchor left by orbStrokeWidth keeps the center in place
-    // regardless of which edge (left/right) it's centered on.
-    orbPosition -= orbStrokeWidth
+type SliderProps = {
+    width: string;
+    height: string;
+    className?: string;
+    style?: CSSProperties;
+    strokeWidth?: SizeValue;
+    strokeColor?: string;
+    sliderClassName?: string;
+    sliderStyle?: CSSProperties;
+};
+
+type LabelProps = {
+    labelText?: string;
+    labelStyle?: CSSProperties;
+}
+
+function Slider(width: string, height: string, rect: React.ReactNode, orb: React.ReactNode, orbSide: "left" | "right", orbStrokeWidth: SizeValue, { labelText, labelStyle }: LabelProps, sliderClassName?: string, sliderStyle?: CSSProperties) {
+    // Custom properties don't get React's automatic px-suffixing for numbers
+    // (that only applies to known CSS properties), so a bare number needs "px"
+    // appended explicitly here.
+    const strokeWidthCss = typeof orbStrokeWidth === "number" ? `${orbStrokeWidth}px` : orbStrokeWidth
+
+    const sliderStyles = {
+        ...sliderStyle,
+        height,
+        width,
+        "--stroke-width": strokeWidthCss,
+    } as CSSProperties
+
+    const fontClassName = labelStyle?.fontFamily === "var(--font-new-amsterdam)"
+        ? styles.labelFontNewAmsterdam
+        : styles.labelFontIdiqlat
+    const labelSideClassName = orbSide === "left" ? styles.labelOrbLeft : styles.labelOrbRight
+    const orbWrapperSideClassName = orbSide === "left" ? styles.orbWrapperLeft : styles.orbWrapperRight
 
     return (
-        <div>
-            <div style={{position: "absolute"}}>{rect}</div>
-            <div className={styles.sliderLabel} style={labelStyles}>
-                <span className={styles.sliderLabelText} style={{width: (widthVal - orbRadius - orbStrokeWidth + heightUnits), left: labelTextMargin}}>{labelText}</span>
+        <div className={`${styles.slider} ${sliderClassName}`} style={sliderStyles}>
+            <div className={styles.rectWrapper}>{rect}</div>
+            <div className={`${styles.sliderLabel} ${fontClassName}`} style={labelStyle}>
+                <span className={`${styles.sliderLabelText} ${labelSideClassName}`}>{labelText}</span>
             </div>
-            <div style={{position: "absolute", left: orbPosition + heightUnits}}>{orb}</div>
+            <div className={`${styles.orbWrapper} ${orbWrapperSideClassName}`}>{orb}</div>
         </div>
     )
 }
 
-export function RedSlider({width, height, className, style}: RectProps) {
+export function RedSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle}: SliderProps) {
     const colors = sliderColors.red
     const heightParts = height.split(/(?<=\d)(?!\d|\.)|(?<=\d\.\d)(?!\d)/)
     // heightParts[0] is the number
@@ -206,86 +186,95 @@ export function RedSlider({width, height, className, style}: RectProps) {
     // heightParts[1] is the units
     const heightUnits = heightParts[1]
     const strokeSizeVal = heightVal*0.05
-    const strokeSize = strokeSizeVal + heightUnits
+    const strokeSize = (strokeWidth != undefined) ? strokeWidth : strokeSizeVal + heightUnits
 
-    // The rect only wants a stroke on its top/bottom edges (not the sides), which a
-    // plain border on the unclipped outer wrapper handles directly — no need for
-    // ClippedVector's general (all-sides) strokeWidth/strokeColor mechanism here.
+    // The rect only wants a stroke on its top/bottom edges (not the sides), which
+    // .sliderBorder (a plain border on the unclipped outer wrapper) handles
+    // directly — no need for ClippedVector's general (all-sides) strokeWidth/
+    // strokeColor mechanism here.
     const rect = RedSliderRect({
-        width, height, className,
-        // boxSizing: "content-box" overrides the global border-box reset for just this
-        // element, so the border adds onto the outside of width/height (400x200 stays
-        // the full pattern area) instead of eating into it.
-        style: {
-            ...style,
-            boxSizing: "content-box",
-            borderTop: `${strokeSize} solid ${colors.outline}`,
-            borderBottom: `${strokeSize} solid ${colors.outline}`,
-        },
+        width, height, style,
+        className: [styles.sliderBorder, styles.borderRed, className].filter(Boolean).join(" "),
     })
     const orb = RedOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline})
-    return Slider(width, height, rect, orb, "right", strokeSizeVal, {labelText: "Projects", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.label}})
+
+    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: "Projects", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle)
 }
 
-export function YellowSlider({width, height, className, style}: RectProps) {
+export function YellowSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle}: SliderProps) {
     const colors = sliderColors.yellow
     const heightParts = height.split(/(?<=\d)(?!\d|\.)|(?<=\d\.\d)(?!\d)/)
     const heightVal = parseFloat(heightParts[0])
     const heightUnits = heightParts[1]
     const strokeSizeVal = heightVal*0.05
-    const strokeSize = strokeSizeVal + heightUnits
+    const strokeSize = (strokeWidth != undefined) ? strokeWidth : strokeSizeVal + heightUnits
 
     const rect = YellowSliderRect({
-        width, height, className,
-        style: {
-            ...style,
-            boxSizing: "content-box",
-            borderTop: `${strokeSize} solid ${colors.outline}`,
-            borderBottom: `${strokeSize} solid ${colors.outline}`,
-        },
+        width, height, style,
+        className: [styles.sliderBorder, styles.borderYellow, className].filter(Boolean).join(" "),
     })
     const orb = YellowOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline})
-    return Slider(width, height, rect, orb, "left", strokeSizeVal, {labelText: "About Me", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.label}})
+    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: "About Me", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle)
 }
 
-export function GreenSlider({width, height, className, style}: RectProps) {
+export function GreenSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle}: SliderProps) {
     const colors = sliderColors.green
     const heightParts = height.split(/(?<=\d)(?!\d|\.)|(?<=\d\.\d)(?!\d)/)
     const heightVal = parseFloat(heightParts[0])
     const heightUnits = heightParts[1]
     const strokeSizeVal = heightVal*0.05
-    const strokeSize = strokeSizeVal + heightUnits
+    const strokeSize = (strokeWidth != undefined) ? strokeWidth : strokeSizeVal + heightUnits
 
     const rect = GreenSliderRect({
-        width, height, className,
-        style: {
-            ...style,
-            boxSizing: "content-box",
-            borderTop: `${strokeSize} solid ${colors.outline}`,
-            borderBottom: `${strokeSize} solid ${colors.outline}`,
-        },
+        width, height, style,
+        className: [styles.sliderBorder, styles.borderGreen, className].filter(Boolean).join(" "),
     })
     const orb = GreenOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline})
-    return Slider(width, height, rect, orb, "right", strokeSizeVal, {labelText: "Experience", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.base}})
+    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: "Experience", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle)
 }
 
-export function BlueSlider({width, height, className, style}: RectProps) {
+export function BlueSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle}: SliderProps) {
     const colors = sliderColors.blue
     const heightParts = height.split(/(?<=\d)(?!\d|\.)|(?<=\d\.\d)(?!\d)/)
     const heightVal = parseFloat(heightParts[0])
     const heightUnits = heightParts[1]
     const strokeSizeVal = heightVal*0.05
-    const strokeSize = strokeSizeVal + heightUnits
+    const strokeSize = (strokeWidth != undefined) ? strokeWidth : strokeSizeVal + heightUnits
 
     const rect = BlueSliderRect({
-        width, height, className,
-        style: {
-            ...style,
-            boxSizing: "content-box",
-            borderTop: `${strokeSize} solid ${colors.outline}`,
-            borderBottom: `${strokeSize} solid ${colors.outline}`,
-        },
+        width, height, style,
+        className: [styles.sliderBorder, styles.borderBlue, className].filter(Boolean).join(" "),
     })
     const orb = BlueOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline})
-    return Slider(width, height, rect, orb, "left", strokeSizeVal, {labelText: "Education", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.base}})
+    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: "Education", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle)
+}
+
+
+
+type AllSlidersProps = {
+    height: string;
+    className?: string;
+    style?: CSSProperties;
+};
+
+// Width isn't a caller-facing concept for the slider group — each slider's rect
+// still needs a real pixel width under the hood (ClippedVector's stroke math
+// requires one, same reason strokeWidth does — see Slider() above), so it's
+// derived from height by this fixed ratio instead of being passed in.
+const SLIDER_WIDTH_RATIO = 2
+
+export function AllSliders({height, className, style}: AllSlidersProps) {
+    const heightParts = height.split(/(?<=\d)(?!\d|\.)|(?<=\d\.\d)(?!\d)/)
+    const heightVal = parseFloat(heightParts[0])
+    const heightUnits = heightParts[1]
+    const width = `${heightVal * SLIDER_WIDTH_RATIO}${heightUnits}`
+
+    return (
+        <div className={styles.allSliders} style={{height}}>
+            <RedSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideLeft}`}/>
+            <GreenSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.bottomSlider} ${styles.slideLeft}`}/>
+            <YellowSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideRight}`}/>
+            <BlueSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.bottomSlider} ${styles.slideRight}`}/>
+        </div>
+    )
 }
