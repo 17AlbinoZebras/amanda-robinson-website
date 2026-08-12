@@ -3,14 +3,14 @@
     min-height: 100vh;
     width: 100vw;
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     justify-content: center;
-    background-color: var(--main-beige);
+    background-color: #78A693;
     font-family: var(--font-afacad-flux);
 }
 
 .heading {
     font-family: var(--font-idiqlat);
     font-size: 64px;
-    color: var(--main-green);
+    color: var(--main-light);
 }
