@@ -1,17 +1,56 @@
 .about {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     height: 100vh;
     width: 100vw;
-    /* background-color: #FFE8BB; */
+    /* Safety net — .aboutContent's scale-to-fit (below) is what actually keeps
+       content inside this box; this just guarantees nothing is ever visible
+       past it (e.g. the one frame before useLayoutEffect first runs).
+
+       This used to be overflow-y: auto (an internal scroll for content taller
+       than 100vh) instead of scaling. That made .about a nested scroll
+       container stacked inside the page's own scroll — wheel/trackpad events
+       over it got captured by its own internal scroll first, only chaining to
+       the outer page scroll at its boundary, which is what made scrolling
+       feel sticky. Switched to scale-to-fit specifically to remove that
+       nested scroll container rather than just tune it. (It was tried before
+       and reverted because .about's own scale transform hijacked
+       AllSliders' positioning back when AllSliders rendered inside .about —
+       AllSliders is now rendered separately in page.tsx as position: fixed,
+       so that conflict no longer applies.) */
+    overflow: hidden;
     background-color: #DCDEEF;
 
     font-family: var(--font-afacad-flux);
+}
 
+.aboutBackground {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+}
+
+.aboutContent {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* Matches .about's own width so percentage values inside (e.g.
+       .upperSection's margin-top: 6.5%) keep resolving against the same
+       reference as before — .aboutContent's own natural width would
+       otherwise be auto/shrink-to-fit now that it's absolutely positioned. */
+    width: 100vw;
+    display: flex;
     flex-direction: column;
-    gap: 7.5%;
+    align-items: center;
+    gap: 6.5vh;
+    /* Shrinks the whole section as one unit so it always fits within .about's
+       100vh instead of needing to scroll — home_page.tsx's useScaleToFit
+       measures this element's natural (unscaled) height via scrollHeight and
+       sets --about-scale to min(1, availableHeight / naturalHeight), so
+       content that already fits renders at its normal size and only
+       taller-than-viewport content actually shrinks. translate(-50%, -50%)
+       keeps it centered regardless of scale, since transform-origin stays at
+       the default center. */
+    transform: translate(-50%, -50%) scale(var(--about-scale, 1));
 }
 
 .upperSection {
@@ -19,13 +58,13 @@
     align-items: center;
     position: relative;
 
-    margin-top: 10%;
+    margin-top: 6.5%;
 }
 
 .blurb {
     background-color: var(--main-yellow);
     color: #FEFAF0;
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 500;
 
     width: 50vw;
@@ -61,7 +100,7 @@
     position: relative;
     flex-direction: row;
     gap: 5%;
-    width: 65vw;
+    width: 67.5vw;
     /* margin-left: -2.5%; */
 }
 
@@ -78,23 +117,27 @@
     margin: -2px auto 4px;
 }
 
-.hobbies {
+.education {
     background-color: #A9ACD6;
     color: #FEFAF0;
     padding: 2.5%;
     border-radius: 24px;
-    flex: 1.25;
+    flex: 1.3;
     /* height: 100%; */
     height: fit-content;
 }
 
 .sectionTitle {
     font-family: var(--font-idiqlat);
-    font-size: 22px;
+    font-size: 24px;
 }
 
 .bodyText {
-    font-size: 24px;
+    font-size: 26px;
+}
+
+.education .bodyText {
+    line-height: 1.6;
 }
 
 .bodyText ul {
@@ -110,42 +153,216 @@
     font-family: var(--font-new-amsterdam);
 
     --blob-pink: #FDBFBD;
+}
 
+.homeBackground {
+    position: absolute;
+    width: 100%;
+    height: 100%;
 }
 
 .orbs {
     position: absolute;
     width: 100vw;
     height: 100vh;
+    --delay-animation: 3s
 }
 
+/* ORB ANIMATIONS
+
+   The vertical target below isn't a plain 10vh/-10vh — it has to be, since
+   translate()'s own value is a fixed offset applied on top of the box's
+   natural (pre-scale) center (transform-origin defaults to center, so
+   scale() never moves it — only translate does). A plain 10vh would place
+   the center 10vh from the edge PLUS half the orb's ORIGINAL --orb-size,
+   when it needs to end up half of --slider-height from the edge instead
+   (matching where each slider's own orb actually sits). The horizontal
+   ±50% doesn't need this same correction — every orb here is anchored
+   flush (0) to its own left/right/top/bottom edge with translate() doing
+   only the artistic resting offset, and that combination happens to make
+   ±50% (of the orb's own unscaled width) exactly cancel its natural
+   center's own offset from that edge, regardless of scale. That
+   cancellation is specific to being flush-anchored at 0, though — it's not
+   a general trick to reuse elsewhere without rechecking the math. */
+@keyframes move-red-orb {
+    0% {
+        transform: translate(17vw, 2vh);
+    }
+    75%, 100% {
+        transform: translate(-50%, calc(10vh + var(--slider-height) / 2 - var(--orb-size) / 2)) scale(calc(var(--slider-height) / var(--orb-size)));
+        opacity: 1;
+    }
+}
+@keyframes return-red-orb {
+    0% {
+        transform: translate(22vw, 5vh);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(22vw, 5vh);
+        opacity: 1;
+    }
+}
+@keyframes move-yellow-orb {
+    0% {
+        transform: translate(-13.75vw, -2.5vh);
+    }
+    75%, 100% {
+        transform: translate(50%, calc(10vh + var(--slider-height) / 2 - var(--orb-size) / 2)) scale(calc(var(--slider-height) / var(--orb-size)));
+        opacity: 1;
+    }
+}
+@keyframes return-yellow-orb {
+    0% {
+        transform: translate(-15.75vw, -3.5vh);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-15.75vw, -3.5vh);
+        opacity: 1;
+    }
+}
+@keyframes move-green-orb {
+    0% {
+        transform: translate(5.5vw, -8vh);
+    }
+    75%, 100% {
+        transform: translate(-50%, calc(-10vh - var(--slider-height) / 2 + var(--orb-size) / 2)) scale(calc(var(--slider-height) / var(--orb-size)));
+        opacity: 1;
+    }
+}
+@keyframes return-green-orb {
+    0% {
+        transform: translate(12vw, -8vh);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(12vw, -8vh);
+        opacity: 1;
+    }
+}
+@keyframes move-blue-orb {
+    0% {
+        transform: translate(-8.25vw, -3vh);
+    }
+    75%, 100% {
+        transform: translate(50%, calc(-10vh - var(--slider-height) / 2 + var(--orb-size) / 2)) scale(calc(var(--slider-height) / var(--orb-size)));
+        opacity: 1;
+    }
+}
+@keyframes return-blue-orb {
+    0% {
+        transform: translate(-11vw, -3vh);
+        opacity: 0;
+    }
+    100% {
+        transform: translate(-11vw, -3vh);
+        opacity: 1;
+    }
+}
+
+/* Each orb's --orb-size below is clamp(min, preferred + vw-slope, max) —
+   algebraically identical to the old clampPx(referencePx, min, max) JS helper
+   (dampedRatio = 0.2 + 0.8*(vw/1600), so scaled = referencePx*0.2 +
+   referencePx*0.05*<vw-count>), just expressed natively so this is the only
+   place orb size needs to be tuned. It's a named custom property (rather than
+   width/height set directly) so .scaleToSliderHeight below can read it back
+   per-orb to compute a scale ratio. home_page.tsx also reads the real
+   rendered pixel size off these boxes (a ref + resize listener) since the
+   mask inside still needs a literal pixel number — see the note there. */
 .redOrb {
     position: absolute;
-    left: 17vw;
-    top: 2vh;
+    /* left: 17vw; */
+    /* top: 2vh; */
+    transform: translate(17vw, 2vh);
+    --orb-size: clamp(180px, 55px + 13.75vw, 380px);
+    width: var(--orb-size);
+    height: var(--orb-size);
+    animation: move-red-orb 5s ease var(--delay-animation) 1 forwards, return-red-orb 2s ease-out 7.5s 1 forwards;
 }
 
 .yellowOrb {
     position: absolute;
-    top: -2.5vh;
-    right: 25vh;
+    top: 0vh;
+    right: 0vw;
+    transform: translate(-13.75vw, -2.5vh);
+    --orb-size: clamp(280px, 85px + 21.25vw, 580px);
+    width: var(--orb-size);
+    height: var(--orb-size);
+    animation: move-yellow-orb 5s ease var(--delay-animation) 1 forwards, return-yellow-orb 2s ease-out 7.5s 1 forwards;
 }
-@media (max-width: 1200px) {
+/* @media (max-width: 1200px) {
     .yellowOrb {
         right: 15vh;
     }
-}
+} */
 
 .greenOrb {
     position: absolute;
-    bottom: 8vh;
-    left: 10vh;
+    bottom: 0vh;
+    left: 0vw;
+    /* bottom: 8vh;
+    left: 5.5vw; */
+    transform: translate(5.5vw, -8vh);
+    --orb-size: clamp(230px, 70px + 17.5vw, 480px);
+    width: var(--orb-size);
+    height: var(--orb-size);
+    animation: move-green-orb 5s ease var(--delay-animation) 1 forwards, return-green-orb 2s ease-out 7.5s 1 forwards;
 }
 
 .blueOrb {
     position: absolute;
-    bottom: 3vh;
-    right: 15vh;
+    /* bottom: 3vh;
+    right: 8.25vw; */
+    bottom: 0vh;
+    right: 0vw;
+    transform: translate(-8.25vw, -3vh);
+    --orb-size: clamp(195px, 60px + 15vw, 410px);
+    width: var(--orb-size);
+    height: var(--orb-size);
+    animation: move-blue-orb 5s ease var(--delay-animation) 1 forwards, return-blue-orb 2s ease-out 7.5s 1 forwards;
+}
+
+/* Scales the orb down (or up) to end at exactly --slider-height tall — apply
+   this alongside your own trigger (a :hover rule, a class toggled in JS, a
+   @keyframes 100% block, ...) to combine with wherever you're moving it to.
+   transform-origin defaults to center, so pair with a translate that targets
+   the slider orb's center if that's what you're matching position to. */
+.scaleToSliderHeight {
+    transform: scale(calc(var(--slider-height) / var(--orb-size)));
+}
+
+@keyframes remove-red-orb-shadow {
+    0%, 50% {
+        filter: drop-shadow(-6px -5px #B4CAC1);
+    }
+    100% {
+        filter: drop-shadow(none);
+    }
+}
+@keyframes remove-yellow-orb-shadow {
+    0%, 50% {
+        filter: drop-shadow(6px -4px var(--main-light));
+    }
+    100% {
+        filter: drop-shadow(none);
+    }
+}
+@keyframes remove-green-orb-shadow {
+    0%, 50% {
+        filter: drop-shadow(-7px 4px #A9ACD6);
+    }
+    100% {
+        filter: drop-shadow(none);
+    }
+}
+@keyframes remove-blue-orb-shadow {
+    0%, 50% {
+        filter: drop-shadow(4px 6px #FFB2B3);
+    }
+    100% {
+        filter: drop-shadow(none);
+    }
 }
 
 /* Drop-shadow colors match each orb's own outline color (sliderColors.X.outline
@@ -154,18 +371,22 @@
    mask_functions.tsx), not on the orb component itself. */
 .orbShadowRed {
     filter: drop-shadow(-6px -5px #B4CAC1);
+    animation: remove-red-orb-shadow 6s ease 1 backwards;
 }
 
 .orbShadowYellow {
     filter: drop-shadow(6px -4px var(--main-light));
+    animation: remove-yellow-orb-shadow 6s ease 1 backwards;
 }
 
 .orbShadowGreen {
     filter: drop-shadow(-7px 4px #A9ACD6);
+    animation: remove-green-orb-shadow 6s ease 1 backwards;
 }
 
 .orbShadowBlue {
     filter: drop-shadow(4px 6px #FFB2B3);
+    animation: remove-blue-orb-shadow 6s ease 1 backwards;
 }
 
 /* Below this width, right/bottom-anchored orbs (yellow, blue) stop scaling in step
@@ -203,12 +424,6 @@
         right: auto;
         left: calc((100vw - 437px) / 2 + 242px);
     }
-}
-
-.sliders {
-    position: absolute;
-    height: 100vh;
-    width: 100vw;
 }
 
 .mainText {

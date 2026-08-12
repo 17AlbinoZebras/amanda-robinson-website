@@ -1,105 +1,127 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import styles from './styles/home_page.module.css'
 import { clipToShape, TintedVector } from './mask_functions'
-import { GreenOrb, RedOrb, YellowOrb, BlueOrb, RedSliderRect, RedSlider, YellowSlider, GreenSlider, BlueSlider, AllSliders } from './sliders'
+import { GreenOrb, RedOrb, YellowOrb, BlueOrb } from './sliders'
+
+// Shrinks the ref'd element (as one unit, via a CSS custom property the
+// caller applies through a transform: scale()) so it always fits within the
+// viewport height instead of needing to scroll. scrollHeight is a layout
+// metric — unaffected by the element's own transform — so this reads the
+// content's true/natural height regardless of whatever scale is already
+// applied, and never scales UP past 1, so content that already fits renders
+// at its normal size. useLayoutEffect (not useEffect) so the correct scale is
+// set before the first paint, rather than flashing at natural size for a
+// frame first.
+function useScaleToFit<T extends HTMLElement>(cssVar: string) {
+    const ref = useRef<T>(null)
+
+    useLayoutEffect(() => {
+        const measure = () => {
+            if (!ref.current) return
+            const scale = Math.min(1, window.innerHeight / ref.current.scrollHeight)
+            ref.current.style.setProperty(cssVar, `${scale}`)
+        }
+        measure()
+        window.addEventListener('resize', measure)
+        return () => window.removeEventListener('resize', measure)
+    }, [cssVar])
+
+    return ref
+}
 
 function AboutSection() {
-    
+    const contentRef = useScaleToFit<HTMLDivElement>('--about-scale')
+
     return (
         <div className={styles.about}>
-            <div className={styles.upperSection}>
-                <div className={styles.blurb}>
-                    <span>Hi! I&#39;m a full-stack web developer.<br/>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span>
+            {/* Outside .aboutContent on purpose — this is a full-bleed 100vw/100vh
+                backdrop, so it shouldn't shrink along with the scaled content. */}
+            <TintedVector src="/masks/Green-Memphis.svg" color='#D4D5E9' width='100vw' height='100vh' maskSize="cover" className={styles.aboutBackground}/>
+            <div className={styles.aboutContent} ref={contentRef}>
+                <div className={styles.upperSection}>
+                    <div className={styles.blurb}>
+                        <span>Hi! I&#39;m Amanda. I build things that make people&#39;s<br/>lives easier. I am energized by untangling complex problems and turning creative ideas into technology people can actually use.</span>
+                    </div>
+                    <div className={styles.headshotContainer}><img src="headshot.jpg" className={styles.headshot}/></div>
                 </div>
-                <div className={styles.headshotContainer}><img src="headshot.jpg" className={styles.headshot}/></div>
-            </div>
-            <div className={styles.lowerSection}>
-                <div className={styles.techStacks}>
-                    <span className={styles.sectionTitle}>Technology Stacks</span>
-                    <br/>
-                    <div className={styles.bodyText}>
-                        <b>Languages: </b>
-                        <p>Java, Python, TypeScript, HTML/CSS, SQL, C++, C</p>
-                        <b>Frameworks/Libraries: </b>
-                        <p>React, Bootstrap, Next.js, Node.js/Express, PySide6</p>
-                        <b>Tools: </b>
-                        <p>Git, VS Code, Claude Code, Warp, Linux</p>
-                        <b>Other: </b>
-                        <p>MySQL, PostgreSQL, SQL Server, AWS</p>
+                <div className={styles.lowerSection}>
+                    <div className={styles.techStacks}>
+                        <span className={styles.sectionTitle}>Technology Stacks</span>
+                        <br/>
+                        <div className={styles.bodyText}>
+                            <b>Languages: </b>
+                            <p>Java, Python, TypeScript, HTML/CSS, SQL, C++, C</p>
+                            <b>Frameworks/Libraries: </b>
+                            <p>React, Bootstrap, Next.js, Node.js/Express, PySide6</p>
+                            <b>Tools: </b>
+                            <p>Git, VS Code, Claude Code, Warp, Linux</p>
+                            <b>Other: </b>
+                            <p>MySQL, PostgreSQL, SQL Server, AWS</p>
+                        </div>
+                    </div>
+                    <div className={styles.education}>
+                        <span className={styles.sectionTitle}>Education</span>
+                        <br/>
+                        <div className={styles.bodyText}>
+                            <b>Worcester Polytechnic Institute</b>
+                            <p>Expected Graduation: May 2028</p>
+                            <p>B.S. Computer Science</p>
+                            <p>Minor in Economics</p>
+                        </div>
                     </div>
                 </div>
-                <div className={styles.hobbies}>
-                    <span className={styles.sectionTitle}>Education</span>
-                    <br/>
-                    <div className={styles.bodyText}>
-                        <b>Worcester Polytechnic Institute</b>
-                        <p>Expected Graduation: May 2028</p>
-                        <p>B.S. Computer Science</p>
-                        <p>Minor in Economics</p>
-                    </div>
-                </div>
             </div>
-            <AllSliders height="250px"/>
         </div>
     )
 }
 
-function Footer() {
 
-}
-
-
-// The width the px sizes below were originally tuned at. Used both as the
-// SSR-safe default (before the client can measure the real window) and as the
-// basis for converting each reference px size into an equivalent vw fraction.
-const REFERENCE_VIEWPORT_WIDTH = 1600
-
-export default function HomePage() {
-    const [viewportWidth, setViewportWidth] = useState(REFERENCE_VIEWPORT_WIDTH)
+// Each orb's size is now defined purely in CSS (see .redOrb etc. in
+// home_page.module.css) — this reads back the real rendered pixel width of
+// that box via a ref, since TintedVector still needs an actual number (not a
+// CSS clamp() string) to size the mask so it fills the frame correctly. The
+// resize listener keeps it in sync as the CSS clamp() value changes; `initial`
+// is just the SSR-safe/first-paint guess (each orb's own clamp() preferred
+// value) before the ref can be measured.
+function useElementWidth<T extends HTMLElement>(initial: number) {
+    const ref = useRef<T>(null)
+    const [width, setWidth] = useState(initial)
 
     useEffect(() => {
-        const updateWidth = () => setViewportWidth(window.innerWidth)
-        updateWidth()
-        window.addEventListener('resize', updateWidth)
-        return () => window.removeEventListener('resize', updateWidth)
+        const measure = () => {
+            if (ref.current) setWidth(ref.current.getBoundingClientRect().width)
+        }
+        measure()
+        window.addEventListener('resize', measure)
+        return () => window.removeEventListener('resize', measure)
     }, [])
 
-    // How much of the "natural" 1:1 size change actually happens as the viewport
-    // moves away from REFERENCE_VIEWPORT_WIDTH — 1 is full linear scaling, 0 is no
-    // scaling at all. 0.8 is a gentle ~20% reduction in sensitivity (e.g. the red
-    // orb at 1200px goes to 220px instead of a full-sensitivity 206px).
-    const SCALE_DAMPING = 0.8
+    return [ref, width] as const
+}
 
-    // Scales referencePx (its rendered size at REFERENCE_VIEWPORT_WIDTH) with the
-    // current viewport width, clamped to [min, max] so it doesn't get absurdly
-    // small/large at extreme widths. This does the same job as CSS clamp(), but as
-    // a real number rather than a browser-evaluated string — TintedVector's
-    // maskSize/position percentages (used by all four orbs and the blob below) need
-    // frameWidth/frameHeight to resolve to an actual pixel number to compute
-    // correctly; a CSS clamp() string can't be parsed as one.
-    const clampPx = (referencePx: number, min: number, max: number) => {
-        const widthRatio = viewportWidth / REFERENCE_VIEWPORT_WIDTH
-        const dampedRatio = 1 + SCALE_DAMPING * (widthRatio - 1)
-        const scaled = referencePx * dampedRatio
-        return Math.min(max, Math.max(min, scaled))
-    }
+export default function HomePage() {
+    const [redOrbRef, redOrbWidth] = useElementWidth<HTMLDivElement>(275)
+    const [yellowOrbRef, yellowOrbWidth] = useElementWidth<HTMLDivElement>(425)
+    const [greenOrbRef, greenOrbWidth] = useElementWidth<HTMLDivElement>(350)
+    const [blueOrbRef, blueOrbWidth] = useElementWidth<HTMLDivElement>(300)
 
     return (
         <div className={styles.home}>
+            <TintedVector src="/masks/cow-blobs.svg" color='#F9F3EB' repeat maskSize="70%" className={styles.homeBackground}/>
             <div className={styles.orbs}>
-                <div className={styles.redOrb}>
-                    <RedOrb size={`${clampPx(275, 180, 380)}px`} className={styles.orbShadowRed} />
+                <div className={styles.redOrb} ref={redOrbRef}>
+                    <RedOrb size={`${redOrbWidth}px`} className={styles.orbShadowRed} />
                 </div>
-                <div className={styles.yellowOrb}>
-                    <YellowOrb size={`${clampPx(425, 280, 580)}px`} className={styles.orbShadowYellow} />
+                <div className={styles.yellowOrb} ref={yellowOrbRef}>
+                    <YellowOrb size={`${yellowOrbWidth}px`} className={styles.orbShadowYellow} />
                 </div>
-                <div className={styles.greenOrb}>
-                    <GreenOrb size={`${clampPx(350, 230, 480)}px`} className={styles.orbShadowGreen} />
+                <div className={styles.greenOrb} ref={greenOrbRef}>
+                    <GreenOrb size={`${greenOrbWidth}px`} className={styles.orbShadowGreen} />
                 </div>
-                <div className={styles.blueOrb}>
-                    <BlueOrb size={`${clampPx(300, 195, 410)}px`} className={styles.orbShadowBlue} />
+                <div className={styles.blueOrb} ref={blueOrbRef}>
+                    <BlueOrb size={`${blueOrbWidth}px`} className={styles.orbShadowBlue} />
                 </div>
             </div>
             {/* <div className={styles.sliders}>
