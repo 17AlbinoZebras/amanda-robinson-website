@@ -13,6 +13,13 @@
   --main-light: #FFFFFB;
   --main-dark: #270722;
   --main-beige: #F6EEE4;
+
+  /* Shared by sliders.module.css (.allSliders' own height) and
+     home_page.module.css (.scaleToSliderHeight, so an orb can scale to match)
+     — a true global rather than scoped to one component's ancestor, since
+     AllSliders and the orbs don't reliably share a common styled ancestor
+     (AllSliders currently renders as a sibling of HomePage in page.tsx). */
+  --slider-height: 250px;
 }
 
 @media (prefers-color-scheme: dark) {

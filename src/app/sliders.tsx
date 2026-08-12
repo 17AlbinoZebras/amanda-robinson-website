@@ -1,9 +1,10 @@
 'use client'
-import React, { CSSProperties, useState } from 'react'
+import React, { CSSProperties, useEffect, useRef, useState } from 'react'
 
 import { ClippedVector, SizeValue } from './mask_functions';
 
 import styles from './styles/sliders.module.css'
+import { AppStateTypes } from './page';
 
 type OrbProps = {
     size: string;
@@ -252,7 +253,7 @@ export function BlueSlider({width, height, className, style, strokeWidth, slider
 
 
 type AllSlidersProps = {
-    height: string;
+    appState: AppStateTypes;
     className?: string;
     style?: CSSProperties;
 };
@@ -263,15 +264,40 @@ type AllSlidersProps = {
 // derived from height by this fixed ratio instead of being passed in.
 const SLIDER_WIDTH_RATIO = 2
 
-export function AllSliders({height, className, style}: AllSlidersProps) {
-    const heightParts = height.split(/(?<=\d)(?!\d|\.)|(?<=\d\.\d)(?!\d)/)
-    const heightVal = parseFloat(heightParts[0])
-    const heightUnits = heightParts[1]
-    const width = `${heightVal * SLIDER_WIDTH_RATIO}${heightUnits}`
-    const [neverHovered, setNeverHovered] = useState(true);
+// Slider height is defined once in CSS (--slider-height, set on .home in
+// home_page.module.css) instead of being passed down as a prop, so an orb's
+// scale-to-slider-height transform can read the same single source of truth.
+// This still needs the real rendered pixel number, though — Slider()'s rect
+// and orb both end up inside ClippedVector, which needs a literal pixel
+// height (see mask_functions.tsx), not a CSS custom property string.
+function useElementHeight<T extends HTMLElement>(initial: number) {
+    const ref = useRef<T>(null)
+    const [height, setHeight] = useState(initial)
+
+    useEffect(() => {
+        const measure = () => {
+            if (ref.current) setHeight(ref.current.getBoundingClientRect().height)
+        }
+        measure()
+        window.addEventListener('resize', measure)
+        return () => window.removeEventListener('resize', measure)
+    }, [])
+
+    return [ref, height] as const
+}
+
+export function AllSliders({ appState, className, style } : AllSlidersProps ) {
+    const [allSlidersRef, heightPx] = useElementHeight<HTMLDivElement>(250)
+    const height = `${heightPx}px`
+    const width = `${heightPx * SLIDER_WIDTH_RATIO}px`
+    
+    const neverHovered = appState.neverHovered
+    const setNeverHovered = appState.setNeverHovered
+
+    // Will add code to adjust the sliders based on which page is active. Will also move neverHovered to appState so it stays consistent when users reload or return to the home page
 
     return (
-        <div className={styles.allSliders} style={{height}} onMouseOver={() => setNeverHovered(false)}>
+        <div className={styles.allSliders} ref={allSlidersRef} onMouseOver={() => setNeverHovered(false)}>
             <RedSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideLeft} ${neverHovered ? styles.bounceSlider : ''}`}/>
             <GreenSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.bottomSlider} ${styles.slideLeft}`}/>
             <YellowSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideRight}`}/>

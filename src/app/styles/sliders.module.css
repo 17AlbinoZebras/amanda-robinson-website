@@ -5,9 +5,17 @@
 /* container-type: size lets every child below use cqw/cqh (% of THIS element's
    own rendered width/height) instead of JS computing pixel values from the
    width/height props — sizing stays correct at any width/height passed in,
-   with no recalculation needed. */
+   with no recalculation needed.
+
+   position: fixed (not absolute) — AllSliders now renders outside .home
+   (directly in page.tsx), so there's no longer a sensible positioned ancestor
+   for .topSlider/.bottomSlider's top/bottom: 10vh to be scoped to; without
+   one, absolute positioning falls back to the page's root, landing wherever
+   that happens to put it relative to actual content instead of the viewport.
+   Fixed positioning is always relative to the viewport regardless of scroll
+   or DOM position, which is also what "stick to screen" actually means. */
 .slider {
-    position: absolute;
+    position: fixed;
     container-type: size;
 }
 
@@ -152,13 +160,32 @@
     bottom: 10vh;
 }
 
-/* No position: relative here on purpose — .allSliders is only 285px tall
-   (its own height prop), while .topSlider/.bottomSlider's top/bottom: 10vh is
-   meant to be measured from the viewport, not from this box. Leaving
-   .allSliders unpositioned lets .slider fall through to the next positioned
-   ancestor up (.sliders in home_page.module.css, which spans the full
-   viewport) as its containing block, same as before this file's slideLeft/
-   slideRight change. */
+/* --slider-height is a global custom property (globals.css), read here for
+   this element's own height and by home_page.module.css's
+   .scaleToSliderHeight, so both stay in sync regardless of where either one
+   renders in the tree.
+
+   position: fixed (not static) — .slider (above) is fixed too, so this
+   wrapper's own box no longer needs to participate in anything positionally;
+   without this, it would sit as a real ~250px block in normal document flow
+   (AllSliders now renders directly in page.tsx, not inside any particular
+   section), adding blank scrollable space for no reason. Fixed removes it
+   from flow the same way absolute would, but fixed's viewport-relative
+   default static position happens to be a harmless, out-of-the-way spot;
+   home_page.tsx's ref-based height measurement is unaffected either way. */
+.allSliders {
+    position: fixed;
+    height: var(--slider-height);
+    /* z-index establishes this as its own stacking context, so every .slider
+       inside it (they don't need their own z-index — descendants without one
+       just stack in DOM order within their nearest ancestor's context) is
+       guaranteed to paint above every other stacking context on the page,
+       regardless of DOM order or whatever z-index anything else picks up
+       later. Deliberately high/round rather than tuned against today's other
+       z-index values (.nameStack, .blobMask, ...), so it stays correct even
+       as those change. */
+    z-index: 9999;
+}
 
 /* Docks the slider flush against the edge, then shifts it fully past that edge
    by its own width via transform — translateX's percentage is relative to the
@@ -190,21 +217,30 @@
 
 
 @keyframes slider-bounce {
-  0%, 55%, 100% {
+  0%, 50%, 100% {
     transform: translateX(-100%);
   }
-  10% {
+  7.5% {
     transform: translateX(-97.5%);
   }
-  20% {
+  15% {
     transform: translateX(-100%);
   }
-  40% {
+  30% {
     transform: translateX(-95%);
   }
 }
 
 .bounceSlider {
     display: inline-block;
-    animation: slider-bounce 3s ease infinite;
+    animation: slider-bounce 3s ease 8.5s infinite;
+    /* Promotes this to its own compositor layer up front, instead of the
+       browser deciding whether to do that only once the animation is already
+       running. Without it, an infinitely-repeating transform animation on a
+       position: fixed element whose subtree is expensive to paint (mask-image
+       for the tinted pattern, clip-path for the orb/rect shapes) can end up
+       repainting that whole layer every frame, which competes with the
+       browser's own scroll compositing and is exactly what makes scrolling
+       feel sticky while it's bouncing. */
+    will-change: transform;
 }
