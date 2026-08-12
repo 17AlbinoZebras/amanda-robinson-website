@@ -1,20 +1,22 @@
-.about {
+/* "Overview" (not "about") — this is the summary embedded in the home page,
+   distinct from the standalone, more in-depth /about page. */
+.overview {
     position: relative;
     height: 100vh;
     width: 100vw;
-    /* Safety net — .aboutContent's scale-to-fit (below) is what actually keeps
-       content inside this box; this just guarantees nothing is ever visible
-       past it (e.g. the one frame before useLayoutEffect first runs).
+    /* Safety net — .overviewContent's scale-to-fit (below) is what actually
+       keeps content inside this box; this just guarantees nothing is ever
+       visible past it (e.g. the one frame before useLayoutEffect first runs).
 
        This used to be overflow-y: auto (an internal scroll for content taller
-       than 100vh) instead of scaling. That made .about a nested scroll
+       than 100vh) instead of scaling. That made .overview a nested scroll
        container stacked inside the page's own scroll — wheel/trackpad events
        over it got captured by its own internal scroll first, only chaining to
        the outer page scroll at its boundary, which is what made scrolling
        feel sticky. Switched to scale-to-fit specifically to remove that
        nested scroll container rather than just tune it. (It was tried before
-       and reverted because .about's own scale transform hijacked
-       AllSliders' positioning back when AllSliders rendered inside .about —
+       and reverted because .overview's own scale transform hijacked
+       AllSliders' positioning back when AllSliders rendered inside .overview —
        AllSliders is now rendered separately in page.tsx as position: fixed,
        so that conflict no longer applies.) */
     overflow: hidden;
@@ -23,34 +25,34 @@
     font-family: var(--font-afacad-flux);
 }
 
-.aboutBackground {
+.overviewBackground {
     position: absolute;
     width: 100vw;
     height: 100vh;
 }
 
-.aboutContent {
+.overviewContent {
     position: absolute;
     top: 50%;
     left: 50%;
-    /* Matches .about's own width so percentage values inside (e.g.
+    /* Matches .overview's own width so percentage values inside (e.g.
        .upperSection's margin-top: 6.5%) keep resolving against the same
-       reference as before — .aboutContent's own natural width would
+       reference as before — .overviewContent's own natural width would
        otherwise be auto/shrink-to-fit now that it's absolutely positioned. */
     width: 100vw;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 6.5vh;
-    /* Shrinks the whole section as one unit so it always fits within .about's
-       100vh instead of needing to scroll — home_page.tsx's useScaleToFit
-       measures this element's natural (unscaled) height via scrollHeight and
-       sets --about-scale to min(1, availableHeight / naturalHeight), so
-       content that already fits renders at its normal size and only
-       taller-than-viewport content actually shrinks. translate(-50%, -50%)
-       keeps it centered regardless of scale, since transform-origin stays at
-       the default center. */
-    transform: translate(-50%, -50%) scale(var(--about-scale, 1));
+    /* Shrinks the whole section as one unit so it always fits within
+       .overview's 100vh instead of needing to scroll — home_page.tsx's
+       useScaleToFit measures this element's natural (unscaled) height via
+       scrollHeight and sets --overview-scale to min(1, availableHeight /
+       naturalHeight), so content that already fits renders at its normal
+       size and only taller-than-viewport content actually shrinks.
+       translate(-50%, -50%) keeps it centered regardless of scale, since
+       transform-origin stays at the default center. */
+    transform: translate(-50%, -50%) scale(var(--overview-scale, 1));
 }
 
 .upperSection {

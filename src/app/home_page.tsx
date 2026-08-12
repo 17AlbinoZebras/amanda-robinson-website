@@ -31,15 +31,15 @@ function useScaleToFit<T extends HTMLElement>(cssVar: string) {
     return ref
 }
 
-function AboutSection() {
-    const contentRef = useScaleToFit<HTMLDivElement>('--about-scale')
+function OverviewSection() {
+    const contentRef = useScaleToFit<HTMLDivElement>('--overview-scale')
 
     return (
-        <div className={styles.about}>
-            {/* Outside .aboutContent on purpose — this is a full-bleed 100vw/100vh
+        <div className={styles.overview}>
+            {/* Outside .overviewContent on purpose — this is a full-bleed 100vw/100vh
                 backdrop, so it shouldn't shrink along with the scaled content. */}
-            <TintedVector src="/masks/Green-Memphis.svg" color='#D4D5E9' width='100vw' height='100vh' maskSize="cover" className={styles.aboutBackground}/>
-            <div className={styles.aboutContent} ref={contentRef}>
+            <TintedVector src="/masks/Green-Memphis.svg" color='#D4D5E9' width='100vw' height='100vh' maskSize="cover" className={styles.overviewBackground}/>
+            <div className={styles.overviewContent} ref={contentRef}>
                 <div className={styles.upperSection}>
                     <div className={styles.blurb}>
                         <span>Hi! I&#39;m Amanda. I build things that make people&#39;s<br/>lives easier. I am energized by untangling complex problems and turning creative ideas into technology people can actually use.</span>
@@ -157,7 +157,7 @@ export default function HomePage() {
                     <span className={styles.subtitle}>I sure do code.<br/>Lorem ipsum, Etc.</span>
                 </div>
             </div>
-            <AboutSection/>
+            <OverviewSection/>
         </div>
     )
 }

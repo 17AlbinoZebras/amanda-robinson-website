@@ -15,7 +15,11 @@
     color: var(--main-blue);
 } */
 
-a:hover {
+/* Scoped to .footer (not a bare a:hover) — CSS Modules only hash class
+   selectors, not plain element selectors, so an unscoped a:hover would leak
+   globally and style every link on the page, including the sliders' now that
+   they're next/link anchors too. */
+.footer a:hover {
     color: var(--main-red);
     text-decoration: underline;
 }
