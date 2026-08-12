@@ -4,7 +4,8 @@ import React, { CSSProperties, useEffect, useRef, useState } from 'react'
 import { ClippedVector, SizeValue } from './mask_functions';
 
 import styles from './styles/sliders.module.css'
-import { AppStateTypes } from './page';
+import { AppStateTypes } from './app_shell';
+import Link from 'next/link';
 
 type OrbProps = {
     size: string;
@@ -149,7 +150,7 @@ type LabelProps = {
     labelStyle?: CSSProperties;
 }
 
-function Slider(width: string, height: string, rect: React.ReactNode, orb: React.ReactNode, orbSide: "left" | "right", orbStrokeWidth: SizeValue, { labelText, labelStyle }: LabelProps, sliderClassName?: string, sliderStyle?: CSSProperties) {
+function Slider(width: string, height: string, rect: React.ReactNode, orb: React.ReactNode, orbSide: "left" | "right", orbStrokeWidth: SizeValue, { labelText, labelStyle }: LabelProps, sliderClassName?: string, sliderStyle?: CSSProperties, href?: string) {
     // Custom properties don't get React's automatic px-suffixing for numbers
     // (that only applies to known CSS properties), so a bare number needs "px"
     // appended explicitly here.
@@ -167,14 +168,35 @@ function Slider(width: string, height: string, rect: React.ReactNode, orb: React
         : styles.labelFontIdiqlat
     const labelSideClassName = orbSide === "left" ? styles.labelOrbLeft : styles.labelOrbRight
     const orbWrapperSideClassName = orbSide === "left" ? styles.orbWrapperLeft : styles.orbWrapperRight
+    const sliderClassNames = `${styles.slider} ${sliderClassName}`
 
-    return (
-        <div className={`${styles.slider} ${sliderClassName}`} style={sliderStyles}>
+    const content = (
+        <>
             <div className={styles.rectWrapper}>{rect}</div>
             <div className={`${styles.sliderLabel} ${fontClassName}`} style={labelStyle}>
                 <span className={`${styles.sliderLabelText} ${labelSideClassName}`}>{labelText}</span>
             </div>
             <div className={`${styles.orbWrapper} ${orbWrapperSideClassName}`}>{orb}</div>
+        </>
+    )
+
+    // The whole slider (rect, orb, and label together) is the click target,
+    // not just the label — rendering the root as a next/link Link instead of
+    // a div when href is given. :hover and container-type: size both work
+    // identically on an <a> as on a <div>, and position: fixed forces
+    // block-level layout regardless of tag, so the existing slide-in-on-hover
+    // CSS needs no changes for this.
+    if (href) {
+        return (
+            <Link href={href} className={sliderClassNames} style={sliderStyles}>
+                {content}
+            </Link>
+        )
+    }
+
+    return (
+        <div className={sliderClassNames} style={sliderStyles}>
+            {content}
         </div>
     )
 }
@@ -199,7 +221,7 @@ export function RedSlider({width, height, className, style, strokeWidth, sliderC
     })
     const orb = RedOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline})
 
-    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: "Projects", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle)
+    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: "Projects", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, "/projects")
 }
 
 export function YellowSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle}: SliderProps) {
@@ -215,7 +237,7 @@ export function YellowSlider({width, height, className, style, strokeWidth, slid
         className: [styles.sliderBorder, styles.borderYellow, className].filter(Boolean).join(" "),
     })
     const orb = YellowOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline})
-    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: "About Me", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle)
+    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: "About Me", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, "/about")
 }
 
 export function GreenSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle}: SliderProps) {
@@ -231,7 +253,7 @@ export function GreenSlider({width, height, className, style, strokeWidth, slide
         className: [styles.sliderBorder, styles.borderGreen, className].filter(Boolean).join(" "),
     })
     const orb = GreenOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline})
-    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: "Experience", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle)
+    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: "Experience", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, "/experience")
 }
 
 export function BlueSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle}: SliderProps) {
@@ -247,7 +269,7 @@ export function BlueSlider({width, height, className, style, strokeWidth, slider
         className: [styles.sliderBorder, styles.borderBlue, className].filter(Boolean).join(" "),
     })
     const orb = BlueOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline})
-    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: "Education", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle)
+    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: "Education", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, "/education")
 }
 
 

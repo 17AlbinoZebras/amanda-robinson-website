@@ -3,9 +3,22 @@ body {
 }
 
 .sliderFadeIn {
+    /* z-index has no effect at all on a statically-positioned element (the
+       default) — needs a position other than static for it to apply. */
+    position: relative;
     opacity: 0;
     pointer-events: none;
-    animation: fade-in-sliders 0.75s ease 6.75s 1 forwards;
+    animation: fade-in-sliders 0.75s ease 5.75s 1 forwards;
+    /* An element with opacity < 1 (true for most of this animation) creates
+       its own CSS stacking context — which traps .allSliders' own z-index:
+       9999 inside it, since that z-index then only competes against this
+       wrapper's OTHER children instead of the rest of the page. This wrapper
+       itself needs the high z-index too, so it — not just its child — wins
+       against things like .nameStack's explicit z-index: 1 elsewhere on the
+       page. (Only relevant on the home page — other routes render
+       <AllSliders> directly with no fade wrapper, where .allSliders' own
+       z-index already works correctly on its own.) */
+    z-index: 9999;
 }
 
 @keyframes fade-in-sliders {

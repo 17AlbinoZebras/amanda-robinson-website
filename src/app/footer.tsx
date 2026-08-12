@@ -15,17 +15,16 @@ export default function Footer() {
             </div>
             <div className={styles.pageLinks}>
                 <div className={styles.leftSection}>
-                    <Link as='/home' href='/home_page'>Home</Link>
+                    <Link href='/'>Home</Link>
                     <br/>
-                    <Link as='/about' href='/about'> About Me</Link>
+                    <Link href='/about'>About Me</Link>
                 </div>
                 <div className={styles.rightSection}>
-                    <Link as='/projects' href='/projects'></Link>
-                    <a>Projects</a>
+                    <Link href='/projects'>Projects</Link>
                     <br/>
-                    <a>Experience</a>
+                    <Link href='/experience'>Experience</Link>
                     <br/>
-                    <a>Education</a>
+                    <Link href='/education'>Education</Link>
                 </div>
             </div>
             <div className={styles.copyright}>
