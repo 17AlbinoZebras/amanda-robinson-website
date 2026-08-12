@@ -167,7 +167,7 @@
     position: absolute;
     width: 100vw;
     height: 100vh;
-    --delay-animation: 3s
+    --delay-animation: 2s
 }
 
 /* ORB ANIMATIONS
@@ -195,14 +195,17 @@
         opacity: 1;
     }
 }
-@keyframes return-red-orb {
+@keyframes hide-red-orb {
     0% {
-        transform: translate(22vw, 5vh);
-        opacity: 0;
+        opacity: 1;
+        pointer-events: auto;
+    }
+    99.9% {
+        pointer-events: auto;
     }
     100% {
-        transform: translate(22vw, 5vh);
-        opacity: 1;
+        opacity: 0;
+        pointer-events: none;
     }
 }
 @keyframes move-yellow-orb {
@@ -214,14 +217,17 @@
         opacity: 1;
     }
 }
-@keyframes return-yellow-orb {
+@keyframes hide-yellow-orb {
     0% {
-        transform: translate(-15.75vw, -3.5vh);
-        opacity: 0;
+        opacity: 1;
+        pointer-events: auto;
+    }
+    99.9% {
+        pointer-events: auto;
     }
     100% {
-        transform: translate(-15.75vw, -3.5vh);
-        opacity: 1;
+        opacity: 0;
+        pointer-events: none;
     }
 }
 @keyframes move-green-orb {
@@ -233,14 +239,17 @@
         opacity: 1;
     }
 }
-@keyframes return-green-orb {
+@keyframes hide-green-orb {
     0% {
-        transform: translate(12vw, -8vh);
-        opacity: 0;
+        opacity: 1;
+        pointer-events: auto;
+    }
+    99.9% {
+        pointer-events: auto;
     }
     100% {
-        transform: translate(12vw, -8vh);
-        opacity: 1;
+        opacity: 0;
+        pointer-events: none;
     }
 }
 @keyframes move-blue-orb {
@@ -252,14 +261,17 @@
         opacity: 1;
     }
 }
-@keyframes return-blue-orb {
+@keyframes hide-blue-orb {
     0% {
-        transform: translate(-11vw, -3vh);
-        opacity: 0;
+        opacity: 1;
+        pointer-events: auto;
+    }
+    99.9% {
+        pointer-events: auto;
     }
     100% {
-        transform: translate(-11vw, -3vh);
-        opacity: 1;
+        opacity: 0;
+        pointer-events: none;
     }
 }
 
@@ -272,26 +284,37 @@
    per-orb to compute a scale ratio. home_page.tsx also reads the real
    rendered pixel size off these boxes (a ref + resize listener) since the
    mask inside still needs a literal pixel number — see the note there. */
+/* Each orb's base class is its settled, post-intro look: fully faded out —
+   once an orb has flown into place over its slider, it disappears rather
+   than reappearing anywhere on the page. This is what a returning visitor
+   sees immediately (never shown at all), and what a first-time visitor sees
+   once the intro animation finishes. pointer-events: none matters here since
+   the orb's own fly-out animation ends with it positioned right on top of
+   its slider (see move-*-orb above) — an invisible box there would
+   otherwise still intercept clicks meant for the slider underneath.
+   The matching .*OrbIntro modifier class (added only on a first visit, see
+   home_page.tsx/app_shell.tsx's playIntro) is what layers the original
+   starting position, full opacity, and the fly-out/fade-out animation back
+   on top — it must come after these base classes in this file so its
+   properties win despite equal class specificity. */
 .redOrb {
     position: absolute;
-    /* left: 17vw; */
-    /* top: 2vh; */
-    transform: translate(17vw, 2vh);
     --orb-size: clamp(180px, 55px + 13.75vw, 380px);
     width: var(--orb-size);
     height: var(--orb-size);
-    animation: move-red-orb 5s ease var(--delay-animation) 1 forwards, return-red-orb 2s ease-out 7.5s 1 forwards;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .yellowOrb {
     position: absolute;
     top: 0vh;
     right: 0vw;
-    transform: translate(-13.75vw, -2.5vh);
     --orb-size: clamp(280px, 85px + 21.25vw, 580px);
     width: var(--orb-size);
     height: var(--orb-size);
-    animation: move-yellow-orb 5s ease var(--delay-animation) 1 forwards, return-yellow-orb 2s ease-out 7.5s 1 forwards;
+    opacity: 0;
+    pointer-events: none;
 }
 /* @media (max-width: 1200px) {
     .yellowOrb {
@@ -303,26 +326,50 @@
     position: absolute;
     bottom: 0vh;
     left: 0vw;
-    /* bottom: 8vh;
-    left: 5.5vw; */
-    transform: translate(5.5vw, -8vh);
     --orb-size: clamp(230px, 70px + 17.5vw, 480px);
     width: var(--orb-size);
     height: var(--orb-size);
-    animation: move-green-orb 5s ease var(--delay-animation) 1 forwards, return-green-orb 2s ease-out 7.5s 1 forwards;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .blueOrb {
     position: absolute;
-    /* bottom: 3vh;
-    right: 8.25vw; */
     bottom: 0vh;
     right: 0vw;
-    transform: translate(-8.25vw, -3vh);
     --orb-size: clamp(195px, 60px + 15vw, 410px);
     width: var(--orb-size);
     height: var(--orb-size);
-    animation: move-blue-orb 5s ease var(--delay-animation) 1 forwards, return-blue-orb 2s ease-out 7.5s 1 forwards;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.redOrbIntro {
+    transform: translate(17vw, 2vh);
+    opacity: 1;
+    pointer-events: auto;
+    animation: move-red-orb 5s ease var(--delay-animation) 1 forwards, hide-red-orb 2s ease-out 7.5s 1 forwards;
+}
+
+.yellowOrbIntro {
+    transform: translate(-13.75vw, -2.5vh);
+    opacity: 1;
+    pointer-events: auto;
+    animation: move-yellow-orb 5s ease var(--delay-animation) 1 forwards, hide-yellow-orb 2s ease-out 7.5s 1 forwards;
+}
+
+.greenOrbIntro {
+    transform: translate(5.5vw, -8vh);
+    opacity: 1;
+    pointer-events: auto;
+    animation: move-green-orb 5s ease var(--delay-animation) 1 forwards, hide-green-orb 2s ease-out 7.5s 1 forwards;
+}
+
+.blueOrbIntro {
+    transform: translate(-8.25vw, -3vh);
+    opacity: 1;
+    pointer-events: auto;
+    animation: move-blue-orb 5s ease var(--delay-animation) 1 forwards, hide-blue-orb 2s ease-out 7.5s 1 forwards;
 }
 
 /* Scales the orb down (or up) to end at exactly --slider-height tall — apply
@@ -370,24 +417,42 @@
 /* Drop-shadow colors match each orb's own outline color (sliderColors.X.outline
    in sliders.tsx) — kept as literal values here since drop-shadow has to live on
    this unclipped wrapper (see ClippedVector's frameStyle docs in
-   mask_functions.tsx), not on the orb component itself. */
+   mask_functions.tsx), not on the orb component itself.
+
+   The base classes below are already the correct settled look with no
+   animation needed — the .orbShadow*Intro modifiers (added only when the
+   intro plays) layer the shadow-removal animation on top, which naturally
+   reverts back to this same base filter once it completes anyway (fill-mode:
+   backwards only affects the pre-start delay, not what happens after). */
 .orbShadowRed {
     filter: drop-shadow(-6px -5px #B4CAC1);
-    animation: remove-red-orb-shadow 6s ease 1 backwards;
 }
 
 .orbShadowYellow {
     filter: drop-shadow(6px -4px var(--main-light));
-    animation: remove-yellow-orb-shadow 6s ease 1 backwards;
 }
 
 .orbShadowGreen {
     filter: drop-shadow(-7px 4px #A9ACD6);
-    animation: remove-green-orb-shadow 6s ease 1 backwards;
 }
 
 .orbShadowBlue {
     filter: drop-shadow(4px 6px #FFB2B3);
+}
+
+.orbShadowRedIntro {
+    animation: remove-red-orb-shadow 6s ease 1 backwards;
+}
+
+.orbShadowYellowIntro {
+    animation: remove-yellow-orb-shadow 6s ease 1 backwards;
+}
+
+.orbShadowGreenIntro {
+    animation: remove-green-orb-shadow 6s ease 1 backwards;
+}
+
+.orbShadowBlueIntro {
     animation: remove-blue-orb-shadow 6s ease 1 backwards;
 }
 

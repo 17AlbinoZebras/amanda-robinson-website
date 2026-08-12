@@ -8,7 +8,7 @@ body {
     position: relative;
     opacity: 0;
     pointer-events: none;
-    animation: fade-in-sliders 0.75s ease 6.75s 1 forwards;
+    animation: fade-in-sliders 0.75s ease 5.75s 1 forwards;
     /* An element with opacity < 1 (true for most of this animation) creates
        its own CSS stacking context — which traps .allSliders' own z-index:
        9999 inside it, since that z-index then only competes against this

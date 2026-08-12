@@ -1,9 +1,10 @@
 'use client'
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import styles from './styles/home_page.module.css'
 import { clipToShape, TintedVector } from './mask_functions'
 import { GreenOrb, RedOrb, YellowOrb, BlueOrb } from './sliders'
+import { AppIntroContext } from './app_shell'
 
 // Shrinks the ref'd element (as one unit, via a CSS custom property the
 // caller applies through a transform: scale()) so it always fits within the
@@ -102,6 +103,7 @@ function useElementWidth<T extends HTMLElement>(initial: number) {
 }
 
 export default function HomePage() {
+    const playIntro = useContext(AppIntroContext)
     const [redOrbRef, redOrbWidth] = useElementWidth<HTMLDivElement>(275)
     const [yellowOrbRef, yellowOrbWidth] = useElementWidth<HTMLDivElement>(425)
     const [greenOrbRef, greenOrbWidth] = useElementWidth<HTMLDivElement>(350)
@@ -111,17 +113,17 @@ export default function HomePage() {
         <div className={styles.home}>
             <TintedVector src="/masks/cow-blobs.svg" color='#F9F3EB' repeat maskSize="70%" className={styles.homeBackground}/>
             <div className={styles.orbs}>
-                <div className={styles.redOrb} ref={redOrbRef}>
-                    <RedOrb size={`${redOrbWidth}px`} className={styles.orbShadowRed} />
+                <div className={`${styles.redOrb} ${playIntro ? styles.redOrbIntro : ''}`} ref={redOrbRef}>
+                    <RedOrb size={`${redOrbWidth}px`} className={`${styles.orbShadowRed} ${playIntro ? styles.orbShadowRedIntro : ''}`} />
                 </div>
-                <div className={styles.yellowOrb} ref={yellowOrbRef}>
-                    <YellowOrb size={`${yellowOrbWidth}px`} className={styles.orbShadowYellow} />
+                <div className={`${styles.yellowOrb} ${playIntro ? styles.yellowOrbIntro : ''}`} ref={yellowOrbRef}>
+                    <YellowOrb size={`${yellowOrbWidth}px`} className={`${styles.orbShadowYellow} ${playIntro ? styles.orbShadowYellowIntro : ''}`} />
                 </div>
-                <div className={styles.greenOrb} ref={greenOrbRef}>
-                    <GreenOrb size={`${greenOrbWidth}px`} className={styles.orbShadowGreen} />
+                <div className={`${styles.greenOrb} ${playIntro ? styles.greenOrbIntro : ''}`} ref={greenOrbRef}>
+                    <GreenOrb size={`${greenOrbWidth}px`} className={`${styles.orbShadowGreen} ${playIntro ? styles.orbShadowGreenIntro : ''}`} />
                 </div>
-                <div className={styles.blueOrb} ref={blueOrbRef}>
-                    <BlueOrb size={`${blueOrbWidth}px`} className={styles.orbShadowBlue} />
+                <div className={`${styles.blueOrb} ${playIntro ? styles.blueOrbIntro : ''}`} ref={blueOrbRef}>
+                    <BlueOrb size={`${blueOrbWidth}px`} className={`${styles.orbShadowBlue} ${playIntro ? styles.orbShadowBlueIntro : ''}`} />
                 </div>
             </div>
             {/* <div className={styles.sliders}>
