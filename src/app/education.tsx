@@ -40,14 +40,14 @@ export default function Education() {
                     <div className={styles.row}>
                         {classes.slice(0, 4).map((course) => (
                             <div id={course.code} className={styles.course} onMouseEnter={() => setHoveredCourseCode(course.code)} onMouseLeave={() => setHoveredCourseCode(null)}>
-                                <a href={course.url}>{hoveredCourseCode === course.code ? course.code : course.title}</a>
+                                <a href={course.url} target="_blank" rel="noopener noreferrer">{hoveredCourseCode === course.code ? course.code : course.title}</a>
                             </div>
                         ))}
                     </div>
                     <div className={styles.row}>
                         {classes.slice(4).map((course) => (
                             <div id={course.code} className={styles.course} onMouseEnter={() => setHoveredCourseCode(course.code)} onMouseLeave={() => setHoveredCourseCode(null)}>
-                                <a href={course.url}>{hoveredCourseCode === course.code ? course.code : course.title}</a>
+                                <a href={course.url} target="_blank" rel="noopener noreferrer">{hoveredCourseCode === course.code ? course.code : course.title}</a>
                             </div>
                         ))}
                     </div>
