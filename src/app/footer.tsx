@@ -1,11 +1,15 @@
 'use client'
 import React, { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 import styles from './styles/footer.module.css'
 import { TintedVector } from './mask_functions'
 import Link from 'next/link'
 
 export default function Footer() {
+    const pathname = usePathname()
+    const linkClassName = (href: string) => pathname === href ? styles.activeLink : undefined
+
     return (
         <div className={styles.footer}>
             <TintedVector src="/masks/cow-blobs.svg" color='#F9F3EB' repeat="x" maskSize="50%" className={styles.footerBackground}/>
@@ -15,16 +19,16 @@ export default function Footer() {
             </div>
             <div className={styles.pageLinks}>
                 <div className={styles.leftSection}>
-                    <Link href='/'>Home</Link>
+                    <Link href='/' className={linkClassName('/')}>Home</Link>
                     <br/>
-                    <Link href='/about'>About Me</Link>
+                    <Link href='/about' className={linkClassName('/about')}>About Me</Link>
                 </div>
                 <div className={styles.rightSection}>
-                    <Link href='/projects'>Projects</Link>
+                    <Link href='/projects' className={linkClassName('/projects')}>Projects</Link>
                     <br/>
-                    <Link href='/experience'>Experience</Link>
+                    <Link href='/experience' className={linkClassName('/experience')}>Experience</Link>
                     <br/>
-                    <Link href='/education'>Education</Link>
+                    <Link href='/education' className={linkClassName('/education')}>Education</Link>
                 </div>
             </div>
             <div className={styles.copyright}>
