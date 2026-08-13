@@ -315,12 +315,15 @@ export function AllSliders({ appState, className, style } : AllSlidersProps ) {
     
     const neverHovered = appState.neverHovered
     const setNeverHovered = appState.setNeverHovered
-
-    // Will add code to adjust the sliders based on which page is active. Will also move neverHovered to appState so it stays consistent when users reload or return to the home page
+    // The bounce is a "hey, interact with these" nudge for a first-time
+    // visitor landing on the home page — it shouldn't play on other routes,
+    // even though AllSliders itself (and neverHovered, which persists in
+    // AppShell across navigation) is shared by every page.
+    const shouldBounce = neverHovered && appState.isHomePage
 
     return (
         <div className={styles.allSliders} ref={allSlidersRef} onMouseOver={() => setNeverHovered(false)}>
-            <RedSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideLeft} ${neverHovered ? styles.bounceSlider : ''}`}/>
+            <RedSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideLeft} ${shouldBounce ? styles.bounceSlider : ''}`}/>
             <GreenSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.bottomSlider} ${styles.slideLeft}`}/>
             <YellowSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideRight}`}/>
             <BlueSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.bottomSlider} ${styles.slideRight}`}/>

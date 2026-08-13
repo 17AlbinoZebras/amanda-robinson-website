@@ -9,6 +9,7 @@ import Footer from './footer'
 export interface AppStateTypes {
     neverHovered: boolean,
     setNeverHovered: (v: boolean) => void;
+    isHomePage: boolean;
 }
 
 // Whether the home page's intro (sliders fade-in, orb fly-out-and-return)
@@ -23,7 +24,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
     const appState: AppStateTypes = {
         neverHovered,
-        setNeverHovered
+        setNeverHovered,
+        isHomePage: pathname === '/'
     }
 
     // hasShownIntroRef tracks "ever shown, this session" without triggering a
