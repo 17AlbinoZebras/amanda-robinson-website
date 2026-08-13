@@ -2,6 +2,7 @@
     position: relative;
     font-family: var(--font-afacad-flux);
     height: 25vh;
+    color: var(--main-dark)
 }
 
 .footerBackground {
