@@ -129,11 +129,24 @@
 }
 
 /* BORDERS — width comes from --stroke-width (see .rectWrapper above), so it
-   always matches the orb's own stroke thickness for the same slider instance. */
+   always matches the orb's own stroke thickness for the same slider instance.
+   Width itself stays constant regardless of whether the stroke is "on" —
+   .strokeVisible below only toggles border-COLOR (transparent <-> the real
+   outline color), never the width, so nothing positioned off --stroke-width
+   (.rectWrapper, .orbWrapper, .sliderLabelText) ever has to jump when a
+   stroke fades in or out. Mirrors ClippedVector's strokeOpacity, which does
+   the same job for the orb's own stroke layer via opacity instead, since a
+   clip-path shape has no border-color equivalent to fade. */
 .sliderBorder {
     box-sizing: content-box;
-    border-top: var(--stroke-width) solid var(--outline-color);
-    border-bottom: var(--stroke-width) solid var(--outline-color);
+    border-top: var(--stroke-width) solid transparent;
+    border-bottom: var(--stroke-width) solid transparent;
+    transition: border-color 300ms ease;
+}
+
+.sliderBorder.strokeVisible {
+    border-top-color: var(--outline-color);
+    border-bottom-color: var(--outline-color);
 }
 
 .borderRed {
@@ -191,16 +204,19 @@
    by its own width via transform — translateX's percentage is relative to the
    element's own box (unlike left/right, which resolve against the containing
    block), so this hides it off-screen without any JS needing to know the
-   slider's actual pixel width. The same property is what a later :hover rule
-   (e.g. transform: translateX(0)) would use to slide it back into view, for
-   the same reason. */
+   slider's actual pixel width. .sliderOpen (JS-tracked in sliders.tsx via
+   onMouseEnter/onMouseLeave, not a plain :hover rule) is what slides it back
+   into view — a real :hover rule can't be "forced closed" after a
+   navigation, since it just reflects the cursor's literal position and a
+   user's mouse is very likely still resting over the same spot right after
+   clicking a slider to navigate. */
 .slideLeft {
     left: 0;
     transform: translateX(-100%);
     transition: all 300ms;
 }
 
-.slideLeft:hover {
+.slideLeft.sliderOpen {
     transform: translateX(0%);
 }
 
@@ -210,7 +226,7 @@
     transition: all 400ms;
 }
 
-.slideRight:hover {
+.slideRight.sliderOpen {
     transform: translateX(0%);
 }
 

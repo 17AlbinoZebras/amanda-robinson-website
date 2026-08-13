@@ -13,6 +13,7 @@ type OrbProps = {
     style?: CSSProperties;
     strokeWidth?: SizeValue; // plain pixel value — a uniform outline, see ClippedVector's strokeWidth
     strokeColor?: string;
+    strokeOpacity?: number; // fades the stroke without affecting strokeWidth's layout impact — see ClippedVector
 };
 
 type MaskProps = {
@@ -42,7 +43,7 @@ export const sliderColors = {
 
 // ORBS
 
-function Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor, src, maskColor, maskClassName}}: {orbProps: OrbProps, maskProps: MaskProps}) {
+function Orb({orbProps: {size, className, style, strokeWidth, strokeColor, strokeOpacity}, maskProps: {shapeColor, src, maskColor, maskClassName}}: {orbProps: OrbProps, maskProps: MaskProps}) {
     return (
         <ClippedVector
             shape="circle(50% at 50% 50%)"
@@ -51,6 +52,7 @@ function Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, mask
             frameHeight={size}
             strokeWidth={strokeWidth}
             strokeColor={strokeColor}
+            strokeOpacity={strokeOpacity}
             src={src}
             color={maskColor}
             className={maskClassName}
@@ -60,25 +62,25 @@ function Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, mask
     )
 }
 
-export function RedOrb({size, className, style, strokeWidth, strokeColor}: OrbProps) {
+export function RedOrb({size, className, style, strokeWidth, strokeColor, strokeOpacity}: OrbProps) {
     const colors = sliderColors.red
-    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.base, src: sliderPaths.red, maskColor: colors.mask, maskClassName: styles.orbRed}})
+    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor, strokeOpacity}, maskProps: {shapeColor: colors.base, src: sliderPaths.red, maskColor: colors.mask, maskClassName: styles.orbRed}})
 }
 
-export function YellowOrb({size, className, style, strokeWidth, strokeColor}: OrbProps) {
+export function YellowOrb({size, className, style, strokeWidth, strokeColor, strokeOpacity}: OrbProps) {
     const colors = sliderColors.yellow
-    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.base, src: sliderPaths.yellow, maskColor: colors.mask, maskClassName: styles.orbYellow}})
+    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor, strokeOpacity}, maskProps: {shapeColor: colors.base, src: sliderPaths.yellow, maskColor: colors.mask, maskClassName: styles.orbYellow}})
 }
 
-export function GreenOrb({size, className, style, strokeWidth, strokeColor}: OrbProps) {
+export function GreenOrb({size, className, style, strokeWidth, strokeColor, strokeOpacity}: OrbProps) {
     const colors = sliderColors.green
-    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.base, src: sliderPaths.green, maskColor: colors.mask, maskClassName: styles.orbGreen}})
+    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor, strokeOpacity}, maskProps: {shapeColor: colors.base, src: sliderPaths.green, maskColor: colors.mask, maskClassName: styles.orbGreen}})
 }
 
-export function BlueOrb({size, className, style, strokeWidth, strokeColor}: OrbProps) {
+export function BlueOrb({size, className, style, strokeWidth, strokeColor, strokeOpacity}: OrbProps) {
     const colors = sliderColors.blue
     // repeat intentionally omitted — the orb stays as-is even when the rect tiles.
-    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor}, maskProps: {shapeColor: colors.base, src: sliderPaths.blue, maskColor: colors.mask, maskClassName: styles.orbBlue}})
+    return Orb({orbProps: {size, className, style, strokeWidth, strokeColor, strokeOpacity}, maskProps: {shapeColor: colors.base, src: sliderPaths.blue, maskColor: colors.mask, maskClassName: styles.orbBlue}})
 }
 
 type RectProps = {
@@ -143,6 +145,11 @@ type SliderProps = {
     strokeColor?: string;
     sliderClassName?: string;
     sliderStyle?: CSSProperties;
+    // The current route (see AppStateTypes in app_shell.tsx) — each slider
+    // compares this to its own page to decide whether it's the "active"
+    // one (see the isActive logic in RedSlider/YellowSlider/GreenSlider/
+    // BlueSlider below).
+    pathname: string;
 };
 
 type LabelProps = {
@@ -150,7 +157,7 @@ type LabelProps = {
     labelStyle?: CSSProperties;
 }
 
-function Slider(width: string, height: string, rect: React.ReactNode, orb: React.ReactNode, orbSide: "left" | "right", orbStrokeWidth: SizeValue, { labelText, labelStyle }: LabelProps, sliderClassName?: string, sliderStyle?: CSSProperties, href?: string) {
+function Slider(width: string, height: string, rect: React.ReactNode, orb: React.ReactNode, orbSide: "left" | "right", orbStrokeWidth: SizeValue, { labelText, labelStyle }: LabelProps, sliderClassName?: string, sliderStyle?: CSSProperties, href?: string, isOpen?: boolean, onOpenChange?: (open: boolean) => void) {
     // Custom properties don't get React's automatic px-suffixing for numbers
     // (that only applies to known CSS properties), so a bare number needs "px"
     // appended explicitly here.
@@ -168,7 +175,17 @@ function Slider(width: string, height: string, rect: React.ReactNode, orb: React
         : styles.labelFontIdiqlat
     const labelSideClassName = orbSide === "left" ? styles.labelOrbLeft : styles.labelOrbRight
     const orbWrapperSideClassName = orbSide === "left" ? styles.orbWrapperLeft : styles.orbWrapperRight
-    const sliderClassNames = `${styles.slider} ${sliderClassName}`
+    // .sliderOpen (JS-tracked via onMouseEnter/onMouseLeave below) replaces a
+    // plain :hover rule for the slide-in-on-hover look — :hover alone can't
+    // be "forced closed" after a navigation, since it just reflects the
+    // cursor's real physical position: if a user clicks a slider, the mouse
+    // is very likely still resting over that same spot right after the page
+    // changes, and a pure :hover rule would keep it open with no way to
+    // reset it short of the mouse actually leaving and re-entering. Tracking
+    // it as React state instead means it can be reset on navigation (see the
+    // key={pathname} remount in AllSliders) regardless of where the cursor
+    // physically is, and it only opens again on a genuine new mouseenter.
+    const sliderClassNames = `${styles.slider} ${sliderClassName} ${isOpen ? styles.sliderOpen : ''}`
 
     const content = (
         <>
@@ -180,6 +197,11 @@ function Slider(width: string, height: string, rect: React.ReactNode, orb: React
         </>
     )
 
+    const hoverHandlers = {
+        onMouseEnter: () => onOpenChange?.(true),
+        onMouseLeave: () => onOpenChange?.(false),
+    }
+
     // The whole slider (rect, orb, and label together) is the click target,
     // not just the label — rendering the root as a next/link Link instead of
     // a div when href is given. :hover and container-type: size both work
@@ -188,20 +210,20 @@ function Slider(width: string, height: string, rect: React.ReactNode, orb: React
     // CSS needs no changes for this.
     if (href) {
         return (
-            <Link href={href} className={sliderClassNames} style={sliderStyles}>
+            <Link href={href} className={sliderClassNames} style={sliderStyles} {...hoverHandlers}>
                 {content}
             </Link>
         )
     }
 
     return (
-        <div className={sliderClassNames} style={sliderStyles}>
+        <div className={sliderClassNames} style={sliderStyles} {...hoverHandlers}>
             {content}
         </div>
     )
 }
 
-export function RedSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle}: SliderProps) {
+export function RedSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle, pathname}: SliderProps) {
     const colors = sliderColors.red
     const heightParts = height.split(/(?<=\d)(?!\d|\.)|(?<=\d\.\d)(?!\d)/)
     // heightParts[0] is the number
@@ -209,7 +231,31 @@ export function RedSlider({width, height, className, style, strokeWidth, sliderC
     // heightParts[1] is the units
     const heightUnits = heightParts[1]
     const strokeSizeVal = heightVal*0.05
-    const strokeSize = (strokeWidth != undefined) ? strokeWidth : strokeSizeVal + heightUnits
+    const activeStrokeSize = (strokeWidth != undefined) ? strokeWidth : strokeSizeVal + heightUnits
+
+    const ownHref = "/projects"
+    const isActive = pathname === ownHref
+
+    const [isOpen, setIsOpen] = useState(false)
+    // Closes the slider on navigation regardless of where the cursor
+    // physically is (see the isOpen note in Slider() above) — resetting the
+    // state directly, rather than remounting the whole component via
+    // key={pathname}, since remounting all 4 sliders' keys simultaneously on
+    // navigation was observed to make React duplicate DOM nodes instead of
+    // replacing them (reproducible, not a one-off — see AllSliders below).
+    useEffect(() => setIsOpen(false), [pathname])
+
+    // The slider matching the current page always shows its stroke (an "you
+    // are here" indicator) and becomes a Home button instead of a link to
+    // the page you're already on — see the other 3 sliders for the same
+    // pattern. On the home page itself none of the sliders is "active"
+    // (none of them link to "/"), so every slider shows its stroke there
+    // too. On a sub-page, an inactive slider's stroke only shows while
+    // open/hovered — strokeSize itself stays constant either way (see
+    // ClippedVector's strokeOpacity) so opening/closing never shifts layout,
+    // just fades the stroke's visibility in and out.
+    const strokeVisible = isActive || pathname === '/' || isOpen
+    const strokeSize = activeStrokeSize
 
     // The rect only wants a stroke on its top/bottom edges (not the sides), which
     // .sliderBorder (a plain border on the unclipped outer wrapper) handles
@@ -217,59 +263,86 @@ export function RedSlider({width, height, className, style, strokeWidth, sliderC
     // strokeColor mechanism here.
     const rect = RedSliderRect({
         width, height, style,
-        className: [styles.sliderBorder, styles.borderRed, className].filter(Boolean).join(" "),
+        className: [styles.sliderBorder, styles.borderRed, strokeVisible ? styles.strokeVisible : '', className].filter(Boolean).join(" "),
     })
-    const orb = RedOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline})
+    const orb = RedOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline, strokeOpacity: strokeVisible ? 1 : 0})
 
-    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: "Projects", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, "/projects")
+    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: isActive ? "Home" : "Projects", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, isOpen, setIsOpen)
 }
 
-export function YellowSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle}: SliderProps) {
+export function YellowSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle, pathname}: SliderProps) {
     const colors = sliderColors.yellow
     const heightParts = height.split(/(?<=\d)(?!\d|\.)|(?<=\d\.\d)(?!\d)/)
     const heightVal = parseFloat(heightParts[0])
     const heightUnits = heightParts[1]
     const strokeSizeVal = heightVal*0.05
-    const strokeSize = (strokeWidth != undefined) ? strokeWidth : strokeSizeVal + heightUnits
+    const activeStrokeSize = (strokeWidth != undefined) ? strokeWidth : strokeSizeVal + heightUnits
+
+    const ownHref = "/about"
+    const isActive = pathname === ownHref
+
+    const [isOpen, setIsOpen] = useState(false)
+    useEffect(() => setIsOpen(false), [pathname])
+
+    const strokeVisible = isActive || pathname === '/' || isOpen
+    const strokeSize = activeStrokeSize
 
     const rect = YellowSliderRect({
         width, height, style,
-        className: [styles.sliderBorder, styles.borderYellow, className].filter(Boolean).join(" "),
+        className: [styles.sliderBorder, styles.borderYellow, strokeVisible ? styles.strokeVisible : '', className].filter(Boolean).join(" "),
     })
-    const orb = YellowOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline})
-    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: "About Me", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, "/about")
+    const orb = YellowOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline, strokeOpacity: strokeVisible ? 1 : 0})
+    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: isActive ? "Home" : "About Me", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, isOpen, setIsOpen)
 }
 
-export function GreenSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle}: SliderProps) {
+export function GreenSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle, pathname}: SliderProps) {
     const colors = sliderColors.green
     const heightParts = height.split(/(?<=\d)(?!\d|\.)|(?<=\d\.\d)(?!\d)/)
     const heightVal = parseFloat(heightParts[0])
     const heightUnits = heightParts[1]
     const strokeSizeVal = heightVal*0.05
-    const strokeSize = (strokeWidth != undefined) ? strokeWidth : strokeSizeVal + heightUnits
+    const activeStrokeSize = (strokeWidth != undefined) ? strokeWidth : strokeSizeVal + heightUnits
+
+    const ownHref = "/experience"
+    const isActive = pathname === ownHref
+
+    const [isOpen, setIsOpen] = useState(false)
+    useEffect(() => setIsOpen(false), [pathname])
+
+    const strokeVisible = isActive || pathname === '/' || isOpen
+    const strokeSize = activeStrokeSize
 
     const rect = GreenSliderRect({
         width, height, style,
-        className: [styles.sliderBorder, styles.borderGreen, className].filter(Boolean).join(" "),
+        className: [styles.sliderBorder, styles.borderGreen, strokeVisible ? styles.strokeVisible : '', className].filter(Boolean).join(" "),
     })
-    const orb = GreenOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline})
-    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: "Experience", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, "/experience")
+    const orb = GreenOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline, strokeOpacity: strokeVisible ? 1 : 0})
+    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: isActive ? "Home" : "Experience", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, isOpen, setIsOpen)
 }
 
-export function BlueSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle}: SliderProps) {
+export function BlueSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle, pathname}: SliderProps) {
     const colors = sliderColors.blue
     const heightParts = height.split(/(?<=\d)(?!\d|\.)|(?<=\d\.\d)(?!\d)/)
     const heightVal = parseFloat(heightParts[0])
     const heightUnits = heightParts[1]
     const strokeSizeVal = heightVal*0.05
-    const strokeSize = (strokeWidth != undefined) ? strokeWidth : strokeSizeVal + heightUnits
+    const activeStrokeSize = (strokeWidth != undefined) ? strokeWidth : strokeSizeVal + heightUnits
+
+    const ownHref = "/education"
+    const isActive = pathname === ownHref
+
+    const [isOpen, setIsOpen] = useState(false)
+    useEffect(() => setIsOpen(false), [pathname])
+
+    const strokeVisible = isActive || pathname === '/' || isOpen
+    const strokeSize = activeStrokeSize
 
     const rect = BlueSliderRect({
         width, height, style,
-        className: [styles.sliderBorder, styles.borderBlue, className].filter(Boolean).join(" "),
+        className: [styles.sliderBorder, styles.borderBlue, strokeVisible ? styles.strokeVisible : '', className].filter(Boolean).join(" "),
     })
-    const orb = BlueOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline})
-    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: "Education", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, "/education")
+    const orb = BlueOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline, strokeOpacity: strokeVisible ? 1 : 0})
+    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: isActive ? "Home" : "Education", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, isOpen, setIsOpen)
 }
 
 
@@ -315,18 +388,19 @@ export function AllSliders({ appState, className, style } : AllSlidersProps ) {
     
     const neverHovered = appState.neverHovered
     const setNeverHovered = appState.setNeverHovered
+    const pathname = appState.pathname
     // The bounce is a "hey, interact with these" nudge for a first-time
     // visitor landing on the home page — it shouldn't play on other routes,
     // even though AllSliders itself (and neverHovered, which persists in
     // AppShell across navigation) is shared by every page.
-    const shouldBounce = neverHovered && appState.isHomePage
+    const shouldBounce = neverHovered && pathname === '/'
 
     return (
         <div className={styles.allSliders} ref={allSlidersRef} onMouseOver={() => setNeverHovered(false)}>
-            <RedSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideLeft} ${shouldBounce ? styles.bounceSlider : ''}`}/>
-            <GreenSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.bottomSlider} ${styles.slideLeft}`}/>
-            <YellowSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideRight}`}/>
-            <BlueSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.bottomSlider} ${styles.slideRight}`}/>
+            <RedSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideLeft} ${shouldBounce ? styles.bounceSlider : ''}`} pathname={pathname}/>
+            <GreenSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.bottomSlider} ${styles.slideLeft}`} pathname={pathname}/>
+            <YellowSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideRight}`} pathname={pathname}/>
+            <BlueSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.bottomSlider} ${styles.slideRight}`} pathname={pathname}/>
         </div>
     )
 }

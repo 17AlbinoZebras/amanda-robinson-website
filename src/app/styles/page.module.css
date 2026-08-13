@@ -27,3 +27,19 @@ body {
     99.9% { pointer-events: none; }
     100% { opacity: 1; pointer-events: auto; }
 }
+
+/* Softens the hard cut between pages — remounted fresh on every navigation
+   via key={pathname} in app_shell.tsx (see the comment there), since
+   {children}'s own wrapper here would otherwise persist across navigation
+   and only ever play this animation once. Fade-in only (not a full
+   crossfade with the outgoing page) — Next.js unmounts the old route and
+   mounts the new one in the same instant, so there's no old content left
+   to fade out without a transition library holding onto it. */
+.pageFadeIn {
+    animation: fade-in-page 400ms ease;
+}
+
+@keyframes fade-in-page {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}

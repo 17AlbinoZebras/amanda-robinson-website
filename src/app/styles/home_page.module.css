@@ -348,28 +348,28 @@
     transform: translate(17vw, 2vh);
     opacity: 1;
     pointer-events: auto;
-    animation: move-red-orb 5s ease var(--delay-animation) 1 forwards, hide-red-orb 2s ease-out 7.5s 1 forwards;
+    animation: move-red-orb 5s ease var(--delay-animation) 1 forwards, hide-red-orb 0.1s ease-out 6.5s 1 forwards;
 }
 
 .yellowOrbIntro {
     transform: translate(-13.75vw, -2.5vh);
     opacity: 1;
     pointer-events: auto;
-    animation: move-yellow-orb 5s ease var(--delay-animation) 1 forwards, hide-yellow-orb 2s ease-out 7.5s 1 forwards;
+    animation: move-yellow-orb 5s ease var(--delay-animation) 1 forwards, hide-yellow-orb 0.1s ease-out 6.5s 1 forwards;
 }
 
 .greenOrbIntro {
     transform: translate(5.5vw, -8vh);
     opacity: 1;
     pointer-events: auto;
-    animation: move-green-orb 5s ease var(--delay-animation) 1 forwards, hide-green-orb 2s ease-out 7.5s 1 forwards;
+    animation: move-green-orb 5s ease var(--delay-animation) 1 forwards, hide-green-orb 0.1s ease-out 6.5s 1 forwards;
 }
 
 .blueOrbIntro {
     transform: translate(-8.25vw, -3vh);
     opacity: 1;
     pointer-events: auto;
-    animation: move-blue-orb 5s ease var(--delay-animation) 1 forwards, hide-blue-orb 2s ease-out 7.5s 1 forwards;
+    animation: move-blue-orb 5s ease var(--delay-animation) 1 forwards, hide-blue-orb 0.1s ease-out 6.5s 1 forwards;
 }
 
 /* Scales the orb down (or up) to end at exactly --slider-height tall — apply

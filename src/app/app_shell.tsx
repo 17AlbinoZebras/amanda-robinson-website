@@ -9,7 +9,7 @@ import Footer from './footer'
 export interface AppStateTypes {
     neverHovered: boolean,
     setNeverHovered: (v: boolean) => void;
-    isHomePage: boolean;
+    pathname: string;
 }
 
 // Whether the home page's intro (sliders fade-in, orb fly-out-and-return)
@@ -25,7 +25,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     const appState: AppStateTypes = {
         neverHovered,
         setNeverHovered,
-        isHomePage: pathname === '/'
+        pathname
     }
 
     // hasShownIntroRef tracks "ever shown, this session" without triggering a
@@ -66,7 +66,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div className={styles.page}>
             <main className={styles.main}>
             <AppIntroContext.Provider value={playIntro}>
-                {children}
+                {/* key={pathname} forces this wrapper (and so its fade-in
+                    animation) to remount on every navigation — a plain,
+                    unkeyed wrapper would only ever play the animation once,
+                    since the wrapper element itself persists across
+                    navigation even though {children} underneath it swaps. */}
+                <div key={pathname} className={styles.pageFadeIn}>
+                    {children}
+                </div>
             </AppIntroContext.Provider>
             <div className={playIntro ? styles.sliderFadeIn : undefined}>
                 <AllSliders appState={appState}/>

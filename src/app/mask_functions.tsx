@@ -275,6 +275,13 @@ type ClippedVectorProps = Omit<TintedVectorProps, "frameWidth" | "frameHeight"> 
   // this component by its old frameWidth/frameHeight needs to account for that.
   strokeWidth?: SizeValue;
   strokeColor?: string;
+  // Fades the stroke layer in/out (e.g. on hover) without touching strokeWidth
+  // itself — since strokeWidth also controls the outer wrapper's size (see
+  // above), animating strokeWidth directly to "show"/"hide" a stroke would
+  // shift the layout of anything sized off it every time visibility toggles.
+  // Keep strokeWidth constant and animate this instead. Defaults to 1 (fully
+  // visible) whenever a stroke exists at all.
+  strokeOpacity?: number;
 };
 
 // TintedVector + clipToShape are almost always used together as "a colored,
@@ -291,6 +298,7 @@ export function ClippedVector({
   shapeColor,
   strokeWidth,
   strokeColor,
+  strokeOpacity = 1,
   frameClassName,
   frameStyle,
   ...vectorProps
@@ -315,7 +323,7 @@ export function ClippedVector({
       style={{ width: outerWidth, height: outerHeight, position: "relative", ...frameStyle }}
     >
       {hasStroke && (
-        <div style={{ position: "absolute", inset: 0, ...clipToShape(shape, strokeColor) }} />
+        <div className={styles.strokeLayer} style={{ position: "absolute", inset: 0, opacity: strokeOpacity, ...clipToShape(shape, strokeColor) }} />
       )}
       <div
         className={styles.clippedFrame}

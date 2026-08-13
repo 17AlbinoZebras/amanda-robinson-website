@@ -8,6 +8,13 @@
   justify-content: center;
 }
 
+/* Lets a stroke's WIDTH stay constant (so nothing sizing itself off it — e.g.
+   sliders.module.css's --stroke-width-driven offsets — ever has to jump) while
+   its VISIBILITY fades in/out via opacity instead of an abrupt show/hide. */
+.strokeLayer {
+  transition: opacity 300ms ease;
+}
+
 .tinted {
   flex-shrink: 0;
   background-color: var(--tint-color);
