@@ -3,8 +3,9 @@
     min-height: 100vh;
     width: 100vw;
     display: flex;
+    flex-direction: column;
     /* align-items: center; */
-    justify-content: center;
+    /* justify-content: center; */
     background-color: #666AA3;
     font-family: var(--font-afacad-flux);
 }
@@ -22,7 +23,96 @@
        --font-new-amsterdam-size in globals.css) — set to the 64px Idiqlat
        .heading uses on about.module.css / experience.module.css so both
        read as the same visual size. */
-    --idiqlat-equivalent-size: 64px;
+    --idiqlat-equivalent-size: 56px;
     font-size: var(--font-new-amsterdam-size);
+    color: #FFE8BA;
+    text-align: center;
+
+    margin-top: 16px;
+}
+
+.subHeading {
+    position: relative;
+    font-family: var(--font-new-amsterdam);
+    --idiqlat-equivalent-size: 40px;
+    font-size: var(--font-new-amsterdam-size);
+    color: #FDC5C4;
+    text-align: center;
+}
+
+.upperSection {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 35vh;
+}
+
+.overview {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    
+    width: 60vw;
+    padding: 32px 24px;
+    border-radius: 32px;
+
+    background-color: #FFE8BA;
+    color: var(--main-blue);
+    font-size: 28px;
+
+    line-height: 1.75;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    width: 45%;
+    align-items: center;
+}
+
+.lowerSection {
+    display: flex;
+    flex-direction: column;
+    gap: 5%;
+    width: 100vw;
+    align-items: center;
+    justify-content: center;
+}
+
+.relevantCourses {
+    margin-top: 44px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    font-size: 24px;
+    font-weight: 500;
+
+    gap: 64px;
+
+    width: 80vw;
+}
+
+.relevantCourses .row {
+    display: flex;
+    flex-direction: row;
+    gap: 52px;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.course {
+    display: flex;
+    width: 200px;
+    height: 100px;
+    padding: 16px;
+    border-radius: 32px;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    background-color: #A9ACD6;
     color: #FFE8BA;
 }
