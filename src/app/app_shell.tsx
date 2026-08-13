@@ -65,20 +65,20 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     return (
         <div className={styles.page}>
             <main className={styles.main}>
-            <AppIntroContext.Provider value={playIntro}>
-                {/* key={pathname} forces this wrapper (and so its fade-in
-                    animation) to remount on every navigation — a plain,
-                    unkeyed wrapper would only ever play the animation once,
-                    since the wrapper element itself persists across
-                    navigation even though {children} underneath it swaps. */}
-                <div key={pathname} className={styles.pageFadeIn}>
-                    {children}
+                <AppIntroContext.Provider value={playIntro}>
+                    {/* key={pathname} forces this wrapper (and so its fade-in
+                        animation) to remount on every navigation — a plain,
+                        unkeyed wrapper would only ever play the animation once,
+                        since the wrapper element itself persists across
+                        navigation even though {children} underneath it swaps. */}
+                    <div key={pathname} className={styles.pageFadeIn}>
+                        {children}
+                    </div>
+                </AppIntroContext.Provider>
+                <div className={playIntro ? styles.sliderFadeIn : undefined}>
+                    <AllSliders appState={appState}/>
                 </div>
-            </AppIntroContext.Provider>
-            <div className={playIntro ? styles.sliderFadeIn : undefined}>
-                <AllSliders appState={appState}/>
-            </div>
-            <Footer/>
+                <Footer/>
             </main>
         </div>
     )
