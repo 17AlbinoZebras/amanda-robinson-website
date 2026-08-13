@@ -213,7 +213,7 @@
 .slideLeft {
     left: 0;
     transform: translateX(-100%);
-    transition: all 600ms;
+    transition: all 550ms;
 }
 
 .slideLeft.sliderOpen {
@@ -223,7 +223,7 @@
 .slideRight {
     right: 0;
     transform: translateX(100%);
-    transition: all 600ms;
+    transition: all 550ms;
 }
 
 .slideRight.sliderOpen {
