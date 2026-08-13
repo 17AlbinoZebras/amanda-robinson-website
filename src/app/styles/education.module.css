@@ -9,8 +9,20 @@
     font-family: var(--font-afacad-flux);
 }
 
+.educationBackground {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
 .heading {
+    position: relative;
     font-family: var(--font-new-amsterdam);
-    font-size: 64px;
+    /* New Amsterdam reads smaller than Idiqlat at the same font-size (see
+       --font-new-amsterdam-size in globals.css) — set to the 64px Idiqlat
+       .heading uses on about.module.css / experience.module.css so both
+       read as the same visual size. */
+    --idiqlat-equivalent-size: 64px;
+    font-size: var(--font-new-amsterdam-size);
     color: #FFE8BA;
 }

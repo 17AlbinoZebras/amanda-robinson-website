@@ -20,6 +20,48 @@
      AllSliders and the orbs don't reliably share a common styled ancestor
      (AllSliders currently renders as a sibling of HomePage in page.tsx). */
   --slider-height: 250px;
+
+}
+
+/* Idiqlat → New Amsterdam / Afacad Flux font-size conversions.
+   New Amsterdam is unicase (x-height ≈ cap-height), while Idiqlat's
+   x-height is only ~75% of cap-height — so at the same font-size, both New
+   Amsterdam and Afacad Flux read smaller than Idiqlat.
+
+   New Amsterdam: calibrated by eye at three (Idiqlat px, New Amsterdam px)
+   pairs: (50, 65), (96, 352/3), (128, 512/3). The boost isn't one line
+   across all three points — two segments joined at 96px, picked via max()
+   since each segment is only valid on its own side of that join (this is
+   the same derivation as .labelFontNewAmsterdam in sliders.module.css,
+   generalized here from cqh to a plain px input so any page can reuse it).
+
+   Afacad Flux: Google Fonts doesn't publish x-height/cap-height metrics for
+   either typeface, so unlike New Amsterdam's multi-point eye calibration,
+   this is a single calibrated pair — Idiqlat 30px ≈ Afacad Flux 34px —
+   extended as one linear scale rather than New Amsterdam's two-segment
+   curve. Recalibrate with a second pair (per the eye-calibration process
+   above) if a size far from 30px ever looks off.
+
+   To use: set --idiqlat-equivalent-size to the Idiqlat px value you're
+   matching (e.g. an existing heading elsewhere using Idiqlat at that size),
+   then font-size: var(--font-new-amsterdam-size) or
+   var(--font-afacad-flux-size) on the New Amsterdam / Afacad Flux element —
+   no need to redo the calibration math by hand.
+
+   This has to be a "*" rule, not a :root one — custom properties resolve
+   var() references once, at their own point of declaration, then simply
+   inherit that already-resolved value downward. A :root-only declaration
+   would resolve var(--idiqlat-equivalent-size) once at :root (where it's
+   never set, so it'd always fall back to 0px) and every element would just
+   inherit that same fixed, wrong result regardless of its own local
+   --idiqlat-equivalent-size. Matching every element with "*" instead makes
+   these redeclared — and thus actually recomputed — on whichever element
+   sets --idiqlat-equivalent-size locally. */
+* {
+  --na-seg1: calc(var(--idiqlat-equivalent-size, 0px) * 157 / 138 + 8.11594px);
+  --na-seg2: calc(var(--idiqlat-equivalent-size, 0px) * 5 / 3 - 42.66667px);
+  --font-new-amsterdam-size: max(var(--na-seg1), var(--na-seg2));
+  --font-afacad-flux-size: calc(var(--idiqlat-equivalent-size, 0px) * 34 / 30);
 }
 
 @media (prefers-color-scheme: dark) {

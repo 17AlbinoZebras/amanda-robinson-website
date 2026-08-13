@@ -9,8 +9,29 @@
     font-family: var(--font-afacad-flux);
 }
 
+.projectsBackground {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
 .heading {
+    /* z-index only has an effect on positioned elements — .heading was
+       position: static (the default), so z-index changes on it were
+       silently ignored. .projectsBackground (position: absolute) paints
+       above static in-flow content regardless of DOM order or z-index, per
+       CSS's painting order rules — positioned elements (even at the default
+       z-index: auto) always paint after static ones. Just needs .heading to
+       be positioned too (no z-index needed): with both elements then in the
+       same z-index: auto paint layer, the tie breaks by DOM order, and
+       .heading comes after .projectsBackground in the markup. */
+    position: relative;
     font-family: var(--font-new-amsterdam);
-    font-size: 64px;
+    /* New Amsterdam reads smaller than Idiqlat at the same font-size (see
+       --font-new-amsterdam-size in globals.css) — set to the 64px Idiqlat
+       .heading uses on about.module.css / experience.module.css so both
+       read as the same visual size. */
+    --idiqlat-equivalent-size: 64px;
+    font-size: var(--font-new-amsterdam-size);
     color: var(--main-blue);
 }

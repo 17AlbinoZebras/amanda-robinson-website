@@ -9,7 +9,14 @@
     font-family: var(--font-afacad-flux);
 }
 
+.aboutBackground {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
 .heading {
+    position: relative;
     font-family: var(--font-idiqlat);
     font-size: 64px;
     color: var(--main-red);
