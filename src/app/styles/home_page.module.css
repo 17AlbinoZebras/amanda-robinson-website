@@ -506,7 +506,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 23vh;
+    margin-top: 23.5vh;
     /* Single source of truth for the text block's responsive width — .nameStack
        uses it directly, and the blob's width (set in home_page.tsx) derives from
        it too, so the two stay proportionally consistent at every viewport size

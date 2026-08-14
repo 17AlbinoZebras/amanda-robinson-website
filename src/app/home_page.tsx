@@ -156,7 +156,7 @@ export default function HomePage() {
                     </svg>
                 </div>
                 <div className={styles.subtitleSection}>
-                    <div className={styles.subtitle}>Builder of effective and unique software</div>
+                    <div className={styles.subtitle}>Builder of unique and effective software</div>
                 </div>
             </div>
             <OverviewSection/>
