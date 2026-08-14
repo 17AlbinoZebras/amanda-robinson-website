@@ -14,7 +14,7 @@ export default function About() {
                         <img src="AmandaHeadshot8ML.jpg" className={styles.headshot}></img>
                     </div>
                     <div className={styles.mainDescription}>
-                        Hi! I&#39;m Amanda, a third year CS student at WPI. I grew up in San Jose, California, but I&#39;m open to working anywhere. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+                        Hi! I&#39;m Amanda Robinson, a third year CS student at WPI. I grew up in San Jose, California, but I love to travel and I&#39;m open to working anywhere. I&#39;ve been coding my whole life, and I find the limitless possibilities to what I can build thrilling. To me, coding is like solving a puzzle—finding new ways to approach old problems. My lifelong passion for logic puzzles has grown into a desire to develop creative solutions to tackle complex problems professionally. 
                     </div>
                 </div>
                 <div className={styles.lowerSection}>
