@@ -3,8 +3,9 @@
     min-height: 100vh;
     width: 100vw;
     display: flex;
-    /* align-items: center; */
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
     background-color: #FDC5C4;
     font-family: var(--font-afacad-flux);
 }
@@ -37,6 +38,179 @@
 
     margin-top: 16px;
 }
+
+.projects {
+    margin-top: 1.5vh;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    height: 81.5vh;
+    width: 70vw;
+
+    --transition-length: 1s;
+}
+
+.project {
+    position: relative;
+    border-radius: 32px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+
+     transition: all var(--transition-length);
+    /* .projectContent stays rendered (opacity-hidden, not display:none) even
+       when closed now — see the note there — so this clips it to the
+       panel's own narrow width during the transition instead of letting it
+       spill out, and also resets flex's "won't shrink below content's own
+       min-content size" default, which would otherwise fight the flex:1
+       collapse since the full-width content no longer disappears from
+       layout the way display:none used to make it. */
+    overflow: hidden;
+}
+
+.projectTitle {
+    font-family: var(--font-new-amsterdam);
+    font-size: 38px;
+    color: var(--main-light);
+    transition: all var(--transition-length);
+}
+
+.projectContent {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 4px;
+    gap: 18px;
+    align-items: center;
+    height: 95%;
+    transition: all var(--transition-length) 0.5s;
+}
+
+.preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 20px;
+    border: 4px solid #FF8F90;
+}
+
+.description {
+    width: 92.5%;
+    border-radius: 20px;
+    padding: 12px;
+    height: 32%;
+
+    background-color: #B4CAC1;
+    color: var(--main-light);
+    /* font-size: 20px; */
+    font-weight: 500;
+    transition: all var(--transition-length);
+}
+
+.description span {
+    display: inline-block;
+    opacity: 1;
+    /* font-size: 20px; */
+    transition: all var(--transition-length);
+}
+
+.projectClosed {
+    flex: 1;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.projectClosed .projectTitle {
+    font-size: 30px;
+    /* Plain rotation of normal horizontal text — no writing-mode/
+       text-orientation involved at all, unlike the previous attempt, which
+       set writing-mode:vertical-lr permanently on the base .projectTitle
+       rule so it would never have to "snap" between open/closed. That
+       broke the open panel's layout badly (its width collapsed to ~24px)
+       because writing-mode changes which axis is "inline" vs "block" for
+       layout/sizing purposes too, not just how it paints — transform
+       doesn't touch that, so the flex algorithm was sizing the open title
+       (and so the whole open .project flex item) using vertical-mode's
+       sizing rules even though it visually looked horizontal. A plain
+       rotate() has no such effect: the box is sized as normal horizontal
+       text pre-rotation, and the rotation is purely a paint-time visual
+       transform layered on top, so it can't disturb layout.
+       rotate(-90deg) (not the read-more-naturally +90deg) is deliberate:
+       it's the SHORT way around from the open state's implicit 0deg, one
+       smoothly-interpolating 90deg turn, landing the title reading
+       bottom-to-top — confirmed against the previous look, which read
+       top-to-bottom, so this is the "should be upside down from how it
+       is now" direction. */
+    transform: rotate(-90deg);
+}
+
+.projectClosed .projectContent {
+    /* Not display:none — a transition can't animate across a display:none
+       boundary at all (an element that isn't rendered has no "previous
+       state" to interpolate from), so anything inside it, including
+       .description span's own opacity/font-size transition below, was
+       just snapping straight to its final value instead of easing,
+       on every open, not just the first. opacity + pointer-events keeps
+       this subtree continuously rendered (just invisible + inert while
+       closed) so the transition can actually play.
+       height/margin-top also need to collapse to 0 here — .projectContent
+       otherwise still claims its full 95% height (and 8px margin) even
+       while invisible, which was pushing the visible title off-center
+       within the closed panel (.projectClosed centers its children as a
+       group, so a huge invisible block below the title shifts where that
+       group's center actually falls). */
+    height: 0;
+    margin-top: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.projectClosed .description span {
+    opacity: 0;
+    font-size: 10px;
+}
+
+.projectOpen {
+    flex: 9;
+    padding: 12px;
+}
+
+.intervle {
+    background-color: #A9ACD6;
+    font-size: 24px;
+    line-height: 1.5;
+}
+
+.intervle img {
+    object-fit: cover;
+    transform: scale(1.1) translate(0, 3.5%);
+}
+
+.shopcomp {
+    background-color: #8286B7;
+    font-size: 20px;
+    line-height: 1.375;
+}
+
+.shopcomp video {
+    object-fit: cover;
+    object-position: 50% 25%;
+    border-radius: 20px;
+    max-width: 100%;
+    /* transition: all var(--transition-length); */
+}
+
+.heatmap {
+    background-color: var(--main-blue);
+    font-size: 24px;
+    line-height: 1.375;
+}
+
+
 
 @media (max-width: 700px) {
     .heading {

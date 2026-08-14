@@ -59,7 +59,7 @@ function OverviewSection() {
                             <b>Tools: </b>
                             <p>Git, VS Code, Claude Code, Warp, Linux</p>
                             <b>Other: </b>
-                            <p>MySQL, PostgreSQL, SQL Server, AWS</p>
+                            <p>MySQL, PostgreSQL, SQL Server, AWS, Figma</p>
                         </div>
                     </div>
                     <div className={styles.education}>
