@@ -116,3 +116,64 @@
     background-color: #A9ACD6;
     color: #FFE8BA;
 }
+
+@media (max-width: 700px) {
+    .heading {
+        --idiqlat-equivalent-size: 38px;
+    }
+
+    .subHeading {
+        --idiqlat-equivalent-size: 28px;
+    }
+
+    .upperSection {
+        height: auto;
+        padding: 24px 0;
+    }
+
+    .overview {
+        flex-direction: column;
+        width: 90vw;
+        padding: 24px 20px;
+    }
+
+    .column {
+        width: 100%;
+    }
+
+    .relevantCourses {
+        width: 90vw;
+        gap: 32px;
+    }
+
+    .relevantCourses .row {
+        /* Fixed 200x100 pills with no wrap meant 4 pills needed ~950px —
+           wildly over any phone width. */
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .course {
+        /* height: auto (with a min-height floor instead of a hard 100px)
+           lets a wrapping title grow the pill instead of overflowing it. */
+        width: 140px;
+        height: auto;
+        min-height: 90px;
+        padding: 12px;
+        font-size: 18px;
+    }
+}
+
+/* Only iPhone SE-class widths (~320-374px) can't comfortably fit two 140px
+   pills + a 20px gap (300px) inside .relevantCourses's 90vw (e.g. ~288px
+   available at a 320px viewport) — shrink further here to keep 2-per-row
+   instead of silently dropping to 1-per-row on the smallest common phones. */
+@media (max-width: 420px) {
+    .course {
+        width: 128px;
+    }
+
+    .relevantCourses .row {
+        gap: 12px;
+    }
+}

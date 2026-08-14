@@ -157,7 +157,7 @@ type LabelProps = {
     labelStyle?: CSSProperties;
 }
 
-function Slider(width: string, height: string, rect: React.ReactNode, orb: React.ReactNode, orbSide: "left" | "right", orbStrokeWidth: SizeValue, { labelText, labelStyle }: LabelProps, sliderClassName?: string, sliderStyle?: CSSProperties, href?: string, isOpen?: boolean, onOpenChange?: (open: boolean) => void) {
+function Slider(width: string, height: string, rect: React.ReactNode, orb: React.ReactNode, orbSide: "left" | "right", orbStrokeWidth: SizeValue, { labelText, labelStyle }: LabelProps, sliderClassName?: string, sliderStyle?: CSSProperties, href?: string, isOpen?: boolean, onOpenChange?: (open: boolean) => void, sliderRef?: React.Ref<HTMLAnchorElement>) {
     // Custom properties don't get React's automatic px-suffixing for numbers
     // (that only applies to known CSS properties), so a bare number needs "px"
     // appended explicitly here.
@@ -197,9 +197,25 @@ function Slider(width: string, height: string, rect: React.ReactNode, orb: React
         </>
     )
 
+    // onClick intercepts the FIRST activation while closed and turns it into
+    // "just open" instead of "navigate" — necessary for touch, which has no
+    // real hover to open the slider before a tap: without this, a tap would
+    // both open AND immediately navigate in the same gesture, so a touch
+    // user could never actually see the slider before leaving the page. On
+    // a real mouse this is a no-op in practice, since hovering already sets
+    // isOpen to true before a click can ever fire, so the click always
+    // reaches the `else` branch and navigates immediately — same as before.
+    const handleClick = (e: React.MouseEvent) => {
+        if (!isOpen) {
+            e.preventDefault()
+            onOpenChange?.(true)
+        }
+    }
+
     const hoverHandlers = {
         onMouseEnter: () => onOpenChange?.(true),
         onMouseLeave: () => onOpenChange?.(false),
+        onClick: handleClick,
     }
 
     // The whole slider (rect, orb, and label together) is the click target,
@@ -210,7 +226,7 @@ function Slider(width: string, height: string, rect: React.ReactNode, orb: React
     // CSS needs no changes for this.
     if (href) {
         return (
-            <Link href={href} className={sliderClassNames} style={sliderStyles} {...hoverHandlers}>
+            <Link href={href} ref={sliderRef} className={sliderClassNames} style={sliderStyles} {...hoverHandlers}>
                 {content}
             </Link>
         )
@@ -236,6 +252,7 @@ export function RedSlider({width, height, className, style, strokeWidth, sliderC
     const ownHref = "/projects"
     const isActive = pathname === ownHref
 
+    const sliderRef = useRef<HTMLAnchorElement>(null)
     const [isOpen, setIsOpen] = useState(false)
     // Closes the slider on navigation regardless of where the cursor
     // physically is (see the isOpen note in Slider() above) — resetting the
@@ -244,6 +261,22 @@ export function RedSlider({width, height, className, style, strokeWidth, sliderC
     // navigation was observed to make React duplicate DOM nodes instead of
     // replacing them (reproducible, not a one-off — see AllSliders below).
     useEffect(() => setIsOpen(false), [pathname])
+    // Closes on a tap anywhere outside the slider — touch has no hover to
+    // leave, so without this, opening a slider via the first-tap-to-open
+    // behavior in Slider() would leave it open with no way to back out
+    // short of tapping it again (which navigates). pointerdown (not click)
+    // so it fires before a tap ON the slider's own navigate-click completes,
+    // and only listens while open, to avoid a permanent global listener.
+    useEffect(() => {
+        if (!isOpen) return
+        const handleOutside = (e: PointerEvent) => {
+            if (sliderRef.current && !sliderRef.current.contains(e.target as Node)) {
+                setIsOpen(false)
+            }
+        }
+        document.addEventListener('pointerdown', handleOutside)
+        return () => document.removeEventListener('pointerdown', handleOutside)
+    }, [isOpen])
 
     // The slider matching the current page always shows its stroke (an "you
     // are here" indicator) and becomes a Home button instead of a link to
@@ -267,7 +300,7 @@ export function RedSlider({width, height, className, style, strokeWidth, sliderC
     })
     const orb = RedOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline, strokeOpacity: strokeVisible ? 1 : 0})
 
-    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: isActive ? "Home" : "Projects", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, isOpen, setIsOpen)
+    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: isActive ? "Home" : "Projects", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, isOpen, setIsOpen, sliderRef)
 }
 
 export function YellowSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle, pathname}: SliderProps) {
@@ -281,8 +314,19 @@ export function YellowSlider({width, height, className, style, strokeWidth, slid
     const ownHref = "/about"
     const isActive = pathname === ownHref
 
+    const sliderRef = useRef<HTMLAnchorElement>(null)
     const [isOpen, setIsOpen] = useState(false)
     useEffect(() => setIsOpen(false), [pathname])
+    useEffect(() => {
+        if (!isOpen) return
+        const handleOutside = (e: PointerEvent) => {
+            if (sliderRef.current && !sliderRef.current.contains(e.target as Node)) {
+                setIsOpen(false)
+            }
+        }
+        document.addEventListener('pointerdown', handleOutside)
+        return () => document.removeEventListener('pointerdown', handleOutside)
+    }, [isOpen])
 
     const strokeVisible = isActive || pathname === '/' || isOpen
     const strokeSize = activeStrokeSize
@@ -292,7 +336,7 @@ export function YellowSlider({width, height, className, style, strokeWidth, slid
         className: [styles.sliderBorder, styles.borderYellow, strokeVisible ? styles.strokeVisible : '', className].filter(Boolean).join(" "),
     })
     const orb = YellowOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline, strokeOpacity: strokeVisible ? 1 : 0})
-    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: isActive ? "Home" : "About Me", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, isOpen, setIsOpen)
+    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: isActive ? "Home" : "About Me", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, isOpen, setIsOpen, sliderRef)
 }
 
 export function GreenSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle, pathname}: SliderProps) {
@@ -306,8 +350,19 @@ export function GreenSlider({width, height, className, style, strokeWidth, slide
     const ownHref = "/experience"
     const isActive = pathname === ownHref
 
+    const sliderRef = useRef<HTMLAnchorElement>(null)
     const [isOpen, setIsOpen] = useState(false)
     useEffect(() => setIsOpen(false), [pathname])
+    useEffect(() => {
+        if (!isOpen) return
+        const handleOutside = (e: PointerEvent) => {
+            if (sliderRef.current && !sliderRef.current.contains(e.target as Node)) {
+                setIsOpen(false)
+            }
+        }
+        document.addEventListener('pointerdown', handleOutside)
+        return () => document.removeEventListener('pointerdown', handleOutside)
+    }, [isOpen])
 
     const strokeVisible = isActive || pathname === '/' || isOpen
     const strokeSize = activeStrokeSize
@@ -317,7 +372,7 @@ export function GreenSlider({width, height, className, style, strokeWidth, slide
         className: [styles.sliderBorder, styles.borderGreen, strokeVisible ? styles.strokeVisible : '', className].filter(Boolean).join(" "),
     })
     const orb = GreenOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline, strokeOpacity: strokeVisible ? 1 : 0})
-    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: isActive ? "Home" : "Experience", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, isOpen, setIsOpen)
+    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: isActive ? "Home" : "Experience", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, isOpen, setIsOpen, sliderRef)
 }
 
 export function BlueSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle, pathname}: SliderProps) {
@@ -331,8 +386,19 @@ export function BlueSlider({width, height, className, style, strokeWidth, slider
     const ownHref = "/education"
     const isActive = pathname === ownHref
 
+    const sliderRef = useRef<HTMLAnchorElement>(null)
     const [isOpen, setIsOpen] = useState(false)
     useEffect(() => setIsOpen(false), [pathname])
+    useEffect(() => {
+        if (!isOpen) return
+        const handleOutside = (e: PointerEvent) => {
+            if (sliderRef.current && !sliderRef.current.contains(e.target as Node)) {
+                setIsOpen(false)
+            }
+        }
+        document.addEventListener('pointerdown', handleOutside)
+        return () => document.removeEventListener('pointerdown', handleOutside)
+    }, [isOpen])
 
     const strokeVisible = isActive || pathname === '/' || isOpen
     const strokeSize = activeStrokeSize
@@ -342,7 +408,7 @@ export function BlueSlider({width, height, className, style, strokeWidth, slider
         className: [styles.sliderBorder, styles.borderBlue, strokeVisible ? styles.strokeVisible : '', className].filter(Boolean).join(" "),
     })
     const orb = BlueOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline, strokeOpacity: strokeVisible ? 1 : 0})
-    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: isActive ? "Home" : "Education", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, isOpen, setIsOpen)
+    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: isActive ? "Home" : "Education", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, isOpen, setIsOpen, sliderRef)
 }
 
 

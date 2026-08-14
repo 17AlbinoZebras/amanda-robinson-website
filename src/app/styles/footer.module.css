@@ -63,3 +63,45 @@
 
     font-size: 18px;
 }
+
+@media (max-width: 700px) {
+    .footer {
+        /* A fixed 25vh with three independently absolutely-positioned
+           blocks is very likely to overlap on a narrow screen — switch to
+           auto height driven by normal document flow instead. */
+        height: auto;
+        padding: 32px 0 24px;
+    }
+
+    .centerSection {
+        height: auto;
+        gap: 8px;
+        font-size: 22px;
+    }
+
+    .pageLinks {
+        /* Previously had no layout role of its own since its children
+           escaped via position: absolute (relative to .footer, skipping
+           this element entirely). Turning it into the actual flex
+           container is what makes the two link groups stack and center
+           as a real block. */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        margin-top: 24px;
+        font-size: 20px;
+    }
+
+    .leftSection,
+    .rightSection {
+        position: static;
+        text-align: center;
+    }
+
+    .copyright {
+        position: static;
+        text-align: center;
+        margin-top: 24px;
+    }
+}

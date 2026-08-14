@@ -31,7 +31,17 @@
        --font-new-amsterdam-size in globals.css) — set to the 64px Idiqlat
        .heading uses on about.module.css / experience.module.css so both
        read as the same visual size. */
-    --idiqlat-equivalent-size: 64px;
+    --idiqlat-equivalent-size: 56px;
     font-size: var(--font-new-amsterdam-size);
     color: var(--main-blue);
+
+    margin-top: 16px;
+}
+
+@media (max-width: 700px) {
+    .heading {
+        /* Matches the ~38px mobile heading size used on about/experience/
+           education for visual consistency across pages. */
+        --idiqlat-equivalent-size: 38px;
+    }
 }

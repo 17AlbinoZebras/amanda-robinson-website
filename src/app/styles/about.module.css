@@ -141,3 +141,46 @@
 .lowerSection li {
     margin-bottom: 4px;
 }
+
+@media (max-width: 700px) {
+    .heading {
+        font-size: 38px;
+    }
+
+    .upperSection {
+        flex-direction: column;
+        height: auto;
+        width: 88vw;
+        padding: 24px 16px;
+    }
+
+    .mainPhoto {
+        /* flex: 2's basis governed the row's main axis (width); once
+           stacked, that same basis would instead govern height, not
+           width — so width needs to be explicit or it falls back to
+           align-items' cross-axis stretch (100% width). */
+        flex: none;
+        width: 60%;
+        margin-right: 0;
+        margin-bottom: 16px;
+    }
+
+    .mainDescription {
+        flex: none;
+        width: 100%;
+    }
+
+    .lowerSection {
+        flex-direction: column;
+        height: auto;
+        width: 88vw;
+        gap: 24px;
+    }
+
+    .activities,
+    .hobbies {
+        flex: none;
+        height: auto;
+        width: 100%;
+    }
+}

@@ -226,6 +226,31 @@
     transition: all 550ms;
 }
 
+@media (max-width: 700px) {
+    /* -100%/100% docks the slider exactly flush with the screen edge, so
+       the only thing visible while closed is whatever pokes out via its
+       own offset — today that's just the orb (see .orbWrapperLeft/Right
+       above), since the rect/label have none. On desktop that lone orb
+       sliver sits harmlessly in the wide margin outside centered content,
+       but mobile pages now use ~85-90vw-wide content, leaving far less
+       margin — so the sliver was cutting directly through scrolled text.
+
+       Insetting HERE — on the slider's own closed-state transform, the
+       thing every child (rect, label, orb alike) moves with — rather than
+       only tuning the orb's own internal offset, is what makes this an
+       inset of the entire slider rather than a fix narrowly scoped to the
+       orb: anything that ever pokes out (now or later) gets pulled back by
+       the same fixed amount, automatically, with no separate per-part
+       tuning required. */
+    .slideLeft {
+        transform: translateX(calc(-100% - 55px));
+    }
+
+    .slideRight {
+        transform: translateX(calc(100% + 55px));
+    }
+}
+
 .slideRight.sliderOpen {
     transform: translateX(0%);
 }

@@ -506,7 +506,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 23.5vh;
+    margin-top: 23vh;
     /* Single source of truth for the text block's responsive width — .nameStack
        uses it directly, and the blob's width (set in home_page.tsx) derives from
        it too, so the two stay proportionally consistent at every viewport size
@@ -542,7 +542,9 @@
 .subtitleSection {
     position: relative;
     display: flex;
-    margin-top: clamp(24px, 2.5vw, 56px);
+    /* margin-top: clamp(24px, 2.5vw, 56px); */
+    margin-top: 48px;
+    width: 30vw;
 }
 
 .subtitle {
@@ -550,5 +552,91 @@
     color: var(--main-green);
     text-align: center;
 
-    font-size: clamp(24px, 2.5vw, 48px);
+    /* font-size: clamp(24px, 2.5vw, 48px); */
+    font-size: 36px;
+}
+
+@media (max-width: 700px) {
+    /* .subtitleSection is a hand-set 30vw (~112px on a 375px phone) — far
+       too narrow for "Builder of effective and unique software", causing
+       severe wrapping. */
+    .subtitleSection {
+        width: 85vw;
+    }
+
+    /* .overview is normally forced to fit exactly one 100vh via
+       useScaleToFit (home_page.tsx) shrinking .overviewContent with
+       transform: scale() — a deliberate desktop fix so nothing needs to
+       scroll *within* the section. Once .upperSection/.lowerSection below
+       stack vertically, the section's natural height grows a lot; still
+       force-fitting that into 100vh would shrink text to a possibly
+       illegible size. Phone pages are routinely several screens tall, so
+       here it's better to let the section be as tall as it needs and
+       scroll with the rest of the page — matching how the page already
+       scrolls between the hero section and this one. */
+    .overview {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+    }
+
+    .overviewContent {
+        /* Neutralizes useScaleToFit with no JS change needed — the hook
+           still computes and sets --overview-scale every resize, but
+           transform: none here always wins in the cascade, so it has
+           nothing left to apply to. */
+        position: static;
+        transform: none;
+        gap: 32px;
+    }
+
+    .overviewBackground {
+        /* Stretches to cover .overview's now content-driven height instead
+           of staying pinned to the first 100vh. Not circular: .overview's
+           auto height resolves from its in-flow children only
+           (.overviewContent) before this absolutely positioned sibling
+           sizes itself against it. */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: auto;
+        height: auto;
+    }
+
+    .upperSection {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .blurb {
+        width: 85vw;
+        /* The original 10%-right padding cleared space for the headshot
+           overlapping on that side — no longer needed once it sits below
+           instead. */
+        padding: 6% 8%;
+        font-size: 22px;
+    }
+
+    .headshotContainer {
+        /* Overrides position: absolute so it flows below .blurb per DOM
+           order instead of overlapping it. 12.5vw of a ~375px screen would
+           render as a ~47px circle — a flat px value reads much better. */
+        position: static;
+        height: 140px;
+        width: 140px;
+    }
+
+    .lowerSection {
+        flex-direction: column;
+        width: 85vw;
+        gap: 24px;
+    }
+
+    .techStacks {
+        /* height: 100% depended on the row's stretch-derived height — in a
+           column with an auto-height parent that resolves to nothing
+           useful, so size to its own content instead. */
+        height: auto;
+    }
 }
