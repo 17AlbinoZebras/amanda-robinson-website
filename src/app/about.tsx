@@ -11,7 +11,7 @@ export default function About() {
             <div className={styles.mainContent}>
                 <div className={styles.upperSection}>
                     <div className={styles.mainPhoto}>
-                        <img src="AmandaHeadshot8ML.jpg" className={styles.headshot}></img>
+                        <img src="about/AmandaHeadshot8ML.jpg" className={styles.headshot}></img>
                     </div>
                     <div className={styles.mainDescription}>
                         I&#39;m Amanda Robinson, a third year CS student at WPI. I grew up in San Jose, California, but I love to travel. I&#39;ve been coding my whole life, and I find the limitless possibilities to what I can build thrilling. To me, designing software is like solving a puzzle—finding new ways to approach old problems. My lifelong passion for logic puzzles has grown into a desire to develop creative solutions to tackle complex problems professionally as a product builder. 
