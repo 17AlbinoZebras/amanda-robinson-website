@@ -92,7 +92,7 @@
 
 .headshot {
     width: 100%;
-    transform: scale(1.5)translate(1%, 3.5%) rotate(9.65deg); 
+    transform: scale(1.5) translate(1.5%, 3.5%) rotate(8.75deg);
 }
 
 .lowerSection {
