@@ -156,7 +156,7 @@ export default function HomePage() {
                     </svg>
                 </div>
                 <div className={styles.subtitleSection}>
-                    <span className={styles.subtitle}>I sure do code.<br/>Lorem ipsum, Etc.</span>
+                    <div className={styles.subtitle}>Builder of effective and unique software</div>
                 </div>
             </div>
             <OverviewSection/>

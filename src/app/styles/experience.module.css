@@ -91,3 +91,50 @@
     padding-right: 7%;
     line-height: 1.6;
 }
+
+@media (max-width: 700px) {
+    .heading {
+        font-size: 38px;
+    }
+
+    .mainBody {
+        /* The fixed 80vh + absolute top:0/bottom:0 trick (via .sfpti1/
+           .sfpti2) existed to guarantee no overlap between two
+           out-of-flow cards. Once the cards are back in normal flow
+           below, that's no longer needed — they simply stack in DOM
+           order with a real gap between them. */
+        height: auto;
+        margin-bottom: 2.5vh;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .section {
+        width: 100vw;
+        height: auto;
+    }
+
+    .sectionLeft,
+    .sectionRight {
+        /* .sfpti1/.sfpti2's top:0/bottom:0 become automatic no-ops once
+           position is static — no need to override those classes
+           separately. Keeping width: 100vw above (not narrower)
+           deliberately preserves the left-bleed/right-bleed look: each
+           card still spans edge-to-edge with a square corner on its
+           bleed side and the asymmetric border-radius unchanged. */
+        position: static;
+    }
+
+    .sectionLeft {
+        padding: 20px 6vw 24px 8vw;
+    }
+
+    .sectionRight {
+        padding: 20px 8vw 24px 6vw;
+    }
+
+    .sectionRight .sectionBody {
+        padding-right: 0;
+    }
+}
