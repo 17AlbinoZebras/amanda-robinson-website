@@ -14,7 +14,7 @@ export default function About() {
                         <img src="about/AmandaHeadshot8ML.jpg" className={styles.headshot}></img>
                     </div>
                     <div className={styles.mainDescription}>
-                        I&#39;m Amanda Robinson, a third year CS student at WPI. I grew up in San Jose, California, but I love to travel. I&#39;ve been coding my whole life, and I find the limitless possibilities to what I can build thrilling. To me, designing software is like solving a puzzle—finding new ways to approach old problems. My lifelong passion for logic puzzles has grown into a desire to develop creative solutions to tackle complex problems professionally as a product builder. 
+                        I&#39;m Amanda Robinson, a third year Computer Science student at WPI. I&#39;ve been using software to solve problems for as long as I can remember. What began as a love of coding and logic puzzles has grown into a passion for building thoughtful, creative products that tackle challenging real-world problems.
                     </div>
                 </div>
                 <div className={styles.lowerSection}>
