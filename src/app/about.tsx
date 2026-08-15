@@ -23,7 +23,7 @@ export default function About() {
                         <ul>
                             <li>Alpha Gamma Delta Sorority | Interim VP New Member Experience</li>
                             <li>Masque Theatre | VP Props & Costumes</li>
-                            <li>Women’s Club Rugby | PR Officer</li>
+                            <li>Women&#39;s Club Rugby | PR Officer</li>
                             <li>Alpha Psi Omega Honor Society | Member</li>
                             <li>Student Alumni Society | Member</li>
                         </ul>
