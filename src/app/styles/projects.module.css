@@ -45,7 +45,7 @@
     display: flex;
     flex-direction: row;
     height: 81.5vh;
-    width: 70vw;
+    width: 75vw;
 
     --transition-length: 1s;
 }
@@ -78,6 +78,20 @@
 }
 
 .projectContent {
+    /* This is the direct flex item of .project (the flex column that
+       centers the title via justify-content:center when closed). Without
+       overflow:hidden, a flex item's "automatic minimum size" resolves to
+       its content's intrinsic minimum rather than 0 — and the iframe deep
+       inside (via .preview > .previewMedia), sized by its own width/height
+       attributes, was contributing its ~370px intrinsic height to that
+       calculation. .project's own overflow:hidden clips the VISUAL result
+       (so .projectContent's rendered/computed height correctly shows 0px
+       while closed), but the flex algorithm's own centering math still used
+       the un-clipped, iframe-inflated automatic minimum internally —
+       shifting where "centered" landed and pushing the title upward.
+       Setting this directly resets the automatic minimum to 0, matching
+       what's actually rendered. */
+    overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -90,6 +104,17 @@
 }
 
 .preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* overflow stays visible here (unlike .previewMedia below) so
+       .expandToggle can hang off the bottom edge without being clipped —
+       the media's own rounded/clipped border now lives one level deeper. */
+}
+
+.previewMedia {
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -109,6 +134,14 @@
     /* font-size: 20px; */
     font-weight: 500;
     transition: all var(--transition-length);
+    /* Without this, .previewExpanded .description's height:0 fights flexbox's
+       "automatic minimum size" — a flex item (this is one, inside
+       .projectContent's flex column) with overflow:visible (the default)
+       won't shrink below its content's own min-content height regardless of
+       an explicit height override, only overflow values other than visible
+       reset that automatic minimum to 0. Same fix already used on .project
+       for the same reason. */
+    overflow: hidden;
 }
 
 .description span {
@@ -175,7 +208,7 @@
 }
 
 .projectOpen {
-    flex: 9;
+    flex: 10;
     padding: 12px;
 }
 
@@ -199,6 +232,83 @@
     width: 600px;
     height: 370px;
     position: relative;
+    transition: width var(--transition-length), height var(--transition-length), margin-top var(--transition-length);
+    /* .preview is a flex item of .projectContent's column layout — without
+       this, flexbox shrinks it below its specified height (on the main/
+       vertical axis) whenever .projectContent doesn't have quite enough
+       room to fit both preview and description at their full sizes at once
+       (e.g. mid-transition, or once the expanded 518px height is in play).
+       flex-shrink:0 makes preview's own width/height always authoritative;
+       any real overflow is handled by .project's overflow:hidden instead. */
+    flex-shrink: 0;
+}
+
+/* Expand-preview toggle — collapses .description (reusing the same
+   height/opacity technique .projectClosed .projectContent already uses
+   elsewhere in this file, so it's the same "closed" look, just triggered by
+   a different piece of state) and grows .preview to fill the freed space.
+   Scaled up by the same ~1.4x on both axes to keep its aspect ratio, so
+   .webPreview (100%/100% of .preview) scales the embedded video/iframe up
+   proportionally with it, no separate adjustment needed there. */
+.previewExpanded .description {
+    /* height: 0 alone is enough to fully collapse this, padding included —
+       box-sizing: border-box is set globally (globals.css's "* { ... }"
+       rule), so height always caps the box's total rendered size regardless
+       of padding. */
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.previewExpanded .preview {
+    margin-top: 2.5%;
+    width: 840px;
+    height: 518px;
+}
+
+.previewExpanded .webPreview {
+    zoom: 0.625;
+}
+
+/* A small pill tab that sticks out from the preview's bottom edge — flat top
+   (tucked under the preview's own border) and rounded bottom corners, same
+   shape language as a sidebar collapse tab, just rotated 90deg (horizontal
+   edge instead of vertical) to match where it needs to attach here. Lives
+   inside .preview (not .projectContent) and is positioned relative to it, so
+   it stays centered on the bottom edge regardless of .preview's own size. */
+.expandToggle {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 18px;
+    border: none;
+    border-radius: 0 0 10px 10px;
+    background-color: #FF8F90;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 200ms;
+}
+
+.expandToggle:hover {
+    background-color: #FFB2B3;
+}
+
+.expandToggle::after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--main-light);
+    transition: transform var(--transition-length);
+}
+
+.previewExpanded .expandToggle::after {
+    transform: rotate(180deg);
 }
 
 .webPreview {
@@ -206,6 +316,7 @@
     height: 100%;
     /* transform: scale(0.5); */
     zoom: 0.45;
+    transition: zoom var(--transition-length)
 }
 
 .shopcomp {
@@ -225,7 +336,7 @@
 .heatmap {
     background-color: var(--main-blue);
     font-size: 24px;
-    line-height: 1.375;
+    line-height: 1.5;
 }
 
 
