@@ -6,9 +6,14 @@
 }
 
 .footerBackground {
+    /* !important needed because TintedVector now has a NATURAL_SIZE entry
+       for cow-blobs.svg — since footer.tsx doesn't pass width/height, that
+       makes it render its own box at that natural size (980x980px) via
+       inline style, which otherwise beats this class's width/height
+       regardless of specificity. Same fix as .educationBackground. */
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
     z-index: -1;
 }
 
@@ -41,6 +46,7 @@
 
 .pageLinks {
     font-size: 24px;
+    line-height: 1.5;
 }
 
 .leftSection {
