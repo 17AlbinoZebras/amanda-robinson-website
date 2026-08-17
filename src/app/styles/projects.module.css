@@ -74,7 +74,7 @@
     font-family: var(--font-new-amsterdam);
     font-size: 38px;
     color: var(--main-light);
-    transition: all var(--transition-length);
+    transition: font-size var(--transition-length), transform var(--transition-length);
 }
 
 .projectContent {
@@ -83,7 +83,7 @@
     flex-direction: column;
     width: 100%;
     margin-top: 4px;
-    gap: 18px;
+    gap: 22px;
     align-items: center;
     height: 95%;
     transition: all var(--transition-length) 0.5s;
@@ -182,12 +182,30 @@
 .intervle {
     background-color: #A9ACD6;
     font-size: 24px;
-    line-height: 1.5;
+    line-height: 1.4;
+}
+
+.openTitle:hover {
+    color: var(--main-beige);
+    cursor: pointer;
 }
 
 .intervle img {
     object-fit: cover;
     transform: scale(1.1) translate(0, 3.5%);
+}
+
+.preview {
+    width: 600px;
+    height: 370px;
+    position: relative;
+}
+
+.webPreview {
+    width: 100%;
+    height: 100%;
+    /* transform: scale(0.5); */
+    zoom: 0.45;
 }
 
 .shopcomp {
@@ -198,7 +216,7 @@
 
 .shopcomp video {
     object-fit: cover;
-    object-position: 50% 25%;
+    object-position: 50% 30%;
     border-radius: 20px;
     max-width: 100%;
     /* transition: all var(--transition-length); */

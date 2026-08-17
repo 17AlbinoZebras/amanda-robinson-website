@@ -12,7 +12,7 @@
   --main-yellow: #FFC145;
   --main-light: #FFFFFB;
   --main-dark: #270722;
-  --main-beige: #F6EEE4;
+  --main-beige: #F6EBDE;
 
   /* Shared by sliders.module.css (.allSliders' own height) and
      home_page.module.css (.scaleToSliderHeight, so an orb can scale to match)

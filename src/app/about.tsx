@@ -17,6 +17,7 @@ export default function About() {
                         I&#39;m Amanda Robinson, a California native and a third year Computer Science student at WPI. I&#39;ve been using software to solve problems for as long as I can remember. What began as a love of coding and logic puzzles has grown into a passion for building thoughtful, creative products that tackle challenging real-world problems.
                     </div>
                 </div>
+                <div className={styles.preview}></div>
                 <div className={styles.lowerSection}>
                     <div className={styles.activities}>
                         <span className={styles.sectionTitle}>Activities & Leadership</span>
