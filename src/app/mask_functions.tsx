@@ -11,6 +11,7 @@ import styles from "./styles/mask_functions.module.css";
 const NATURAL_SIZE: Record<string, { width: number; height: number }> = {
   "/masks/Blob.svg": { width: 1103.39, height: 462.54 },
   "/masks/Blue-Squiggles.svg": { width: 86.43, height: 86.41 },
+  "/masks/cow-blobs.svg": { width: 980, height: 980.0249 },
   "/masks/Green-Memphis.svg": { width: 942.91, height: 469.31 },
   "/masks/Red-Squiggles.svg": { width: 612.01, height: 306.02 },
   "/masks/Yellow-Memphis.svg": { width: 1494, height: 750 },
