@@ -12,8 +12,15 @@
 
 .educationBackground {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    /* !important is needed here specifically because TintedVector always
+       renders its width/height props as an inline style on this same
+       element — inline styles beat any class rule regardless of how it's
+       written, so without this, the width='100vw' height='100vh' props in
+       education.tsx would keep pinning the background to exactly one
+       viewport's height, never growing to match .page's actual height once
+       the course description makes the page taller. */
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .heading {
@@ -82,16 +89,19 @@
 }
 
 .relevantCourses {
-    margin-top: 44px;
+    margin: 44px 0;
     position: relative;
     display: flex;
     flex-direction: column;
     font-size: 24px;
     font-weight: 500;
 
-    gap: 64px;
+    gap: 44px;
 
     width: 80vw;
+
+    align-items: center;
+    justify-content: center;
 }
 
 .relevantCourses .row {
@@ -115,6 +125,142 @@
     text-align: center;
     background-color: #A9ACD6;
     color: #FFE8BA;
+
+    cursor: pointer;
+}
+
+/* height is set via an inline style (education.tsx measures
+   .courseDescriptionInner's scrollHeight with JS) rather than CSS Grid's
+   usual 0fr/1fr content-based track trick. That trick needs
+   .courseDescriptionInner (the grid item) to auto-size to its content, but
+   .courseDescriptionInner also needs its own overflow:hidden (to clip the
+   vertical slide, and to look clean when collapsed) — and a grid item's
+   automatic minimum size collapses to 0 whenever its overflow isn't
+   visible, which was capping the row at ~24px regardless of actual content
+   height. JS-measuring the height directly and transitioning a plain
+   height property sidesteps that; scrollHeight always reports the true
+   content height regardless of the current overflow/clip state. */
+.courseDescription {
+    width: 90%;
+    overflow: hidden;
+    transition: height 1s;
+}
+
+/* While switching directly between two open courses, the box's height needs
+   to reach its target in the same 0.7s the text takes to slide — not the
+   1s used for opening/closing — otherwise the box is still growing/
+   shrinking for up to another 300ms after the text has already settled
+   into place, which reads as the bottom padding "catching up" late. */
+.courseDescriptionSliding {
+    transition: height 0.7s;
+}
+
+.courseDescriptionInner {
+    /* height:100% (not auto) — without this, this element's own rendered
+       height comes from its normal-flow child (the outgoing text), which
+       doesn't change size during a slide (it only translates via transform).
+       .courseDescription (the parent) is animating its height separately
+       toward the new target, so without this the yellow background here
+       would stay pinned at the OLD content's size the whole time, then
+       suddenly jump to match once displayedCourse updates at the very end —
+       exactly the "jump" that's most visible on the biggest height deltas
+       (switching to/from the longest descriptions). height:100% makes it
+       track .courseDescription's animating height directly, so the
+       background always fills exactly however much is currently revealed.
+       The box can still shrink to 0 height when closed, but this child
+       would still want to render at its natural (full) height unless
+       clipped — overflow:hidden is what actually makes the collapse look
+       like a clean crop instead of the text just staying visible and
+       spilling out. */
+    height: 100%;
+    overflow: hidden;
+    background-color: #FFE8BA;
+    color: var(--main-blue);
+
+    border-radius: 32px;
+
+    font-size: 22px;
+    font-weight: 400;
+
+    opacity: 0;
+    transition: opacity 1s;
+
+    /* Positioning context for .courseDescriptionIncoming below. */
+    position: relative;
+}
+
+.courseDescriptionOpen .courseDescriptionInner {
+    /* Padding lives here (not on .courseDescription) — with overflow:hidden
+       and a 0-height box, padding on this element collapses away with it
+       automatically. If it lived on the outer box instead, the padding
+       would stay a fixed size regardless of height, leaving a visible gap
+       even fully closed. */
+    padding: 12px 16px;
+    opacity: 1;
+}
+
+.courseDescriptionText {
+    transition: transform 0.7s ease;
+}
+
+/* translateY(var(--slide-distance)), not translateY(100%) — see
+   education.tsx's slideDistance for why: outgoing and incoming are
+   different courses with different natural heights, so each using its OWN
+   100% would move them different absolute pixel distances over the same
+   0.7s, letting the shorter one finish early and briefly overlap (or gap)
+   with the other instead of staying edge-to-edge like a push-slide needs.
+   --slide-distance is one shared value (set on .courseDescriptionInner, so
+   both layers inherit it) both layers move by instead. */
+.courseDescriptionText.slideOutUp {
+    transform: translateY(calc(var(--slide-distance) * -1));
+}
+
+.courseDescriptionText.slideOutDown {
+    transform: translateY(var(--slide-distance));
+}
+
+/* Applied for one reset frame when a slide finishes — see education.tsx's
+   suppressReset. Without this, removing the slide-out class (transform back
+   to 0) while the text simultaneously updates to the new course would
+   itself transition, animating the now-relabeled element back in right
+   after the real slide-in already finished. */
+.courseDescriptionText.noTransition {
+    transition: none;
+}
+
+.courseDescriptionIncoming {
+    position: absolute;
+    /* top/left/right (not top:0;left:0;width:100%) — an absolutely
+       positioned element's offsets are relative to its containing block's
+       PADDING box, ignoring the padding itself, unlike the outgoing text
+       (normal flow, which does respect .courseDescriptionInner's padding).
+       top:0;left:0 would render this flush against the edges with no
+       padding while sliding in, then visibly jump once it settles into
+       .courseDescriptionText's normal, padded position. Matching
+       .courseDescriptionInner's own 12px/16px padding here keeps it
+       aligned throughout. This also means it measures at the same width
+       the settled text will actually have, instead of a wider,
+       padding-less one that could fit the text in fewer lines and
+       undercount the height needed once really positioned. */
+    top: 12px;
+    left: 16px;
+    right: 16px;
+}
+
+/* Starting (pre-transition) positions — education.tsx measures the incoming
+   element and flips slideSettled to true in a layout effect right after it
+   mounts, which is what actually triggers the transition to .settled below
+   to play. */
+.courseDescriptionIncoming.enterFromBelow {
+    transform: translateY(var(--slide-distance));
+}
+
+.courseDescriptionIncoming.enterFromAbove {
+    transform: translateY(calc(var(--slide-distance) * -1));
+}
+
+.courseDescriptionIncoming.settled {
+    transform: translateY(0);
 }
 
 @media (max-width: 700px) {
