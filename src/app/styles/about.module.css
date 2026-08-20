@@ -12,8 +12,8 @@
 
 .aboutBackground {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .heading {
@@ -32,6 +32,8 @@
 
     align-items: center;
     justify-content: center;
+
+    gap: 32px;
 }
 
 .upperSection {
@@ -41,7 +43,7 @@
     justify-content: center;
     align-items: center;
 
-    margin: 1% 0 4.25% 0;
+    margin: 1% 0 0 0;
     width: 60vw;
     height: 38.5vh;
     border-radius: 24px;
@@ -80,6 +82,96 @@
     line-height: 1.4;
 }
 
+/* height is set via an inline style (about.tsx measures .previewInner's
+   scrollHeight with JS) and transitioned, rather than left to size instantly
+   via height:auto (which can't be transitioned) — same technique used for
+   education's courseDescription box, which smoothly reveals/collapses
+   variable-height content (some hobbies have 0 photos, others 3). See that
+   file's CSS for the longer story on why a plain measured height beats CSS
+   Grid's 0fr/1fr trick here. */
+.preview {
+    width: 75%;
+    overflow: hidden;
+    transition: height 1s;
+}
+
+.previewInner {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    /* Fades in/out both when the box opens/closes and when switching
+       directly between an activity, a hobby, or between two of either
+       (see about.tsx's contentVisible) — one opacity transition covers
+       all of those cases, unlike education's courseDescription, which
+       slides instead. */
+    opacity: 0;
+    transition: opacity 0.6s;
+}
+
+.previewInner.previewVisible {
+    opacity: 1;
+}
+
+/* .hobbyPreview's own row/gap layout — previously lived directly on
+   .previewInner, back when it only ever needed to lay out photos. Now that
+   .previewInner can instead hold .activityPreview (a text list, wants its
+   own column-ish layout, not a photo row), each gets its own internal
+   layout instead of sharing one imposed by their parent. */
+.hobbyPreview {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
+}
+
+.activityPreview {
+    width: 100%;
+    padding-inline-start: 32px;
+    margin-left: 10%;
+
+    color: var(--main-red);
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.5;
+    font-size: 24px;
+}
+
+.activityPreview li::marker {
+    content: '\2726 \00a0';
+    font-size: 20px;
+}
+
+.previewSegment {
+    flex: 1;
+    max-width: 60%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    font-size: 20px;
+}
+
+.previewImg {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    border-radius: 8px;
+}
+
+.caption {
+    /* color: #FF8F90; */
+    color: var(--main-red);
+    text-align: center;
+    font-weight: 500;
+
+    margin-top: 8px;
+}
+
 .lowerSection {
     position: relative;
     display: flex;
@@ -93,6 +185,8 @@
     width: 67.5vw;
 
     font-size: 27px;
+
+    margin-bottom: 32px;
 }
 
 .sectionTitle {
@@ -137,6 +231,15 @@
 
     line-height: 1.5;
     margin-top: 4px;
+}
+
+.hobbies li::marker {
+    content: '\2726 \00a0';
+    font-size: 22px;
+}
+
+.canClick {
+    cursor: pointer;
 }
 
 .lowerSection li {

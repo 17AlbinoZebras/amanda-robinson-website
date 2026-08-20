@@ -12,7 +12,7 @@ export default function Experience() {
                 <div className={`${styles.section} ${styles.sectionLeft} ${styles.sfpti1}`}>
                     <span className={styles.sectionTitle}>South Florida Proton Therapy Institute</span>
                     <ul className={styles.sectionBody}>
-                        <li>Created an application to automate the download of MRI and CT scans</li>
+                        <li>Created an application to automate the download of MRI and CT scans, which was used to test a program that would provide patients a safer treatment process</li>
                         <li>Harnessed the Varian medical database to isolate relevant data while ensuring HIPAA-compliance</li>
                         <li>Technologies: SQL Server, SQL, DICOM, Java, Python</li>
                     </ul>

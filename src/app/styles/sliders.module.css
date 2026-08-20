@@ -45,6 +45,42 @@
     left: calc(100cqw - 50cqh - var(--stroke-width));
 }
 
+.sliderIcon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 25%;
+    height: 25%;
+
+    padding: 7.5%;
+    
+    border-radius: 50%;
+
+    transition: margin-left 550ms, transform 550ms;
+}
+
+.orbWrapperRight .sliderIcon {
+    margin-left: 20%;
+    transform: translate(-50%, -50%) scale(80%);
+}
+
+.slider:hover .orbWrapperRight .sliderIcon {
+    margin-left: 0;
+    transform: translate(-50%, -50%) scale(100%);
+}
+
+.orbWrapperLeft .sliderIcon {
+    margin-left: -20%;
+    transform: translate(-50%, -50%) scale(80%);
+}
+
+.slider:hover .orbWrapperLeft .sliderIcon {
+    margin-left: 0;
+    transform: translate(-50%, -50%) scale(100%);
+}
+
 .sliderLabel {
     position: absolute;
     display: flex;

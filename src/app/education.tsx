@@ -12,8 +12,7 @@ interface course {
     description: string;
 }
 
-export default function Education() {
-    const classes: course[] = [
+const classes: course[] = [
         {title: "Algorithms", code: "CS2223", url: "https://www.wpi.edu/academics/calendar-courses/course-descriptions/3776/computer-science#CS-2223", description: "Building on a fundamental knowledge of data structures, data abstraction techniques, and mathematical tools, a number of examples of algorithm design and analysis worst case and average case will be developed. Topics include greedy algorithms, divide-and-conquer, dynamic programming, heuristics, and probabilistic algorithms. Problems will be drawn from areas such as sorting, graph theory, and string processing. The influence of the computational model on algorithm design will be discussed. Students will be expected to perform analysis on a variety of algorithms."},
         {title: "Software Engineering", code: "CS3733", url: "https://www.wpi.edu/academics/calendar-courses/course-descriptions/3776/computer-science#CS-3733", description: "This course introduces the fundamental principles of software engineering. Modern software development techniques and life cycles are emphasized. Topics include requirements analysis and specification, analysis and design, architecture, implementation, testing and quality, configuration management, and project management. Students will be expected to complete a project that employs techniques from the topics studied."},
         {title: "Database Systems", code: "CS3431", url: "https://www.wpi.edu/academics/calendar-courses/course-descriptions/3776/computer-science#CS-3431", description: "This course introduces the student to the design, use, and application of database management systems. Topics include the relational data model, relational query languages, design theory, and conceptual data design and modeling for relational database design. Techniques that provide for data independence and minimal redundancy will be discussed. Students will be expected to design and implement database system applications."},
@@ -23,6 +22,7 @@ export default function Education() {
         {title: "Machine Learning", code: "CS4342", url: "https://www.wpi.edu/academics/calendar-courses/course-descriptions/3776/computer-science#CS-4342", description: "In this course, students will explore both theoretical and practical aspects of machine learning, including algorithms for regression, classification, dimensionality reduction, clustering, and density estimation. Specific topics may include neural networks and deep learning, Bayesian networks and probabilistic graphical models, principal component analysis, k-means clustering, decision trees and random forests, support vector machines, and kernel methods."}
     ]
 
+export default function Education() {
     const [hoveredCourseCode, setHoveredCourseCode] = useState<string | null>(null);
 
     const [activeCourse, setActiveCourse] = useState<course | null>(null)
