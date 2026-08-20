@@ -58,6 +58,11 @@
     margin-bottom: 1%;
 }
 
+.sectionBody li::marker {
+    content: '\2726 \00a0';
+    font-size: 24px;
+}
+
 .sfpti1 {
     top: 0;
 }

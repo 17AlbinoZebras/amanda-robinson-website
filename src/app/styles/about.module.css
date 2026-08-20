@@ -98,19 +98,49 @@
 .previewInner {
     display: flex;
     flex-direction: row;
-    gap: 20px;
     justify-content: center;
 
     /* Fades in/out both when the box opens/closes and when switching
-       directly between two already-open hobbies (see about.tsx's
-       contentVisible) — one opacity transition covers both cases, unlike
-       education's courseDescription, which slides instead. */
+       directly between an activity, a hobby, or between two of either
+       (see about.tsx's contentVisible) — one opacity transition covers
+       all of those cases, unlike education's courseDescription, which
+       slides instead. */
     opacity: 0;
     transition: opacity 0.6s;
 }
 
 .previewInner.previewVisible {
     opacity: 1;
+}
+
+/* .hobbyPreview's own row/gap layout — previously lived directly on
+   .previewInner, back when it only ever needed to lay out photos. Now that
+   .previewInner can instead hold .activityPreview (a text list, wants its
+   own column-ish layout, not a photo row), each gets its own internal
+   layout instead of sharing one imposed by their parent. */
+.hobbyPreview {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
+}
+
+.activityPreview {
+    width: 100%;
+    padding-inline-start: 32px;
+    margin-left: 10%;
+
+    color: var(--main-red);
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.5;
+    font-size: 24px;
+}
+
+.activityPreview li::marker {
+    content: '\2726 \00a0';
+    font-size: 20px;
 }
 
 .previewSegment {
@@ -137,6 +167,7 @@
     /* color: #FF8F90; */
     color: var(--main-red);
     text-align: center;
+    font-weight: 500;
 
     margin-top: 8px;
 }
@@ -202,7 +233,12 @@
     margin-top: 4px;
 }
 
-.hobbies li {
+.hobbies li::marker {
+    content: '\2726 \00a0';
+    font-size: 22px;
+}
+
+.canClick {
     cursor: pointer;
 }
 
