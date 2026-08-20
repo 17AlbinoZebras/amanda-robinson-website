@@ -90,7 +90,7 @@
    file's CSS for the longer story on why a plain measured height beats CSS
    Grid's 0fr/1fr trick here. */
 .preview {
-    width: 80%;
+    width: 75%;
     overflow: hidden;
     transition: height 1s;
 }

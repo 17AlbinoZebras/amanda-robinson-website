@@ -63,7 +63,7 @@
 
 .orbWrapperRight .sliderIcon {
     margin-left: 20%;
-    transform: translate(-50%, -50%) scale(80%);
+    transform: translate(-50%, -50%) scale(85%);
 }
 
 .slider:hover .orbWrapperRight .sliderIcon {
@@ -73,7 +73,7 @@
 
 .orbWrapperLeft .sliderIcon {
     margin-left: -20%;
-    transform: translate(-50%, -50%) scale(80%);
+    transform: translate(-50%, -50%) scale(85%);
 }
 
 .slider:hover .orbWrapperLeft .sliderIcon {

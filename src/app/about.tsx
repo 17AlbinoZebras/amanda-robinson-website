@@ -14,7 +14,7 @@ const hobbies: hobby[] = [
     {title: "Photography", photos: [{src: "/about/WakodahatcheeHeron.jpg"}, {src: "/about/KaylaSeniorPhoto.jpg"}, {src: "/about/Squirrel.jpg"}]},
     {title: "Theater", photos: [{src: "/about/8ML-Exec-Cropped.jpg", caption: <span className={styles.caption}>The leadership team of <i>8 Minutes Left</i>, which I assistant stage managed.</span>}]},
     {title: "Crafts", photos: [{src: "/about/origami-dragon.jpg"}]},
-    {title: "Board Games", photos: []},
+    {title: "Board Games", photos: [{src: "/about/Catan.jpg"}]},
     {title: "Learning New Skills", photos: [{src: "/about/stained-glass-snail.jpg"}]}
 ]
 
