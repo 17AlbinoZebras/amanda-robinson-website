@@ -69,11 +69,14 @@
 .sectionLeft {
     position: absolute;
     left: 0;
+    z-index: 1;
     
     border-radius: 0 32px 32px 0;
     padding: 1.5% 2% 2% 10%;
     background-color: #C9CBE8;
     color: var(--main-light);
+
+    font-size: 28px;
 }
 
 .sectionRight {
@@ -81,7 +84,7 @@
     position: absolute;
     right: 0;
 
-    padding: 1.5% 5% 2% 2%;
+    padding: 2.5% 5% 2% 2%;
 
     background-color: var(--main-light);
     color: #88AA9C;
