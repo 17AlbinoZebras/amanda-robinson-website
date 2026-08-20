@@ -168,6 +168,7 @@ export default function About() {
                         )}
                     </div>
                 </div>
+                <div className={styles.preview}></div>
                 <div className={styles.lowerSection}>
                     <div className={styles.activities}>
                         <span className={styles.sectionTitle}>Activities & Leadership</span>
