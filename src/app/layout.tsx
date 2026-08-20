@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import "./styles/globals.css";
 
 import '@fontsource/new-amsterdam';
 import '@fontsource/idiqlat';
 import '@fontsource-variable/afacad-flux/wght.css';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import AppShell from "./app_shell";
 
