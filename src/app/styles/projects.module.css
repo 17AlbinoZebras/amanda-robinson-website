@@ -347,4 +347,87 @@
            education for visual consistency across pages. */
         --idiqlat-equivalent-size: 38px;
     }
+
+    /* The 3-panel horizontal row (a thin sliver per closed panel, one
+       expanding wide when open) only works with real horizontal space to
+       spare — at a 375px viewport, 75vw split flex:1/flex:1/flex:10 puts
+       closed panels at ~23px wide, unusable regardless of anything inside
+       them. Switching to a column reuses the exact same .project elements
+       and the same activeProject open/close click logic (no JS changes) —
+       flex:1 vs flex:10 just drives height instead of width now. */
+    .projects {
+        flex-direction: column;
+        width: 90vw;
+        height: 80vh;
+    }
+
+    .project {
+        /* height:100% was sizing the CROSS axis in row mode; in column mode
+           that's the MAIN axis, where an explicit height would override
+           flex:1/flex:10's own computed height entirely. auto lets
+           flex-grow drive it instead, same as .course did earlier in this
+           file's counterpart in education.module.css. */
+        height: auto;
+        width: 100%;
+    }
+
+    .projectClosed {
+        /* Touch-target floor — a flex:1 share of the leftover space after
+           the open panel's flex:10 claims most of it can otherwise shrink
+           well below a comfortably tappable height. */
+        min-height: 56px;
+    }
+
+    .projectClosed .projectTitle {
+        /* Rotation suited a narrow vertical sliver; a short wide bar wants
+           its title reading normally, not sideways. */
+        transform: none;
+        font-size: 20px;
+    }
+
+    .preview {
+        width: 100%;
+        height: auto;
+        /* Same ratio as the desktop 600x370 fixed box, so the embedded
+           iframe/video keeps its proportions once width goes fluid — same
+           technique as about.module.css's .mainPhoto. */
+        aspect-ratio: 60 / 37;
+        /* Desktop's flex-shrink:0 was there specifically to keep .preview
+           at its fixed px size regardless of available space; that's the
+           opposite of what's needed once it's a fluid, aspect-ratio-based
+           box that's SUPPOSED to shrink to fit. */
+        flex-shrink: 1;
+    }
+
+    .description {
+        /* Was inheriting 20-24px from .intervle/.shopcomp/.heatmap — sized
+           for a 600px-wide preview, too large once .preview shrinks to fit
+           a phone screen. */
+        font-size: 15px;
+    }
+
+    /* No room to expand a preview that's already full-width inside a
+       vertical accordion panel, so the toggle (and the whole expanded-state
+       concept) is dropped on mobile entirely. */
+    .expandToggle {
+        display: none;
+    }
+
+    /* Guards a leftover previewExpanded:true carried over from a
+       desktop-width session that got resized down to mobile mid-session —
+       .expandToggle is hidden so it can't be newly triggered here, but
+       without this the expanded desktop rules below would still apply and
+       fight the mobile .preview/.description sizing above. */
+    .previewExpanded .preview {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 60 / 37;
+        margin-top: 0;
+    }
+
+    .previewExpanded .description {
+        height: 32%;
+        opacity: 1;
+        pointer-events: auto;
+    }
 }

@@ -129,6 +129,14 @@
     cursor: pointer;
 }
 
+.courseTitle {
+    transition: all 1s;
+}
+
+.activeCourse {
+    font-weight: 800;
+}
+
 /* height is set via an inline style (education.tsx measures
    .courseDescriptionInner's scrollHeight with JS) rather than CSS Grid's
    usual 0fr/1fr content-based track trick. That trick needs
@@ -307,6 +315,24 @@
         min-height: 90px;
         padding: 12px;
         font-size: 18px;
+    }
+
+    .courseDescription {
+        width: 95%;
+    }
+
+    .courseDescriptionInner {
+        font-size: 18px;
+        padding: 10px 14px;
+    }
+
+    /* Kept in sync with .courseDescriptionInner's padding above — see the
+       comment on .courseDescriptionIncoming's desktop rule for why these
+       have to match exactly. */
+    .courseDescriptionIncoming {
+        top: 10px;
+        left: 14px;
+        right: 14px;
     }
 }
 
