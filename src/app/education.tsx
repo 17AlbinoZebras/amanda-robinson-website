@@ -222,7 +222,7 @@ export default function Education() {
                     <div className={styles.row}>
                         {classes.slice(0, 4).map((course) => (
                             <div key={course.code} className={styles.course} onMouseEnter={() => setHoveredCourseCode(course.code)} onMouseLeave={() => setHoveredCourseCode(null)} onClick={() => changeActiveCourse(course)}>
-                                <div>{hoveredCourseCode === course.code ? course.code : course.title}</div>
+                                <div className={`${styles.courseTitle} ${activeCourse === course ? styles.activeCourse : ''}`}>{hoveredCourseCode === course.code ? course.code : course.title}</div>
                             </div>
                         ))}
                     </div>
@@ -242,7 +242,7 @@ export default function Education() {
                     <div className={styles.row}>
                         {classes.slice(4).map((course) => (
                             <div key={course.code} className={styles.course} onMouseEnter={() => setHoveredCourseCode(course.code)} onMouseLeave={() => setHoveredCourseCode(null)} onClick={() => changeActiveCourse(course)}>
-                                <div>{hoveredCourseCode === course.code ? course.code : course.title}</div>
+                                <div className={`${styles.courseTitle} ${activeCourse === course ? styles.activeCourse : ''}`}>{hoveredCourseCode === course.code ? course.code : course.title}</div>
                             </div>
                         ))}
                     </div>

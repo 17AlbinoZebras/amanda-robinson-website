@@ -92,7 +92,22 @@
 .preview {
     width: 75%;
     overflow: hidden;
-    transition: height 1s;
+    /* .mainContent's gap (32px) applies unconditionally between every pair
+       of adjacent children — even when .preview is collapsed to height:0,
+       it still sits between .upperSection and .lowerSection and still
+       contributes a full 32px gap on BOTH sides, doubling the visible space
+       between them compared to every other (single) gap in that column.
+       -16px margin on each side cancels half of each of those two gaps,
+       netting out to one normal 32px gap total while closed; margin:0 when
+       open removes that cancellation so the normal gap returns on both
+       sides of the fully revealed box. Transitioning together with height
+       keeps the collapse/reveal smooth instead of the spacing snapping. */
+    margin: -16px 0;
+    transition: height 1s, margin 1s;
+}
+
+.previewOpen {
+    margin: 0;
 }
 
 .previewInner {
@@ -242,8 +257,14 @@
     cursor: pointer;
 }
 
+.activeSection {
+    font-weight: 600;
+}
+
 .lowerSection li {
     margin-bottom: 4px;
+
+    transition: font-weight 1s;
 }
 
 @media (max-width: 700px) {
@@ -286,5 +307,41 @@
         flex: none;
         height: auto;
         width: 100%;
+    }
+
+    .preview {
+        /* Matches .upperSection/.lowerSection's 88vw siblings above, instead
+           of the desktop 75% (of .mainContent, itself already narrower on
+           mobile). */
+        width: 90%;
+    }
+
+    .hobbyPreview {
+        /* Up to 3 .previewSegment, each capped at max-width:60%, cannot fit
+           side by side at any width (180% > 100%) — column-stack them,
+           mirroring .upperSection/.lowerSection's own stacking above. */
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .previewSegment {
+        max-width: 100%;
+        width: 100%;
+        flex: none;
+    }
+
+    .previewImg {
+        /* height:100% needed a definite ancestor height, which came free
+           from flexbox's cross-axis stretch in row mode — gone now that
+           .hobbyPreview is a column and height is each item's own main
+           axis. aspect-ratio replaces it directly, so object-fit:cover
+           still has a real box to crop into. */
+        height: auto;
+        aspect-ratio: 4 / 3;
+    }
+
+    .activityPreview {
+        margin-left: 0;
+        font-size: 20px;
     }
 }

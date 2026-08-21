@@ -133,7 +133,7 @@ export default function About() {
                         I&#39;m Amanda Robinson, a California native and a third year Computer Science student at WPI. I&#39;ve been using software to solve problems for as long as I can remember. What began as a love of coding and logic puzzles has grown into a passion for building thoughtful, creative products that tackle challenging real-world problems.
                     </div>
                 </div>
-                <div className={styles.preview} style={{height: (activeActivity || activeHobby) ? `${measuredHeight}px` : '0px'}}>
+                <div className={`${styles.preview} ${(activeActivity || activeHobby) ? styles.previewOpen : ''}`} style={{height: (activeActivity || activeHobby) ? `${measuredHeight}px` : '0px'}}>
                     <div ref={previewInnerRef} className={`${styles.previewInner} ${contentVisible ? styles.previewVisible : ''}`}>
                         {/* Only one of these two is ever mounted at a time
                             (displayedActivity/displayedHobby are mutually
@@ -168,13 +168,12 @@ export default function About() {
                         )}
                     </div>
                 </div>
-                <div className={styles.preview}></div>
                 <div className={styles.lowerSection}>
                     <div className={styles.activities}>
                         <span className={styles.sectionTitle}>Activities & Leadership</span>
                         <ul>
                             {activities.map((activity) => (
-                                <li key={activity.org} className={activity.details ? styles.canClick : ''} onClick={() => changeActiveActivity(activity)}>{activity.org} | {activity.role}</li>
+                                <li key={activity.org} className={`${activity.details ? styles.canClick : ''} ${activeActivity === activity ? styles.activeSection : ''}`} onClick={() => changeActiveActivity(activity)}>{activity.org} | {activity.role}</li>
                             ))}
                         </ul>
                     </div>
@@ -182,7 +181,7 @@ export default function About() {
                         <span className={styles.sectionTitle}>Hobbies & Interests</span>
                         <ul>
                             {hobbies.map((hobby) => (
-                                <li key={hobby.title} className={hobby.photos ? styles.canClick : ''} onClick={() => changeActiveHobby(hobby)}>{hobby.title}</li>
+                                <li key={hobby.title} className={`${hobby.photos ? styles.canClick : ''} ${activeHobby === hobby ? styles.activeSection : ''}`} onClick={() => changeActiveHobby(hobby)}>{hobby.title}</li>
                             ))}
                         </ul>
                     </div>
