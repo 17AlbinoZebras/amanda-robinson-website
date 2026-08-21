@@ -257,6 +257,14 @@
     cursor: pointer;
 }
 
+.activities .canClick:hover {
+    color: #FAE4B8;
+}
+
+.hobbies .canClick:hover {
+    color: var(--main-yellow)
+}
+
 .activeSection {
     font-weight: 600;
 }
