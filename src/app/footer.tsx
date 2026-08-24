@@ -19,16 +19,14 @@ export default function Footer() {
             </div>
             <div className={styles.pageLinks}>
                 <div className={styles.leftSection}>
-                    <Link href='/' className={linkClassName('/')}>Home</Link>
-                    <br/>
-                    <Link href='/about' className={linkClassName('/about')}>About Me</Link>
+                    <p><Link href='/' className={linkClassName('/')}>Home</Link></p>
+                    <p><Link href='/about' className={linkClassName('/about')}>About Me</Link></p>
+                    <p><Link href='/resume' className={linkClassName('/resume')}>Resume</Link></p>
                 </div>
                 <div className={styles.rightSection}>
-                    <Link href='/projects' className={linkClassName('/projects')}>Projects</Link>
-                    <br/>
-                    <Link href='/experience' className={linkClassName('/experience')}>Experience</Link>
-                    <br/>
-                    <Link href='/education' className={linkClassName('/education')}>Education</Link>
+                    <p><Link href='/projects' className={linkClassName('/projects')}>Projects</Link></p>
+                    <p><Link href='/experience' className={linkClassName('/experience')}>Experience</Link></p>
+                    <p><Link href='/education' className={linkClassName('/education')}>Education</Link></p>
                 </div>
             </div>
             <div className={styles.copyright}>

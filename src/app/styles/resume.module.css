@@ -1,0 +1,73 @@
+.page {
+    position: relative;
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+    background-color: #B4CAC1;
+    font-family: var(--font-afacad-flux);
+}
+
+.resumeBackground {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.heading {
+    position: relative;
+    font-family: var(--font-idiqlat);
+    /* New Amsterdam reads smaller than Idiqlat at the same font-size (see
+       --font-new-amsterdam-size in globals.css) — set to the 64px Idiqlat
+       .heading uses on about.module.css / experience.module.css so both
+       read as the same visual size. */
+    /* --idiqlat-equivalent-size: 56px;
+    font-size: var(--font-new-amsterdam-size); */
+    font-size: 56px;
+    font-weight: 400;
+    color: var(--main-blue);
+
+    margin-top: 12px;
+}
+
+.resume {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 55%;
+    height: 85vh;
+}
+
+.downloadButton {
+    position: absolute;
+    z-index: 1;
+    font-size: 28px;
+    color: #FDC5C4;
+    left: 3.5%;
+    top: 2.5%;
+    background-color: var(--main-blue);
+    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.downloadButton:hover {
+    filter: brightness(0.9)
+}
+
+.resume iframe {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    max-width: 816px;
+    /* max-height: 600px; */
+    border: none;
+}
