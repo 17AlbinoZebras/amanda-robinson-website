@@ -10,7 +10,8 @@ export default function Experience() {
             <span className={styles.heading}>Work Experience</span>
             <div className={styles.mainBody}>
                 <div className={`${styles.section} ${styles.sectionLeft} ${styles.sfpti1}`}>
-                    <span className={styles.sectionTitle}>South Florida Proton Therapy Institute</span>
+                    <h2 className={styles.sectionTitle}>South Florida Proton Therapy Institute</h2>
+                    <h3 className={styles.sectionSubtitle}>Imaging Download Automation</h3>
                     <ul className={styles.sectionBody}>
                         <li>Created an application to automate the download of MRI and CT scans, which was used to test a program that would provide patients a safer treatment process</li>
                         <li>Harnessed the Varian medical database to isolate relevant data while ensuring HIPAA-compliance</li>
@@ -18,7 +19,8 @@ export default function Experience() {
                     </ul>
                 </div>
                 <div className={`${styles.section} ${styles.sectionRight} ${styles.sfpti2}`}>
-                    <span className={styles.sectionTitle}>South Florida Proton Therapy Institute (Contd.)</span>
+                    <h2 className={styles.sectionTitle}>South Florida Proton Therapy Institute</h2>
+                    <h3 className={styles.sectionSubtitle}>Hospital Outreach Heatmap</h3>
                     <ul className={styles.sectionBody}>
                         <li>Applied software engineering fundamentals to build a dynamic heatmap representation of company and national statistics from numerous sources</li>
                         <li>Technologies: Typescript, React, Next.js, Leaflet, GeoJSON, Google Places API, Claude Code</li>
