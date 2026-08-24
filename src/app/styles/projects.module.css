@@ -34,6 +34,7 @@
        read as the same visual size. */
     --idiqlat-equivalent-size: 56px;
     font-size: var(--font-new-amsterdam-size);
+    font-weight: 400;
     color: var(--main-blue);
 
     margin-top: 16px;
@@ -74,6 +75,7 @@
     font-family: var(--font-new-amsterdam);
     font-size: 38px;
     color: var(--main-light);
+    text-align: center;
     transition: font-size var(--transition-length), transform var(--transition-length);
 }
 
@@ -113,6 +115,8 @@
 }
 
 .previewMedia {
+    /* Positioning context for .interactiveHint below. */
+    position: relative;
     width: 100%;
     height: 100%;
     display: flex;
@@ -121,6 +125,45 @@
     overflow: hidden;
     border-radius: 20px;
     border: 4px solid #FF8F90;
+}
+
+/* Hints that an iframe preview is the actual live site, not a static
+   screenshot — nothing about an <iframe> visually signals that on its own,
+   unlike .webPreview's <video> sibling, which already has obvious native
+   play/pause controls. pointer-events:none so it never blocks a real click
+   into the iframe underneath, even over its own small area. */
+@keyframes interactive-hint-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+}
+
+.interactiveHint {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    pointer-events: none;
+
+    padding: 5px 12px;
+    border-radius: 14px;
+    background-color: #FF8F90;
+    color: var(--main-light);
+    font-family: var(--font-afacad-flux);
+    font-size: 13px;
+    font-weight: 600;
+
+    opacity: 1;
+    animation: interactive-hint-pulse 1.8s ease-in-out infinite;
+    transition: opacity 0.5s ease;
+}
+
+/* Always rendered (not conditionally mounted) so this can fade out on
+   dismiss instead of vanishing instantly — an unmount has no previous
+   opacity to transition from, same reasoning as the project titles staying
+   as a single persistent <a> instead of swapping element types. The pulse
+   keeps running underneath since only opacity is touched, but that's
+   invisible once fully transparent. */
+.interactiveHintHidden {
+    opacity: 0;
 }
 
 .description {
@@ -149,6 +192,14 @@
     opacity: 1;
     /* font-size: 20px; */
     transition: all var(--transition-length);
+}
+
+.description a {
+    text-decoration: underline;
+}
+
+.description a:hover {
+    color: #8286B7;
 }
 
 .projectClosed {
@@ -278,11 +329,11 @@
    it stays centered on the bottom edge regardless of .preview's own size. */
 .expandToggle {
     position: absolute;
-    bottom: -18px;
+    bottom: -14px;
     left: 50%;
     transform: translateX(-50%);
     width: 40px;
-    height: 18px;
+    height: 14px;
     border: none;
     border-radius: 0 0 10px 10px;
     background-color: #FF8F90;
@@ -336,7 +387,7 @@
 .heatmap {
     background-color: var(--main-blue);
     font-size: 24px;
-    line-height: 1.5;
+    line-height: 1.4;
 }
 
 
