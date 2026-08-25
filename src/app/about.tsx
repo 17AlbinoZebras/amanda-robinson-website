@@ -26,10 +26,10 @@ const activities: activity[] = [
 
 const hobbies: hobby[] = [
     {title: "Photography", photos: [{src: "/about/WakodahatcheeHeron.jpg"}, {src: "/about/KaylaSeniorPhoto.jpg"}, {src: "/about/Squirrel.jpg"}]},
-    {title: "Theater", photos: [{src: "/about/8ML-Exec-Cropped.jpg", caption: <span className={styles.caption}>The leadership team of <i>8 Minutes Left</i>, which I assistant stage managed.</span>}]},
+    {title: "Theater", photos: [{src: "/about/8ML-Exec-Cropped.jpg", caption: <p className={styles.caption}>The leadership team of <i>8 Minutes Left</i>, which I assistant stage managed.</p>}]},
     {title: "Crafts", photos: [{src: "/about/origami-dragon.jpg"}]},
     {title: "Board Games", photos: [{src: "/about/Catan.jpg"}]},
-    {title: "Learning New Skills", photos: [{src: "/about/stained-glass-snail.jpg", caption: <span className={styles.caption}>My first stained glass project!</span>}]}
+    {title: "Learning New Skills", photos: [{src: "/about/stained-glass-snail.jpg", caption: <p className={styles.caption}>My first stained glass project!</p>}]}
 ]
 
 export default function About() {
@@ -123,15 +123,15 @@ export default function About() {
     return (
         <div className={styles.page}>
             <TintedVector src="/masks/Yellow-Memphis.svg" color='#FBDDA1' width='100vw' height='100vh' repeat='y' maskSize='cover' className={styles.aboutBackground}/>
-            <span className={styles.heading}>About Me</span>
+            <h1 className={styles.heading}>About Me</h1>
             <div className={styles.mainContent}>
                 <div className={styles.upperSection}>
                     <div className={styles.mainPhoto}>
                         <img src="about/AmandaHeadshot8ML.jpg" className={styles.headshot}></img>
                     </div>
-                    <div className={styles.mainDescription}>
+                    <p className={styles.mainDescription}>
                         I&#39;m Amanda Robinson, a California native and a third year Computer Science student at WPI. I&#39;ve been using software to solve problems for as long as I can remember. What began as a love of coding and logic puzzles has grown into a passion for building thoughtful, creative products that tackle challenging real-world problems.
-                    </div>
+                    </p>
                 </div>
                 <div className={`${styles.preview} ${(activeActivity || activeHobby) ? styles.previewOpen : ''}`} style={{height: (activeActivity || activeHobby) ? `${measuredHeight}px` : '0px'}}>
                     <div ref={previewInnerRef} className={`${styles.previewInner} ${contentVisible ? styles.previewVisible : ''}`}>
@@ -170,7 +170,7 @@ export default function About() {
                 </div>
                 <div className={styles.lowerSection}>
                     <div className={styles.activities}>
-                        <span className={styles.sectionTitle}>Activities & Leadership</span>
+                        <h2 className={styles.sectionTitle}>Activities & Leadership</h2>
                         <ul>
                             {activities.map((activity) => (
                                 <li key={activity.org} className={`${activity.details ? styles.canClick : ''} ${activeActivity === activity ? styles.activeSection : ''}`} onClick={() => changeActiveActivity(activity)}>{activity.org} | {activity.role}</li>
@@ -178,7 +178,7 @@ export default function About() {
                         </ul>
                     </div>
                     <div className={styles.hobbies}>
-                        <span className={styles.sectionTitle}>Hobbies & Interests</span>
+                        <h2 className={styles.sectionTitle}>Hobbies & Interests</h2>
                         <ul>
                             {hobbies.map((hobby) => (
                                 <li key={hobby.title} className={`${hobby.photos ? styles.canClick : ''} ${activeHobby === hobby ? styles.activeSection : ''}`} onClick={() => changeActiveHobby(hobby)}>{hobby.title}</li>

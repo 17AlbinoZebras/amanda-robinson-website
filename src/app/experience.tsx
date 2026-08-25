@@ -7,7 +7,7 @@ export default function Experience() {
     return (
         <div className={styles.page}>
             <TintedVector src="/masks/Green-Memphis.svg" color='#729E8C' width='100vw' height='100vh' maskSize='cover' className={styles.experienceBackground}/>
-            <span className={styles.heading}>Work Experience</span>
+            <h1 className={styles.heading}>Work Experience</h1>
             <div className={styles.mainBody}>
                 <div className={`${styles.section} ${styles.sectionLeft} ${styles.sfpti1}`}>
                     <h2 className={styles.sectionTitle}>South Florida Proton Therapy Institute</h2>

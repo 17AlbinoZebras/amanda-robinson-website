@@ -32,6 +32,9 @@
        read as the same visual size. */
     --idiqlat-equivalent-size: 56px;
     font-size: var(--font-new-amsterdam-size);
+    /* Explicit — this is an <h1> now (was a <span>), and h1's UA-default
+       bold would otherwise change its appearance. */
+    font-weight: 400;
     color: #FFE8BA;
     text-align: center;
 
@@ -43,6 +46,9 @@
     font-family: var(--font-new-amsterdam);
     --idiqlat-equivalent-size: 40px;
     font-size: var(--font-new-amsterdam-size);
+    /* Explicit — this is an <h2> now (was a <span>), and h2's UA-default
+       bold would otherwise change its appearance. */
+    font-weight: 400;
     color: #FDC5C4;
     text-align: center;
 }

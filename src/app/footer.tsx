@@ -30,7 +30,7 @@ export default function Footer() {
                 </div>
             </div>
             <div className={styles.copyright}>
-                <span>© Amanda N. Robinson 2026</span>
+                <p>© Amanda N. Robinson 2026</p>
             </div>
         </div>
     )

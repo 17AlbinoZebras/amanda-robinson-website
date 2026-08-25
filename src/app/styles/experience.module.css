@@ -20,6 +20,9 @@
     position: relative;
     font-family: var(--font-idiqlat);
     font-size: 56px;
+    /* Explicit — this is an <h1> now (was a <span>), and h1's UA-default
+       bold would otherwise change its appearance. */
+    font-weight: 400;
     color: var(--main-light);
     text-align: center;
 

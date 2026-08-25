@@ -43,24 +43,6 @@ export default function Projects() {
         })
     }
 
-    // Guards the title <a>'s own navigation on a click that's opening the
-    // panel (not one on an already-open panel). Without this, clicking a
-    // closed title both opens the panel AND navigates away: the click
-    // bubbles to .project's onClick, which calls setActiveProject
-    // synchronously (React flushes discrete events like click immediately),
-    // so by the time the browser gets to the click's own default action
-    // (follow the link), href has ALREADY been set to the real URL by that
-    // same re-render — even though the element had no href at the moment
-    // it was actually clicked. Preventing default here (but not stopping
-    // propagation, so .project's onClick still runs and opens the panel)
-    // means a click only ever opens; a SEPARATE, later click on the
-    // now-open title is what actually navigates.
-    const guardTitleLink = (proj: string) => (e: React.MouseEvent) => {
-        if (activeProject !== proj) {
-            e.preventDefault()
-        }
-    }
-
     // The iframe previews (Intervle, Heatmap) embed the actual live site —
     // easy to mistake for a static screenshot at a glance, since nothing
     // about an <iframe> visually signals "this is a real, running app you
@@ -133,24 +115,7 @@ export default function Projects() {
             <h1 className={styles.heading}>Projects</h1>
             <div className={styles.projects}>
                 <div onClick={() => changeActiveProject('intervle')} className={`${styles.project} ${activeProject === 'intervle' ? styles.projectOpen : styles.projectClosed} ${styles.intervle}`}>
-                    {/* Always an <a>, never swapped for a <span> — conditionally
-                        rendering a different element type (as this used to
-                        do) unmounts and remounts on every open/close, and a
-                        CSS transition can't play across that boundary (no
-                        previous state to interpolate from), so the title
-                        just snapped instead of transitioning smoothly like
-                        ShopComp's (always a single, unchanging <span>).
-                        href/target/rel are only set while open, so it's
-                        inert (same as a plain span) while closed. */}
-                    <a
-                        href={activeProject === 'intervle' ? 'https://intervle-wordle-game.vercel.app/' : undefined}
-                        target={activeProject === 'intervle' ? '_blank' : undefined}
-                        rel={activeProject === 'intervle' ? 'noopener noreferrer' : undefined}
-                        onClick={guardTitleLink('intervle')}
-                        className={`${styles.projectTitle} ${activeProject === 'intervle' ? styles.openTitle : ''}`}
-                    >
-                        Intervle
-                    </a>
+                    <h2 className={styles.projectTitle}>Intervle</h2>
                     <div className={`${styles.projectContent} ${previewExpanded ? styles.previewExpanded : ''}`}>
                         <div className={styles.preview}>
                             <div className={styles.previewMedia} onMouseEnter={handlePreviewMouseEnter} onMouseLeave={handlePreviewMouseLeave}>
@@ -160,11 +125,11 @@ export default function Projects() {
                             </div>
                             <button type="button" className={styles.expandToggle} onClick={toggleExpandPreview} aria-label={previewExpanded ? 'Show description' : 'Expand preview'}/>
                         </div>
-                        <div className={styles.description}><span>My first real web design project back in 2023, <a href='https://intervle-wordle-game.vercel.app/' target="_blank" rel="noopener noreferrer">Intervle</a> is a responsive web game inspired by everybody&#39;s favorite word puzzle, Wordle, but with a lexicographic twist. Results indicate alphabetical distance from the target word in either direction for each letter position.<br/>Technologies: HTML, CSS, JavaScript (Bootstrap)</span></div>
+                        <div className={styles.description}><p>My first real web design project back in 2023, <a href='https://intervle-wordle-game.vercel.app/' target="_blank" rel="noopener noreferrer">Intervle</a> is a responsive web game inspired by everybody&#39;s favorite word puzzle, Wordle, but with a lexicographic twist. Results indicate alphabetical distance from the target word in either direction for each letter position.<br/>Technologies: HTML, CSS, JavaScript (Bootstrap)</p></div>
                     </div>
                 </div>
                 <div onClick={() => changeActiveProject('shopcomp')} className={`${styles.project} ${activeProject === 'shopcomp' ? styles.projectOpen : styles.projectClosed} ${styles.shopcomp}`}>
-                    <span className={styles.projectTitle}>ShopComp</span>
+                    <h2 className={styles.projectTitle}>ShopComp</h2>
                     <div className={`${styles.projectContent} ${previewExpanded ? styles.previewExpanded : ''}`}>
                         <div className={styles.preview}>
                             {/* No interactiveHint here — native <video controls>
@@ -179,21 +144,11 @@ export default function Projects() {
                             </div>
                             <button type="button" className={styles.expandToggle} onClick={toggleExpandPreview} aria-label={previewExpanded ? 'Show description' : 'Expand preview'}/>
                         </div>
-                        <div className={styles.description}><span>Shopcomp is a full-stack grocery comparison web app with an AWS backend, enabling users to upload/manage receipts, maintain shopping lists, and compute best-price options from historical purchase data using a MySQL relational schema. In my team, I was responsible for the shopping list and calculation functionality shown above for our Software Engineering final project. Additionally, I designed and refactored database schema and developed complex queries.<br/>Technologies: Next.js, React, TypeScript, AWS Amplify/Cognito, AWS CDK, MySQL</span></div>
+                        <div className={styles.description}><p>Shopcomp is a full-stack grocery comparison web app with an AWS backend, enabling users to upload/manage receipts, maintain shopping lists, and compute best-price options from historical purchase data using a MySQL relational schema. In my team, I was responsible for the shopping list and calculation functionality shown above for our Software Engineering final project. Additionally, I designed and refactored database schema and developed complex queries.<br/>Technologies: Next.js, React, TypeScript, AWS Amplify/Cognito, AWS CDK, MySQL</p></div>
                     </div>
                 </div>
                 <div onClick={() => changeActiveProject('heatmap')} className={`${styles.project} ${activeProject === 'heatmap' ? styles.projectOpen : styles.projectClosed} ${styles.heatmap}`}>
-                    {/* Always an <a>, never swapped for a <span> — see the
-                        same note on Intervle's title above. */}
-                    <a
-                        href={activeProject === 'heatmap' ? 'https://patient-heatmap-public.vercel.app/' : undefined}
-                        target={activeProject === 'heatmap' ? '_blank' : undefined}
-                        rel={activeProject === 'heatmap' ? 'noopener noreferrer' : undefined}
-                        onClick={guardTitleLink('heatmap')}
-                        className={`${styles.projectTitle} ${activeProject === 'heatmap' ? styles.openTitle : ''}`}
-                    >
-                        Clinical Analysis
-                    </a>
+                    <h2 className={styles.projectTitle}>Clinical Analysis</h2>
                     <div className={`${styles.projectContent} ${previewExpanded ? styles.previewExpanded : ''}`}>
                         <div className={styles.preview}>
                             <div className={styles.previewMedia} onMouseEnter={handlePreviewMouseEnter} onMouseLeave={handlePreviewMouseLeave}>
@@ -203,7 +158,7 @@ export default function Projects() {
                             </div>
                             <button type="button" className={styles.expandToggle} onClick={toggleExpandPreview} aria-label={previewExpanded ? 'Show description' : 'Expand preview'}/>
                         </div>
-                        <div className={styles.description}><span>A <a href='https://patient-heatmap-public.vercel.app/' target="_blank" rel="noopener noreferrer">dynamic heatmap</a> representation of hospital outreach statistics based on a variety of data. This application was used by the South Florida Proton Therapy Institute to identify areas to prioritize outreach. This version is fully generated data for sample purposes.<br/>Technologies: Typescript, React, Next.js, Leaflet, GeoJSON, Google Places API, Claude Code</span></div>
+                        <div className={styles.description}><p>A <a href='https://patient-heatmap-public.vercel.app/' target="_blank" rel="noopener noreferrer">dynamic heatmap</a> representation of hospital outreach statistics based on a variety of data. This application was used by the South Florida Proton Therapy Institute to identify areas to prioritize outreach. This version is fully generated data for sample purposes.<br/>Technologies: Typescript, React, Next.js, Leaflet, GeoJSON, Google Places API, Claude Code</p></div>
                     </div>
                 </div>
             </div>

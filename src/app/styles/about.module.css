@@ -20,6 +20,9 @@
     position: relative;
     font-family: var(--font-idiqlat);
     font-size: 56px;
+    /* Explicit — this is an <h1> now (was a <span>), and h1's UA-default
+       bold would otherwise change its appearance. */
+    font-weight: 400;
     color: var(--main-red);
 
     margin-top: 12px;
@@ -207,6 +210,9 @@
 .sectionTitle {
     font-family: var(--font-idiqlat);
     font-size: 24px;
+    /* Explicit — these are <h2>s now (were <span>s), and h2's UA-default
+       bold would otherwise change their appearance. */
+    font-weight: 400;
     margin-left: 4px;
 }
 

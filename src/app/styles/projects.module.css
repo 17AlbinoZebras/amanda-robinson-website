@@ -74,6 +74,10 @@
 .projectTitle {
     font-family: var(--font-new-amsterdam);
     font-size: 38px;
+    /* Explicit — ShopComp's title is an <h2> (Intervle/Heatmap's are <a>,
+       already normal-weight by default), and h2's UA-default bold would
+       otherwise change its appearance vs. its two siblings. */
+    font-weight: 400;
     color: var(--main-light);
     text-align: center;
     transition: font-size var(--transition-length), transform var(--transition-length);
@@ -187,7 +191,7 @@
     overflow: hidden;
 }
 
-.description span {
+.description p {
     display: inline-block;
     opacity: 1;
     /* font-size: 20px; */
@@ -253,7 +257,7 @@
     pointer-events: none;
 }
 
-.projectClosed .description span {
+.projectClosed .description p {
     opacity: 0;
     font-size: 10px;
 }
@@ -267,11 +271,6 @@
     background-color: #A9ACD6;
     font-size: 24px;
     line-height: 1.4;
-}
-
-.openTitle:hover {
-    color: var(--main-beige);
-    cursor: pointer;
 }
 
 .intervle img {

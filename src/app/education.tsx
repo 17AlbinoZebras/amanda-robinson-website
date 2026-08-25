@@ -169,7 +169,7 @@ export default function Education() {
     // below for why this has to be one shared, JS-computed pixel value
     // rather than each layer just using its own translateY(100%).
     const [slideDistance, setSlideDistance] = useState(0)
-    const incomingRef = useRef<HTMLDivElement>(null)
+    const incomingRef = useRef<HTMLParagraphElement>(null)
     useLayoutEffect(() => {
         if (incomingCourse && incomingRef.current) {
             // incomingRef is the bare text element — .courseDescriptionInner's
@@ -203,21 +203,21 @@ export default function Education() {
     return (
         <div className={styles.page}>
             <TintedVector src="/masks/Blue-Squiggles.svg" color='#61659B' width='100vw' height='100vh' repeat="y" maskSize='cover' className={styles.educationBackground}/>
-            <span className={styles.heading}>Education</span>
+            <h1 className={styles.heading}>Education</h1>
             <div className={styles.upperSection}>
                 <div className={styles.overview}>
                     <div className={styles.column}>
                         <b>Worcester Polytechnic Institute</b>
-                        <span>Expected Graduation: May 2028</span>
+                        <p>Expected Graduation: May 2028</p>
                     </div>
                     <div className={styles.column}>
-                        <span>B.S. Computer Science</span>
-                        <span>Minor in Economics</span>
+                        <p>B.S. Computer Science</p>
+                        <p>Minor in Economics</p>
                     </div>
                 </div>
             </div>
             <div className={styles.lowerSection}>
-                <span className={styles.subHeading}>Relevant Courses</span>
+                <h2 className={styles.subHeading}>Relevant Courses</h2>
                 <div className={styles.relevantCourses}>
                     <div className={styles.row}>
                         {classes.slice(0, 4).map((course) => (
@@ -228,14 +228,14 @@ export default function Education() {
                     </div>
                     <div className={`${styles.courseDescription} ${activeCourse ? styles.courseDescriptionOpen : ''} ${incomingCourse ? styles.courseDescriptionSliding : ''}`} style={{height: activeCourse ? `${measuredHeight}px` : '0px'}}>
                         <div ref={innerRef} className={styles.courseDescriptionInner} style={{'--slide-distance': `${slideDistance}px`} as React.CSSProperties}>
-                            <div className={`${styles.courseDescriptionText} ${incomingCourse ? (slideDirection === 'up' ? styles.slideOutUp : styles.slideOutDown) : ''} ${suppressReset ? styles.noTransition : ''}`}>{displayedCourse?.description}</div>
+                            <p className={`${styles.courseDescriptionText} ${incomingCourse ? (slideDirection === 'up' ? styles.slideOutUp : styles.slideOutDown) : ''} ${suppressReset ? styles.noTransition : ''}`}>{displayedCourse?.description}</p>
                             {incomingCourse && (
                                 // Keyed by course code so an interruption (incomingCourse
                                 // changing to a different course mid-slide) forces a clean
                                 // remount instead of reusing this node — otherwise it would
                                 // carry over its previous, still in-flight transform value
                                 // and visibly continue animating from the wrong side.
-                                <div key={incomingCourse.code} ref={incomingRef} className={`${styles.courseDescriptionText} ${styles.courseDescriptionIncoming} ${slideSettled ? styles.settled : (slideDirection === 'up' ? styles.enterFromBelow : styles.enterFromAbove)}`}>{incomingCourse.description}</div>
+                                <p key={incomingCourse.code} ref={incomingRef} className={`${styles.courseDescriptionText} ${styles.courseDescriptionIncoming} ${slideSettled ? styles.settled : (slideDirection === 'up' ? styles.enterFromBelow : styles.enterFromAbove)}`}>{incomingCourse.description}</p>
                             )}
                         </div>
                     </div>

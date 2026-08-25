@@ -43,14 +43,13 @@ function OverviewSection() {
             <div className={styles.overviewContent} ref={contentRef}>
                 <div className={styles.upperSection}>
                     <div className={styles.blurb}>
-                        <span>Hi! I&#39;m Amanda. I build things that make people&#39;s<br/>lives easier. I am energized by untangling complex problems and turning creative ideas into technology people can actually use.</span>
+                        <p>Hi! I&#39;m Amanda. I build things that make people&#39;s<br/>lives easier. I am energized by untangling complex problems and turning creative ideas into technology people can actually use.</p>
                     </div>
                     <div className={styles.headshotContainer}><img src="headshot.jpg" className={styles.headshot}/></div>
                 </div>
                 <div className={styles.lowerSection}>
                     <div className={styles.techStacks}>
-                        <span className={styles.sectionTitle}>Technology Stacks</span>
-                        <br/>
+                        <h2 className={styles.sectionTitle}>Technology Stacks</h2>
                         <div className={styles.bodyText}>
                             <b>Languages: </b>
                             <p>Java, Python, TypeScript, HTML/CSS, SQL, C++, C</p>
@@ -63,8 +62,7 @@ function OverviewSection() {
                         </div>
                     </div>
                     <div className={styles.education}>
-                        <span className={styles.sectionTitle}>Education</span>
-                        <br/>
+                        <h2 className={styles.sectionTitle}>Education</h2>
                         <div className={styles.bodyText}>
                             <b>Worcester Polytechnic Institute</b>
                             <p>Expected Graduation: May 2028</p>
@@ -156,7 +154,7 @@ export default function HomePage() {
                     </svg>
                 </div>
                 <div className={styles.subtitleSection}>
-                    <div className={styles.subtitle}>Builder of unique and effective software</div>
+                    <p className={styles.subtitle}>Builder of unique and effective software</p>
                 </div>
             </div>
             <OverviewSection/>
