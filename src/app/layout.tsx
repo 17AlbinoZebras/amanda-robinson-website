@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   },
   description: "Portfolio of Amanda N. Robinson, a software developer who builds thoughtful, creative products for real-world problems.",
   authors: {name: 'Amanda N. Robinson'},
-  metadataBase: new URL('https://amandarobinson.xyz')
+  metadataBase: new URL('https://amanda-robinson-website.vercel.app')
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
