@@ -1,16 +1,30 @@
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { ImageResponse } from 'next/og'
 
 export const ogImageSize = { width: 1200, height: 630 }
 export const ogImageContentType = 'image/png'
 
-// Shared by every route's opengraph-image.tsx (see e.g. about/opengraph-image.tsx)
-// so each page's card only has to supply its own title + colors, not
-// reimplement the whole layout. Uses generic system fonts rather than the
-// site's own (Idiqlat/New Amsterdam/Afacad Flux) — Satori (which renders
-// these) can't load @fontsource packages directly, only raw font file
-// buffers passed in explicitly, and a close-enough bold sans-serif is a
-// reasonable tradeoff for a social-preview card versus that complexity.
-export function buildOgImage(title: string, background: string, textColor: string) {
+// Satori (which renders these) can't load @fontsource packages directly —
+// only a raw font file buffer, passed in explicitly via ImageResponse's
+// `fonts` option, and only in ttf/otf/woff (not woff2, unlike the
+// @fontsource-variable/afacad-flux <link> the rest of the site uses in the
+// browser) — hence the separate, non-variable @fontsource/afacad-flux
+// dependency this reads from instead. Loaded once here, shared by every
+// page's card as the subtitle's font, since it doesn't vary per page the
+// way the title's does.
+const afacadFlux = await readFile(
+    join(process.cwd(), 'node_modules/@fontsource/afacad-flux/files/afacad-flux-latin-500-normal.woff')
+)
+const AFACAD_FLUX_NAME = 'Afacad Flux'
+
+type TitleFont = { name: string; data: Buffer | ArrayBuffer; weight: 400 | 500 | 600 | 700 }
+
+// titleFont is each caller's own page-heading font (New Amsterdam or
+// Idiqlat — see each route's opengraph-image.tsx); the subtitle always
+// renders in the shared Afacad Flux above, matching how the real pages
+// pair a themed heading font with Afacad Flux for everything else.
+export function buildOgImage(title: string, background: string, textColor: string, titleFont: TitleFont) {
     return new ImageResponse(
         (
             <div
@@ -22,13 +36,13 @@ export function buildOgImage(title: string, background: string, textColor: strin
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: background,
-                    fontFamily: 'sans-serif',
                 }}
             >
                 <div
                     style={{
                         fontSize: 96,
-                        fontWeight: 700,
+                        fontWeight: titleFont.weight,
+                        fontFamily: titleFont.name,
                         color: textColor,
                         textAlign: 'center',
                         padding: '0 60px',
@@ -41,6 +55,7 @@ export function buildOgImage(title: string, background: string, textColor: strin
                     style={{
                         fontSize: 36,
                         fontWeight: 500,
+                        fontFamily: AFACAD_FLUX_NAME,
                         color: textColor,
                         opacity: 0.85,
                         marginTop: 28,
@@ -50,6 +65,12 @@ export function buildOgImage(title: string, background: string, textColor: strin
                 </div>
             </div>
         ),
-        { ...ogImageSize }
+        {
+            ...ogImageSize,
+            fonts: [
+                { name: titleFont.name, data: titleFont.data, style: 'normal', weight: titleFont.weight },
+                { name: AFACAD_FLUX_NAME, data: afacadFlux, style: 'normal', weight: 500 },
+            ],
+        }
     )
 }

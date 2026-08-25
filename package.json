@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@fontsource-variable/afacad-flux": "^5.3.0",
+    "@fontsource/afacad-flux": "^5.3.0",
     "@fontsource/idiqlat": "^5.3.0",
     "@fontsource/new-amsterdam": "^5.3.0",
     "@fortawesome/free-solid-svg-icons": "^7.3.1",
