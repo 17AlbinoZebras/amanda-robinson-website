@@ -24,7 +24,10 @@ type TitleFont = { name: string; data: Buffer | ArrayBuffer; weight: 400 | 500 |
 // Idiqlat — see each route's opengraph-image.tsx); the subtitle always
 // renders in the shared Afacad Flux above, matching how the real pages
 // pair a themed heading font with Afacad Flux for everything else.
-export function buildOgImage(title: string, background: string, textColor: string, titleFont: TitleFont) {
+// subtitle defaults to the byline every page but Home uses — Home swaps
+// the two (title "Amanda Robinson", subtitle "Software Developer") since
+// its title is otherwise the only one not actually naming the page.
+export function buildOgImage(title: string, background: string, textColor: string, titleFont: TitleFont, subtitle: string = 'Amanda N. Robinson') {
     return new ImageResponse(
         (
             <div
@@ -61,7 +64,7 @@ export function buildOgImage(title: string, background: string, textColor: strin
                         marginTop: 28,
                     }}
                 >
-                    Amanda N. Robinson
+                    {subtitle}
                 </div>
             </div>
         ),

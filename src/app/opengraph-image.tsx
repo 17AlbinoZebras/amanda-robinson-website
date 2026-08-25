@@ -14,9 +14,9 @@ const newAmsterdam = await readFile(
 )
 
 export default async function Image() {
-    return buildOgImage('Software Developer', '#F6EBDE', '#5B5F97', {
+    return buildOgImage('Amanda Robinson', '#F6EBDE', '#5B5F97', {
         name: 'New Amsterdam',
         data: newAmsterdam,
         weight: 400,
-    })
+    }, 'Software Developer')
 }
