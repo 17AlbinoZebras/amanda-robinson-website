@@ -46,24 +46,39 @@
     width: 55vw;
 }
 
-.sectionTitle {
+.roleInfo {
+    position: relative;
+    display: flex;
+    justify-self: center;
+    flex-direction: row;
+
+    font-family: var(--font-idiqlat);
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 2px;
+    color: var(--main-blue);
+}
+
+.employer {
     position: relative;
     font-family: var(--font-idiqlat);
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 500;
     line-height: 1.1;
     text-align: center;
+    color: var(--main-blue);
 }
 
-.sectionSubtitle {
+.projectName {
     font-weight: 500;
-    font-size: 30px;
+    font-size: 28px;
     text-align: center;
+    color: var(--main-blue);
 }
 
 .sectionBody {
     padding-inline-start: 24px;
-    line-height: 1.375;
+    line-height: 1.35;
 }
 
 .sectionBody li {
@@ -89,11 +104,11 @@
     z-index: 1;
     
     border-radius: 0 32px 32px 0;
-    padding: 1% 2% 2% 9.25%;
+    padding: 0.75% 2% 2% 9.25%;
     background-color: #C9CBE8;
     color: var(--main-light);
 
-    font-size: 29px;
+    font-size: 27px;
 }
 
 .sectionRight {
@@ -101,23 +116,37 @@
     position: absolute;
     right: 0;
 
-    padding: 1.5% 5% 2% 2%;
+    padding: 0.75% 5% 2% 2%;
 
     background-color: var(--main-light);
     color: #88AA9C;
+
+    font-size: 28px;
 }
 
-.sectionRight .sectionTitle {
+.sectionRight .titleSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-left: 10%;
+}
+
+/* .sectionRight .sectionTitle {
     padding-left: 10%;
 }
 
 .sectionRight .sectionSubtitle {
     padding-left: 7.5%;
-}
+} */
 
 .sectionRight .sectionBody {
     padding-right: 7%;
-    line-height: 1.5;
+    line-height: 1.55;
+}
+
+.sectionRight .roleInfo {
+    padding-left: 10%;
 }
 
 @media (max-width: 700px) {
