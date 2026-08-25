@@ -227,9 +227,26 @@ function Slider(width: string, height: string, rect: React.ReactNode, orb: React
         }
     }
 
+    // Mirrors the hover handlers below so keyboard-tab users get the same
+    // slide-open reveal a mouse hover gives — without this, Tab landing on a
+    // closed slider left it visually off-screen with no way to see what it
+    // even was before pressing Enter. Gated to :focus-visible (not every
+    // focus) so a mouse click — which also focuses the link — doesn't fire
+    // this too; harmless either way since onMouseEnter already opened it by
+    // then, but this keeps a click from touching state it doesn't need to.
+    // onBlur closes unconditionally, same as onMouseLeave — Tabbing to the
+    // next element is the keyboard equivalent of the mouse moving off.
+    const handleFocus = (e: React.FocusEvent<HTMLElement>) => {
+        if (e.currentTarget.matches(':focus-visible')) {
+            onOpenChange?.(true)
+        }
+    }
+
     const hoverHandlers = {
         onMouseEnter: () => onOpenChange?.(true),
         onMouseLeave: () => onOpenChange?.(false),
+        onFocus: handleFocus,
+        onBlur: () => onOpenChange?.(false),
         onClick: handleClick,
     }
 
@@ -486,7 +503,14 @@ export function AllSliders({ appState, className, style } : AllSlidersProps ) {
     const shouldBounce = neverHovered && pathname === '/'
 
     return (
-        <div className={styles.allSliders} ref={allSlidersRef} onMouseOver={() => setNeverHovered(false)}>
+        // onFocus alongside onMouseOver — without it, a keyboard-only user
+        // tabbing straight to the (first, bouncing) red slider would never
+        // dismiss the bounce hint, and its still-running @keyframes
+        // animation would keep overriding .sliderOpen's transform for as
+        // long as it played, silently defeating the new focus-visible
+        // open behavior on the one slider a first-time keyboard visitor is
+        // most likely to reach first.
+        <div className={styles.allSliders} ref={allSlidersRef} onMouseOver={() => setNeverHovered(false)} onFocus={() => setNeverHovered(false)}>
             <RedSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideLeft} ${shouldBounce ? styles.bounceSlider : ''}`} pathname={pathname}/>
             <GreenSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.bottomSlider} ${styles.slideLeft}`} pathname={pathname}/>
             <YellowSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideRight}`} pathname={pathname}/>
