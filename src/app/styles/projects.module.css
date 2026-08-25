@@ -273,6 +273,16 @@
     line-height: 1.4;
 }
 
+.openTitle {
+    text-decoration: underline;
+}
+
+.openTitle:hover {
+    /* color: var(--main-beige); */
+    filter: brightness(0.9);
+    cursor: pointer;
+}
+
 .intervle img {
     object-fit: cover;
     transform: scale(1.1) translate(0, 3.5%);

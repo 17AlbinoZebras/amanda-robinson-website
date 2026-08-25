@@ -4,6 +4,15 @@ import React, { useEffect, useRef, useState } from 'react'
 import styles from './styles/projects.module.css'
 import { TintedVector } from './mask_functions'
 
+// TODO: fill in each project's real GitHub repo URL — titles link here
+// (only while their panel is open, see guardTitleLink below) once these
+// are set.
+const projectGithubUrls: Record<string, string> = {
+    intervle: 'https://github.com/17AlbinoZebras/Intervle-wordle-game',
+    shopcomp: 'https://github.com/17AlbinoZebras/ShopComp',
+    heatmap: 'https://github.com/17AlbinoZebras/outreach-heatmap',
+}
+
 export default function Projects() {
     const [activeProject, setActiveProject] = useState<string>('heatmap')
 
@@ -12,6 +21,13 @@ export default function Projects() {
             setActiveProject(proj)
         }
     }
+
+    // A title only ever links out once its own panel is the open one, and
+    // only once projectGithubUrls actually has a real URL for it (still
+    // blank above, to be filled in later) — until then this is false and
+    // the title renders as plain inert text, same as before it had a link
+    // at all.
+    const titleLinksTo = (proj: string) => activeProject === proj ? projectGithubUrls[proj] : ''
 
     // Only one project is ever open at a time, so a single shared boolean is
     // enough — no need to track this per project. Resets whenever the open
@@ -41,6 +57,24 @@ export default function Projects() {
             }
             return newlyExpanded
         })
+    }
+
+    // Guards a title <a>'s own navigation on a click that's opening the
+    // panel (not one on an already-open panel). Without this, clicking a
+    // closed title both opens the panel AND navigates away: the click
+    // bubbles to .project's onClick, which calls setActiveProject
+    // synchronously (React flushes discrete events like click immediately),
+    // so by the time the browser gets to the click's own default action
+    // (follow the link), href has ALREADY been set to the real URL by that
+    // same re-render — even though the element had no href at the moment
+    // it was actually clicked. Preventing default here (but not stopping
+    // propagation, so .project's onClick still runs and opens the panel)
+    // means a click only ever opens; a SEPARATE, later click on the
+    // now-open title is what actually navigates.
+    const guardTitleLink = (proj: string) => (e: React.MouseEvent) => {
+        if (activeProject !== proj) {
+            e.preventDefault()
+        }
     }
 
     // The iframe previews (Intervle, Heatmap) embed the actual live site —
@@ -115,7 +149,26 @@ export default function Projects() {
             <h1 className={styles.heading}>Projects</h1>
             <div className={styles.projects}>
                 <div onClick={() => changeActiveProject('intervle')} className={`${styles.project} ${activeProject === 'intervle' ? styles.projectOpen : styles.projectClosed} ${styles.intervle}`}>
-                    <h2 className={styles.projectTitle}>Intervle</h2>
+                    {/* role="heading"/aria-level (not a wrapping <h2>) — the
+                        rotate(-90deg) closed-state transform (see
+                        .projectClosed .projectTitle below) needs to apply
+                        directly to whichever element flexbox measures for
+                        layout, which has to stay this <a> itself: wrapping
+                        it in a separate <h2> moved that measured box to the
+                        (unrotated) wrapper while the transform stayed on the
+                        inner <a>, so the two disagreed on the tab's size and
+                        the closed tabs overlapped. */}
+                    <a
+                        role="heading"
+                        aria-level={2}
+                        href={titleLinksTo('intervle') || undefined}
+                        target={activeProject === 'intervle' ? '_blank' : undefined}
+                        rel={activeProject === 'intervle' ? 'noopener noreferrer' : undefined}
+                        onClick={guardTitleLink('intervle')}
+                        className={`${styles.projectTitle} ${activeProject === 'intervle' ? styles.openTitle : ''}`}
+                    >
+                        Intervle
+                    </a>
                     <div className={`${styles.projectContent} ${previewExpanded ? styles.previewExpanded : ''}`}>
                         <div className={styles.preview}>
                             <div className={styles.previewMedia} onMouseEnter={handlePreviewMouseEnter} onMouseLeave={handlePreviewMouseLeave}>
@@ -129,7 +182,17 @@ export default function Projects() {
                     </div>
                 </div>
                 <div onClick={() => changeActiveProject('shopcomp')} className={`${styles.project} ${activeProject === 'shopcomp' ? styles.projectOpen : styles.projectClosed} ${styles.shopcomp}`}>
-                    <h2 className={styles.projectTitle}>ShopComp</h2>
+                    <a
+                        role="heading"
+                        aria-level={2}
+                        href={titleLinksTo('shopcomp') || undefined}
+                        target={activeProject === 'shopcomp' ? '_blank' : undefined}
+                        rel={activeProject === 'shopcomp' ? 'noopener noreferrer' : undefined}
+                        onClick={guardTitleLink('shopcomp')}
+                        className={`${styles.projectTitle} ${activeProject === 'shopcomp' ? styles.openTitle : ''}`}
+                    >
+                        ShopComp
+                    </a>
                     <div className={`${styles.projectContent} ${previewExpanded ? styles.previewExpanded : ''}`}>
                         <div className={styles.preview}>
                             {/* No interactiveHint here — native <video controls>
@@ -148,7 +211,17 @@ export default function Projects() {
                     </div>
                 </div>
                 <div onClick={() => changeActiveProject('heatmap')} className={`${styles.project} ${activeProject === 'heatmap' ? styles.projectOpen : styles.projectClosed} ${styles.heatmap}`}>
-                    <h2 className={styles.projectTitle}>Clinical Analysis</h2>
+                    <a
+                        role="heading"
+                        aria-level={2}
+                        href={titleLinksTo('heatmap') || undefined}
+                        target={activeProject === 'heatmap' ? '_blank' : undefined}
+                        rel={activeProject === 'heatmap' ? 'noopener noreferrer' : undefined}
+                        onClick={guardTitleLink('heatmap')}
+                        className={`${styles.projectTitle} ${activeProject === 'heatmap' ? styles.openTitle : ''}`}
+                    >
+                        Clinical Analysis
+                    </a>
                     <div className={`${styles.projectContent} ${previewExpanded ? styles.previewExpanded : ''}`}>
                         <div className={styles.preview}>
                             <div className={styles.previewMedia} onMouseEnter={handlePreviewMouseEnter} onMouseLeave={handlePreviewMouseLeave}>
