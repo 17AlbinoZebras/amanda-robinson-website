@@ -64,6 +64,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
     return (
         <div className={styles.page}>
+            {/* AllSliders (a <nav>) and Footer (a <footer>) are siblings of
+                <main>, not nested inside it — <main> should hold only the
+                page's own unique content; site-wide navigation and footer
+                chrome are separate top-level landmarks, not part of it. */}
             <main className={styles.main}>
                 <AppIntroContext.Provider value={playIntro}>
                     {/* key={pathname} forces this wrapper (and so its fade-in
@@ -75,11 +79,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                         {children}
                     </div>
                 </AppIntroContext.Provider>
-                <div className={playIntro ? styles.sliderFadeIn : undefined}>
-                    <AllSliders appState={appState}/>
-                </div>
-                <Footer/>
             </main>
+            <div className={playIntro ? styles.sliderFadeIn : undefined}>
+                <AllSliders appState={appState}/>
+            </div>
+            <Footer/>
         </div>
     )
 }

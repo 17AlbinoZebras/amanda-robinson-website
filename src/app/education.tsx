@@ -36,6 +36,20 @@ export default function Education() {
         }
     }
 
+    // .course is a plain <div> with no native keyboard support of its own —
+    // same fix as projects.tsx's .project: role="button" + tabIndex make it
+    // a real Tab stop, this handles the Enter/Space a native <button> would.
+    // target === currentTarget guards against a bubbled keydown from some
+    // future focusable child; there isn't one today, but costs nothing to
+    // guard against.
+    const handleCourseKeyDown = (targetCourse: course) => (e: React.KeyboardEvent) => {
+        if (e.target !== e.currentTarget) return
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            changeActiveCourse(targetCourse)
+        }
+    }
+
     // The description box is always mounted now (see the JSX below) so its
     // height transition has something to animate from/to — a conditionally
     // rendered element has no "previous state" to interpolate, so it would
@@ -203,7 +217,9 @@ export default function Education() {
     return (
         <div className={styles.page}>
             <TintedVector src="/masks/Blue-Squiggles.svg" color='#61659B' width='100vw' height='100vh' repeat="y" maskSize='cover' className={styles.educationBackground}/>
-            <h1 className={styles.heading}>Education</h1>
+            <header>
+                <h1 className={styles.heading}>Education</h1>
+            </header>
             <div className={styles.upperSection}>
                 <div className={styles.overview}>
                     <div className={styles.column}>
@@ -221,7 +237,20 @@ export default function Education() {
                 <div className={styles.relevantCourses}>
                     <div className={styles.row}>
                         {classes.slice(0, 4).map((course) => (
-                            <div key={course.code} className={styles.course} onMouseEnter={() => setHoveredCourseCode(course.code)} onMouseLeave={() => setHoveredCourseCode(null)} onClick={() => changeActiveCourse(course)}>
+                            <div
+                                key={course.code}
+                                className={styles.course}
+                                onMouseEnter={() => setHoveredCourseCode(course.code)}
+                                onMouseLeave={() => setHoveredCourseCode(null)}
+                                onFocus={(e) => e.target === e.currentTarget && setHoveredCourseCode(course.code)}
+                                onBlur={(e) => e.target === e.currentTarget && setHoveredCourseCode(null)}
+                                onClick={() => changeActiveCourse(course)}
+                                onKeyDown={handleCourseKeyDown(course)}
+                                role="button"
+                                tabIndex={0}
+                                aria-expanded={activeCourse === course}
+                                aria-label={course.title}
+                            >
                                 <div className={`${styles.courseTitle} ${activeCourse === course ? styles.activeCourse : ''}`}>{hoveredCourseCode === course.code ? course.code : course.title}</div>
                             </div>
                         ))}
@@ -241,7 +270,20 @@ export default function Education() {
                     </div>
                     <div className={styles.row}>
                         {classes.slice(4).map((course) => (
-                            <div key={course.code} className={styles.course} onMouseEnter={() => setHoveredCourseCode(course.code)} onMouseLeave={() => setHoveredCourseCode(null)} onClick={() => changeActiveCourse(course)}>
+                            <div
+                                key={course.code}
+                                className={styles.course}
+                                onMouseEnter={() => setHoveredCourseCode(course.code)}
+                                onMouseLeave={() => setHoveredCourseCode(null)}
+                                onFocus={(e) => e.target === e.currentTarget && setHoveredCourseCode(course.code)}
+                                onBlur={(e) => e.target === e.currentTarget && setHoveredCourseCode(null)}
+                                onClick={() => changeActiveCourse(course)}
+                                onKeyDown={handleCourseKeyDown(course)}
+                                role="button"
+                                tabIndex={0}
+                                aria-expanded={activeCourse === course}
+                                aria-label={course.title}
+                            >
                                 <div className={`${styles.courseTitle} ${activeCourse === course ? styles.activeCourse : ''}`}>{hoveredCourseCode === course.code ? course.code : course.title}</div>
                             </div>
                         ))}

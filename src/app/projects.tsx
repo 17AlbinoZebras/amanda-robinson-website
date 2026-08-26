@@ -22,6 +22,26 @@ export default function Projects() {
         }
     }
 
+    // .project itself is a plain <div> — clickable via its own onClick below,
+    // but with no keyboard affordance at all by default (divs aren't
+    // focusable, and have no native Enter/Space activation). role="button" +
+    // tabIndex make it a real Tab stop; this handles the two keys a native
+    // <button> would respond to. e.target === e.currentTarget scopes it to
+    // the div itself, not a bubbled keydown from one of its own focusable
+    // children (the title <a>, the expand toggle <button>) — those already
+    // handle their own Enter/Space natively, and without this guard a single
+    // Enter press on the title would double-fire changeActiveProject (once
+    // from this handler via bubbling, once from the click the browser
+    // synthesizes for the link) — harmless since it no-ops when already
+    // active, but redundant.
+    const handleProjectKeyDown = (proj: string) => (e: React.KeyboardEvent) => {
+        if (e.target !== e.currentTarget) return
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            changeActiveProject(proj)
+        }
+    }
+
     // A title only ever links out once its own panel is the open one, and
     // only once projectGithubUrls actually has a real URL for it (still
     // blank above, to be filled in later) — until then this is false and
@@ -146,9 +166,19 @@ export default function Projects() {
     return (
         <div className={styles.page}>
             <TintedVector src="/masks/Red-Squiggles.svg" color='#FDBCBB' width='100vw' height='100vh' maskSize='cover' className={styles.projectsBackground}/>
-            <h1 className={styles.heading}>Projects</h1>
+            <header>
+                <h1 className={styles.heading}>Projects</h1>
+            </header>
             <div className={styles.projects}>
-                <div onClick={() => changeActiveProject('intervle')} className={`${styles.project} ${activeProject === 'intervle' ? styles.projectOpen : styles.projectClosed} ${styles.intervle}`}>
+                <div
+                    onClick={() => changeActiveProject('intervle')}
+                    onKeyDown={handleProjectKeyDown('intervle')}
+                    role="button"
+                    tabIndex={0}
+                    aria-expanded={activeProject === 'intervle'}
+                    aria-label="Intervle"
+                    className={`${styles.project} ${activeProject === 'intervle' ? styles.projectOpen : styles.projectClosed} ${styles.intervle}`}
+                >
                     {/* role="heading"/aria-level (not a wrapping <h2>) — the
                         rotate(-90deg) closed-state transform (see
                         .projectClosed .projectTitle below) needs to apply
@@ -181,7 +211,15 @@ export default function Projects() {
                         <div className={styles.description}><p>My first real web design project back in 2023, <a href='https://intervle-wordle-game.vercel.app/' target="_blank" rel="noopener noreferrer">Intervle</a> is a responsive web game inspired by everybody&#39;s favorite word puzzle, Wordle, but with a lexicographic twist. Results indicate alphabetical distance from the target word in either direction for each letter position.<br/>Technologies: HTML, CSS, JavaScript (Bootstrap)</p></div>
                     </div>
                 </div>
-                <div onClick={() => changeActiveProject('shopcomp')} className={`${styles.project} ${activeProject === 'shopcomp' ? styles.projectOpen : styles.projectClosed} ${styles.shopcomp}`}>
+                <div
+                    onClick={() => changeActiveProject('shopcomp')}
+                    onKeyDown={handleProjectKeyDown('shopcomp')}
+                    role="button"
+                    tabIndex={0}
+                    aria-expanded={activeProject === 'shopcomp'}
+                    aria-label="ShopComp"
+                    className={`${styles.project} ${activeProject === 'shopcomp' ? styles.projectOpen : styles.projectClosed} ${styles.shopcomp}`}
+                >
                     <a
                         role="heading"
                         aria-level={2}
@@ -210,7 +248,15 @@ export default function Projects() {
                         <div className={styles.description}><p>Shopcomp is a full-stack grocery comparison web app with an AWS backend, enabling users to upload/manage receipts, maintain shopping lists, and compute best-price options from historical purchase data using a MySQL relational schema. In my team, I was responsible for the shopping list and calculation functionality shown above for our Software Engineering final project. Additionally, I designed and refactored database schema and developed complex queries.<br/>Technologies: Next.js, React, TypeScript, AWS Amplify/Cognito, AWS CDK, MySQL</p></div>
                     </div>
                 </div>
-                <div onClick={() => changeActiveProject('heatmap')} className={`${styles.project} ${activeProject === 'heatmap' ? styles.projectOpen : styles.projectClosed} ${styles.heatmap}`}>
+                <div
+                    onClick={() => changeActiveProject('heatmap')}
+                    onKeyDown={handleProjectKeyDown('heatmap')}
+                    role="button"
+                    tabIndex={0}
+                    aria-expanded={activeProject === 'heatmap'}
+                    aria-label="Clinical Analysis"
+                    className={`${styles.project} ${activeProject === 'heatmap' ? styles.projectOpen : styles.projectClosed} ${styles.heatmap}`}
+                >
                     <a
                         role="heading"
                         aria-level={2}

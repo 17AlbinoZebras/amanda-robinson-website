@@ -13,7 +13,7 @@ interface activity {
 
 interface hobby {
     title: string;
-    photos?: {src: string, caption?: JSX.Element}[]
+    photos?: {src: string, alt: string, caption?: JSX.Element}[]
 }
 
 const activities: activity[] = [
@@ -25,11 +25,15 @@ const activities: activity[] = [
 ]
 
 const hobbies: hobby[] = [
-    {title: "Photography", photos: [{src: "/about/WakodahatcheeHeron.jpg"}, {src: "/about/KaylaSeniorPhoto.jpg"}, {src: "/about/Squirrel.jpg"}]},
-    {title: "Theater", photos: [{src: "/about/8ML-Exec-Cropped.jpg", caption: <p className={styles.caption}>The leadership team of <i>8 Minutes Left</i>, which I assistant stage managed.</p>}]},
-    {title: "Crafts", photos: [{src: "/about/origami-dragon.jpg"}]},
-    {title: "Board Games", photos: [{src: "/about/Catan.jpg"}]},
-    {title: "Learning New Skills", photos: [{src: "/about/stained-glass-snail.jpg", caption: <p className={styles.caption}>My first stained glass project!</p>}]}
+    {title: "Photography", photos: [
+        {src: "/about/WakodahatcheeHeron.jpg", alt: "A tricolored heron wading in rippling water"},
+        {src: "/about/KaylaSeniorPhoto.jpg", alt: "A woman in a white dress standing on a graffiti-covered pier at sunset"},
+        {src: "/about/Squirrel.jpg", alt: "A squirrel standing on sandy ground"}
+    ]},
+    {title: "Theater", photos: [{src: "/about/8ML-Exec-Cropped.jpg", alt: "Group photo of the leadership team on the set of 8 Minutes Left", caption: <p className={styles.caption}>The leadership team of <i>8 Minutes Left</i>, which I assistant stage managed.</p>}]},
+    {title: "Crafts", photos: [{src: "/about/origami-dragon.jpg", alt: "A purple origami dragon"}]},
+    {title: "Board Games", photos: [{src: "/about/Catan.jpg", alt: "A Settlers of Catan board game set up mid-play, with resource tiles, roads, and cards"}]},
+    {title: "Learning New Skills", photos: [{src: "/about/stained-glass-snail.jpg", alt: "A stained glass snail ornament in teal and orange", caption: <p className={styles.caption}>My first stained glass project!</p>}]}
 ]
 
 export default function About() {
@@ -53,6 +57,29 @@ export default function About() {
         }
         else {
             setActiveHobby(null)
+        }
+    }
+
+    // Only the .canClick <li>s (ones with details/photos to reveal — see the
+    // conditional class on each below) are genuinely interactive; the rest
+    // stay plain, non-focusable text, matching how neither is clickable-
+    // looking to a mouse user either. Enter/Space here mirror the Enter/
+    // Space handling added for education.tsx's .course and projects.tsx's
+    // .project — same reasoning: a plain <li onClick> has no keyboard
+    // affordance of its own.
+    const handleActivityKeyDown = (targetActivity: activity) => (e: React.KeyboardEvent) => {
+        if (e.target !== e.currentTarget) return
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            changeActiveActivity(targetActivity)
+        }
+    }
+
+    const handleHobbyKeyDown = (targetHobby: hobby) => (e: React.KeyboardEvent) => {
+        if (e.target !== e.currentTarget) return
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            changeActiveHobby(targetHobby)
         }
     }
 
@@ -123,11 +150,13 @@ export default function About() {
     return (
         <div className={styles.page}>
             <TintedVector src="/masks/Yellow-Memphis.svg" color='#FBDDA1' width='100vw' height='100vh' repeat='y' maskSize='cover' className={styles.aboutBackground}/>
-            <h1 className={styles.heading}>About Me</h1>
+            <header>
+                <h1 className={styles.heading}>About Me</h1>
+            </header>
             <div className={styles.mainContent}>
                 <div className={styles.upperSection}>
                     <div className={styles.mainPhoto}>
-                        <img src="about/AmandaHeadshot8ML.jpg" className={styles.headshot}></img>
+                        <img src="about/AmandaHeadshot8ML.jpg" alt="Amanda Robinson smiling in front of a brick wall" className={styles.headshot}></img>
                     </div>
                     <p className={styles.mainDescription}>
                         I&#39;m Amanda Robinson, a California native and a third year Computer Science student at WPI. I&#39;ve been using software to solve problems for as long as I can remember. What began as a love of coding and logic puzzles has grown into a passion for building thoughtful, creative products that tackle challenging real-world problems.
@@ -160,7 +189,7 @@ export default function About() {
                                             leaving the box stuck too short. onLoad
                                             re-measures once each image's real size is
                                             known. */}
-                                        <img className={styles.previewImg} src={photo.src} onLoad={remeasure}/>
+                                        <img className={styles.previewImg} src={photo.src} alt={photo.alt} onLoad={remeasure}/>
                                         { photo.caption }
                                     </div>
                                 ))}
@@ -173,7 +202,15 @@ export default function About() {
                         <h2 className={styles.sectionTitle}>Activities & Leadership</h2>
                         <ul>
                             {activities.map((activity) => (
-                                <li key={activity.org} className={`${activity.details ? styles.canClick : ''} ${activeActivity === activity ? styles.activeSection : ''}`} onClick={() => changeActiveActivity(activity)}>{activity.org} | {activity.role}</li>
+                                <li
+                                    key={activity.org}
+                                    className={`${activity.details ? styles.canClick : ''} ${activeActivity === activity ? styles.activeSection : ''}`}
+                                    onClick={() => changeActiveActivity(activity)}
+                                    onKeyDown={activity.details ? handleActivityKeyDown(activity) : undefined}
+                                    role={activity.details ? 'button' : undefined}
+                                    tabIndex={activity.details ? 0 : undefined}
+                                    aria-expanded={activity.details ? activeActivity === activity : undefined}
+                                >{activity.org} | {activity.role}</li>
                             ))}
                         </ul>
                     </div>
@@ -181,7 +218,15 @@ export default function About() {
                         <h2 className={styles.sectionTitle}>Hobbies & Interests</h2>
                         <ul>
                             {hobbies.map((hobby) => (
-                                <li key={hobby.title} className={`${hobby.photos ? styles.canClick : ''} ${activeHobby === hobby ? styles.activeSection : ''}`} onClick={() => changeActiveHobby(hobby)}>{hobby.title}</li>
+                                <li
+                                    key={hobby.title}
+                                    className={`${hobby.photos ? styles.canClick : ''} ${activeHobby === hobby ? styles.activeSection : ''}`}
+                                    onClick={() => changeActiveHobby(hobby)}
+                                    onKeyDown={hobby.photos ? handleHobbyKeyDown(hobby) : undefined}
+                                    role={hobby.photos ? 'button' : undefined}
+                                    tabIndex={hobby.photos ? 0 : undefined}
+                                    aria-expanded={hobby.photos ? activeHobby === hobby : undefined}
+                                >{hobby.title}</li>
                             ))}
                         </ul>
                     </div>

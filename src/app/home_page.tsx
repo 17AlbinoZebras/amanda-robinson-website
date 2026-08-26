@@ -45,7 +45,7 @@ function OverviewSection() {
                     <div className={styles.blurb}>
                         <p>Hi! I&#39;m Amanda. I build things that make people&#39;s<br/>lives easier. I am energized by untangling complex problems and turning creative ideas into technology people can actually use.</p>
                     </div>
-                    <div className={styles.headshotContainer}><img src="headshot.jpg" className={styles.headshot}/></div>
+                    <div className={styles.headshotContainer}><img src="headshot.jpg" alt="Amanda Robinson smiling against a dark background" className={styles.headshot}/></div>
                 </div>
                 <div className={styles.lowerSection}>
                     <div className={styles.techStacks}>
@@ -127,7 +127,7 @@ export default function HomePage() {
             {/* <div className={styles.sliders}>
                 <AllSliders height='285px'/>
             </div> */}
-            <div className={styles.mainText}>
+            <header className={styles.mainText}>
                 <div className={styles.nameSection}>
                     <div className={styles.blobMask}>
                         {/* Sized as a fixed ratio of --text-block-width (defined in
@@ -156,7 +156,7 @@ export default function HomePage() {
                 <div className={styles.subtitleSection}>
                     <p className={styles.subtitle}>Builder of unique and effective software</p>
                 </div>
-            </div>
+            </header>
             <OverviewSection/>
         </div>
     )

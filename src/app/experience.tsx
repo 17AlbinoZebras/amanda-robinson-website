@@ -10,7 +10,9 @@ export default function Experience() {
     return (
         <div className={styles.page}>
             <TintedVector src="/masks/Green-Memphis.svg" color='#729E8C' width='100vw' height='100vh' maskSize='cover' className={styles.experienceBackground}/>
-            <h1 className={styles.heading}>Work Experience</h1>
+            <header>
+                <h1 className={styles.heading}>Work Experience</h1>
+            </header>
             <div className={styles.mainBody}>
                 <div className={`${styles.section} ${styles.sectionLeft} ${styles.sfpti1}`}>
                     <div className={styles.titleSection}>

@@ -11,7 +11,7 @@ export default function Footer() {
     const linkClassName = (href: string) => pathname === href ? styles.activeLink : undefined
 
     return (
-        <div className={styles.footer}>
+        <footer className={styles.footer}>
             <TintedVector src="/masks/cow-blobs.svg" color='#F9F3EB' repeat="x" maskSize="50%" className={styles.footerBackground}/>
             <div className={styles.centerSection}>
                 <a href='mailto:amanda@danivan.com'>amanda@danivan.com</a>
@@ -32,6 +32,6 @@ export default function Footer() {
             <div className={styles.copyright}>
                 <p>© Amanda N. Robinson 2026</p>
             </div>
-        </div>
+        </footer>
     )
 }

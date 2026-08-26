@@ -489,7 +489,7 @@ function useElementHeight<T extends HTMLElement>(initial: number) {
 }
 
 export function AllSliders({ appState, className, style } : AllSlidersProps ) {
-    const [allSlidersRef, heightPx] = useElementHeight<HTMLDivElement>(250)
+    const [allSlidersRef, heightPx] = useElementHeight<HTMLElement>(250)
     const height = `${heightPx}px`
     const width = `${heightPx * SLIDER_WIDTH_RATIO}px`
     
@@ -510,11 +510,11 @@ export function AllSliders({ appState, className, style } : AllSlidersProps ) {
         // long as it played, silently defeating the new focus-visible
         // open behavior on the one slider a first-time keyboard visitor is
         // most likely to reach first.
-        <div className={styles.allSliders} ref={allSlidersRef} onMouseOver={() => setNeverHovered(false)} onFocus={() => setNeverHovered(false)}>
+        <nav className={styles.allSliders} ref={allSlidersRef} aria-label="Site navigation" onMouseOver={() => setNeverHovered(false)} onFocus={() => setNeverHovered(false)}>
             <RedSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideLeft} ${shouldBounce ? styles.bounceSlider : ''}`} pathname={pathname}/>
             <GreenSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.bottomSlider} ${styles.slideLeft}`} pathname={pathname}/>
             <YellowSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.topSlider} ${styles.slideRight}`} pathname={pathname}/>
             <BlueSlider width={width} height={height} className={className} style={style} sliderClassName={`${styles.bottomSlider} ${styles.slideRight}`} pathname={pathname}/>
-        </div>
+        </nav>
     )
 }
