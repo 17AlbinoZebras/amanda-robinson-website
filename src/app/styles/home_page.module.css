@@ -71,12 +71,47 @@
 
     width: 50vw;
     padding: 2.5% 10% 2.5% 5%;
+    /* .headshotContainer (below) is positioned to deliberately overlap this
+       box's top-right corner — this and its width/right-offset are now all
+       percentages of the same reference (.upperSection, this element's own
+       containing block, which .headshotContainer's position:absolute also
+       resolves its own % against — see the note there), so the clearance
+       this needs is directly comparable to that circle's own numbers
+       instead of requiring a unit conversion. Tuned empirically rather than
+       hand-derived (text wrapping makes the exact overlap point hard to get
+       right analytically), and specifically re-checked against a real
+       browser screenshot, not just this project's own preview tooling — an
+       earlier pass (30%) measured as just-clearing-it in the sandboxed
+       preview browser here, but showed as a much bigger gap than needed in
+       an actual browser, pointing to a real font-rendering/text-wrap
+       difference between the two rather than a measurement mistake. 28% is
+       the tightened value from that real screenshot, rechecked back in
+       this preview browser across 701–1920px wide (15–92px clearance,
+       narrowest at 701px, the tightest point right at the mobile
+       breakpoint) to confirm it doesn't overlap here either — but given the
+       cross-environment mismatch already seen once, treat this as a
+       reasonable default to nudge further, not a value to trust blindly. */
+    padding-right: 28%;
     border-radius: 24px;
 }
 
 .headshotContainer {
-    height: 12.5vw;
-    width: 12.5vw;
+    /* % of .blurb's own width (not vw) — .upperSection (this element's
+       containing block, via position:absolute below) has no explicit width
+       of its own, but as a flex item under .overviewContent's
+       align-items:center it shrinks to fit its content, which in practice
+       is just .blurb (the only element in normal flow — this element is
+       taken out of flow by its own position:absolute). So .upperSection's
+       width IS .blurb's width, and sizing this as a % of it puts both this
+       and .blurb's own %-based padding-right (below) in the same reference
+       frame — change one and the other can be worked out directly, instead
+       of needing to convert between vw and % by hand.
+       aspect-ratio (not also a height %) — .upperSection's own HEIGHT is
+       auto/content-driven, and percentage heights don't resolve against an
+       indefinite parent height at all; aspect-ratio:1 gets the same "stay
+       square" result from the definite width instead, sidestepping that. */
+    width: 25%;
+    aspect-ratio: 1;
     clip-path: circle(50%);
     overflow: hidden;
     position: relative;
@@ -92,6 +127,14 @@
 
 .headshot {
     width: 100%;
+    /* Explicit, rather than relying on the browser inferring it from the
+       <img>'s own width/height attributes (2401x3600, set by next/image) —
+       confirmed that inference doesn't reliably kick in here once width is
+       CSS-overridden to 100%: height was computing as a literal 3600px
+       (the raw attribute value) instead of scaling proportionally,
+       stretching the image far past the circular mask. */
+    aspect-ratio: 2401 / 3600;
+    height: auto;
     transform: scale(1.5) translate(1.5%, 3.5%) rotate(8.75deg);
 }
 
@@ -154,7 +197,7 @@
 
 .home {
     position: relative;
-    background-color: var(--main-beige);
+    background-color: #FBF5EF;
     font-family: var(--font-new-amsterdam);
 
     --blob-pink: #FDBFBD;
@@ -559,7 +602,7 @@
 
 .subtitle {
     font-family: var(--font-idiqlat);
-    color: var(--main-green);
+    color: #648C7C;
     text-align: center;
 
     /* font-size: clamp(24px, 2.5vw, 48px); */
@@ -615,24 +658,36 @@
     }
 
     .upperSection {
+        /* display:flex wasn't actually set on the base (desktop) rule —
+           harmless there since .headshotContainer is position:absolute
+           (out of flow) and .blurb is the only other child, so there was
+           nothing for flex-direction/align-items to apply to. Needed here
+           for real, now that .headshotContainer joins normal flow below and
+           this needs to actually stack + center + reorder them. */
+        display: flex;
         flex-direction: column;
+        align-items: center;
         gap: 24px;
     }
 
     .blurb {
         width: 85vw;
         /* The original 10%-right padding cleared space for the headshot
-           overlapping on that side — no longer needed once it sits below
+           overlapping on that side — no longer needed once it sits above
            instead. */
         padding: 6% 8%;
         font-size: 22px;
     }
 
     .headshotContainer {
-        /* Overrides position: absolute so it flows below .blurb per DOM
-           order instead of overlapping it. 12.5vw of a ~375px screen would
-           render as a ~47px circle — a flat px value reads much better. */
+        /* Overrides position: absolute so it joins normal flow instead of
+           overlapping .blurb. order: -1 (rather than reordering the JSX
+           itself) puts it first — above .blurb — despite coming second in
+           the DOM, matching "centered above" without touching the desktop
+           markup order. 12.5vw of a ~375px screen would render as a ~47px
+           circle — a flat px value reads much better. */
         position: static;
+        order: -1;
         height: 140px;
         width: 140px;
     }

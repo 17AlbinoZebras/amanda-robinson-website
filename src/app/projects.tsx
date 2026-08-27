@@ -13,7 +13,31 @@ const projectGithubUrls: Record<string, string> = {
     heatmap: 'https://github.com/17AlbinoZebras/outreach-heatmap',
 }
 
+// Matches the site's one existing responsive breakpoint (the plain CSS
+// media queries throughout styles/*.module.css) — kept as a JS constant
+// here because Heatmap's mobile fallback (see below) needs to make an
+// actual mount/unmount decision, not just a visual one, so it can't be CSS
+// alone. If that breakpoint ever changes, this needs updating to match.
+const MOBILE_BREAKPOINT_PX = 700
+
+function useIsMobile() {
+    // false first (assumes desktop) since there's no viewport to measure
+    // during SSR — corrected on mount, same tradeoff sliders.tsx's
+    // useElementHeight and home_page.tsx's useElementWidth already make for
+    // their own measure-after-mount values.
+    const [isMobile, setIsMobile] = useState(false)
+    useEffect(() => {
+        const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT_PX}px)`)
+        setIsMobile(mql.matches)
+        const handleChange = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+        mql.addEventListener('change', handleChange)
+        return () => mql.removeEventListener('change', handleChange)
+    }, [])
+    return isMobile
+}
+
 export default function Projects() {
+    const isMobile = useIsMobile()
     const [activeProject, setActiveProject] = useState<string>('heatmap')
 
     const changeActiveProject= (proj: string) => {
@@ -202,8 +226,15 @@ export default function Projects() {
                     <div className={`${styles.projectContent} ${previewExpanded ? styles.previewExpanded : ''}`}>
                         <div className={styles.preview}>
                             <div className={styles.previewMedia} onMouseEnter={handlePreviewMouseEnter} onMouseLeave={handlePreviewMouseLeave}>
-                                <iframe ref={intervleIframeRef} src="https://intervle-wordle-game.vercel.app/" title="Intervle: A Wordle Spin-off" className={styles.webPreview} width="600" height="370"/>
-                                {/* <img width='600' height='370' src='projects/intervle.jpg'/> */}
+                                {/* Only mounted while this is the open panel —
+                                    an <iframe> loads a whole separate page/app,
+                                    not just an image, so the other two sitting
+                                    around unmounted-but-loaded was real wasted
+                                    load time on every visit regardless of
+                                    whether they were ever opened. */}
+                                {activeProject === 'intervle' && (
+                                    <iframe ref={intervleIframeRef} src="https://intervle-wordle-game.vercel.app/" title="Intervle: A Wordle Spin-off" className={styles.webPreview} width="600" height="370"/>
+                                )}
                                 <span className={`${styles.interactiveHint} ${showInteractiveHint ? '' : styles.interactiveHintHidden}`}>Try it live!</span>
                             </div>
                             <button type="button" className={styles.expandToggle} onClick={toggleExpandPreview} aria-label={previewExpanded ? 'Show description' : 'Expand preview'}/>
@@ -241,7 +272,14 @@ export default function Projects() {
                                 into one of the two iframes should clear it —
                                 interacting with this video shouldn't. */}
                             <div className={styles.previewMedia}>
-                                <video className={styles.webPreview} width='650' height='370' src='projects/shopcomp-functionality.mp4' controls controlsList="nodownload" muted/>
+                                {/* preload="none" — a plain <video> otherwise
+                                    starts fetching (at least metadata, often
+                                    more) as soon as it mounts, same as the
+                                    iframes' unwanted eager-load problem below,
+                                    just lighter-weight. poster shows a real
+                                    frame in its place until the user actually
+                                    presses play. */}
+                                <video className={styles.webPreview} width='650' height='370' src='projects/shopcomp-functionality.mp4' poster="/projects/shopcomp-poster.jpg" preload="none" controls controlsList="nodownload" muted/>
                             </div>
                             <button type="button" className={styles.expandToggle} onClick={toggleExpandPreview} aria-label={previewExpanded ? 'Show description' : 'Expand preview'}/>
                         </div>
@@ -271,9 +309,29 @@ export default function Projects() {
                     <div className={`${styles.projectContent} ${previewExpanded ? styles.previewExpanded : ''}`}>
                         <div className={styles.preview}>
                             <div className={styles.previewMedia} onMouseEnter={handlePreviewMouseEnter} onMouseLeave={handlePreviewMouseLeave}>
-                                {/* <img height='370' src='projects/heatmap.jpg'/> */}
-                                <iframe ref={heatmapIframeRef} src="https://patient-heatmap-public.vercel.app/" title="Hospital Outreach Heatmap" className={styles.webPreview} width="600" height="370"/>
-                                <span className={`${styles.interactiveHint} ${showInteractiveHint ? '' : styles.interactiveHintHidden}`}>Try it live!</span>
+                                {/* Heatmap's live app is a dense data
+                                    dashboard — small controls, hover-driven
+                                    detail, a map meant for a mouse — that
+                                    isn't usable through a shrunk-down iframe
+                                    on a phone. Below the mobile breakpoint it
+                                    swaps for a plain screenshot and a real
+                                    link out, instead of embedding something
+                                    that doesn't work there anyway. Otherwise,
+                                    same conditional-mount reasoning as
+                                    Intervle's iframe above. */}
+                                {isMobile ? (
+                                    <>
+                                        <img src="/projects/heatmap.jpg" alt="Screenshot of the Hospital Outreach Heatmap showing patient density across Florida counties" className={styles.mobilePreviewImage}/>
+                                        <a href="https://patient-heatmap-public.vercel.app/" target="_blank" rel="noopener noreferrer" className={styles.openLiveDemoButton}>Open the live demo</a>
+                                    </>
+                                ) : (
+                                    <>
+                                        {activeProject === 'heatmap' && (
+                                            <iframe ref={heatmapIframeRef} src="https://patient-heatmap-public.vercel.app/" title="Hospital Outreach Heatmap" className={styles.webPreview} width="600" height="370"/>
+                                        )}
+                                        <span className={`${styles.interactiveHint} ${showInteractiveHint ? '' : styles.interactiveHintHidden}`}>Try it live!</span>
+                                    </>
+                                )}
                             </div>
                             <button type="button" className={styles.expandToggle} onClick={toggleExpandPreview} aria-label={previewExpanded ? 'Show description' : 'Expand preview'}/>
                         </div>

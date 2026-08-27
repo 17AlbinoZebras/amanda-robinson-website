@@ -1,5 +1,6 @@
 'use client'
 import React, { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 
 import styles from './styles/home_page.module.css'
 import { clipToShape, TintedVector } from './mask_functions'
@@ -43,9 +44,28 @@ function OverviewSection() {
             <div className={styles.overviewContent} ref={contentRef}>
                 <div className={styles.upperSection}>
                     <div className={styles.blurb}>
-                        <p>Hi! I&#39;m Amanda. I build things that make people&#39;s<br/>lives easier. I am energized by untangling complex problems and turning creative ideas into technology people can actually use.</p>
+                        <p>Hi! I&#39;m Amanda. I build things that make people&#39;s lives easier. I am energized by untangling complex problems and turning creative ideas into technology people can actually use.</p>
                     </div>
-                    <div className={styles.headshotContainer}><img src="headshot.jpg" alt="Amanda Robinson smiling against a dark background" className={styles.headshot}/></div>
+                    <div className={styles.headshotContainer}>
+                        {/* Explicit width/height (the source file's real
+                            2401x3600) instead of fill — fill's own
+                            object-fit:cover would re-crop against this
+                            container's square-ish box using ITS OWN default
+                            crop point, different from the specific
+                            scale/translate/rotate below that was tuned by
+                            eye to center the face well within the circular
+                            mask. sizes tells Next.js how big this actually
+                            renders on screen, so it can serve a properly
+                            downscaled image instead of the full source. */}
+                        <Image
+                            src="/headshot.jpg"
+                            alt="Amanda Robinson smiling against a dark background"
+                            width={2401}
+                            height={3600}
+                            sizes="(max-width: 700px) 140px, 12.5vw"
+                            className={styles.headshot}
+                        />
+                    </div>
                 </div>
                 <div className={styles.lowerSection}>
                     <div className={styles.techStacks}>
@@ -109,7 +129,7 @@ export default function HomePage() {
 
     return (
         <div className={styles.home}>
-            <TintedVector src="/masks/cow-blobs.svg" color='#F9F3EB' repeat maskSize="70%" className={styles.homeBackground}/>
+            <TintedVector src="/masks/cow-blobs.svg" color='#F7EEE3' repeat maskSize="70%" className={styles.homeBackground}/>
             <div className={styles.orbs}>
                 <div className={`${styles.redOrb} ${playIntro ? styles.redOrbIntro : ''}`} ref={redOrbRef}>
                     <RedOrb size={`${redOrbWidth}px`} className={`${styles.orbShadowRed} ${playIntro ? styles.orbShadowRedIntro : ''}`} />

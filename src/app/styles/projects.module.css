@@ -438,6 +438,19 @@
         min-height: 56px;
     }
 
+    .projectOpen {
+        /* flex:10 (grow:10, shrink:1, basis:0%) has no floor of its own —
+           combined with .project's own overflow:hidden (needed elsewhere,
+           see the base rule's comment) resetting its automatic minimum size
+           to 0 instead of its content's real height, the open panel could
+           end up shrunk shorter than its own description actually needs,
+           silently clipping the last line or two of text instead of wrapping
+           to a taller box. min-height: fit-content overrides that with "at
+           least as tall as this panel's own content," regardless of what
+           the flex algorithm would otherwise compute. */
+        min-height: fit-content;
+    }
+
     .projectClosed .projectTitle {
         /* Rotation suited a narrow vertical sliver; a short wide bar wants
            its title reading normally, not sideways. */
@@ -464,6 +477,16 @@
            for a 600px-wide preview, too large once .preview shrinks to fit
            a phone screen. */
         font-size: 15px;
+        /* Desktop's height: 32% (a fixed fraction of .projectContent) is
+           content-agnostic — on a short mobile viewport that 32% can be
+           less than the actual description needs, and since this also has
+           overflow:hidden (see the base rule, needed for the expand/collapse
+           transition), the overflow just clips mid-sentence instead of
+           wrapping. auto + a floor lets it grow to fit whichever
+           description is longest, instead of every panel being capped to
+           whatever the shortest one happens to need. */
+        height: auto;
+        min-height: 110px;
     }
 
     /* No room to expand a preview that's already full-width inside a
@@ -486,8 +509,43 @@
     }
 
     .previewExpanded .description {
-        height: 32%;
+        height: auto;
+        min-height: 110px;
         opacity: 1;
         pointer-events: auto;
+    }
+
+    /* Heatmap's mobile fallback (a screenshot + a real link out, in place of
+       the iframe — see the note in projects.tsx) — .previewMedia already
+       clips to rounded corners via its own overflow:hidden/border-radius,
+       so this doesn't need its own. */
+    .mobilePreviewImage {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .openLiveDemoButton {
+        position: absolute;
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+
+        padding: 10px 20px;
+        border-radius: 999px;
+
+        background-color: var(--main-blue);
+        color: var(--main-light);
+        font-family: var(--font-afacad-flux);
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        transition: filter 200ms;
+    }
+
+    .openLiveDemoButton:hover {
+        filter: brightness(1.1);
     }
 }
