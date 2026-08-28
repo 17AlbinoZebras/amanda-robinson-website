@@ -56,7 +56,6 @@
     font-size: 20px;
     font-weight: 400;
     margin-bottom: 2px;
-    color: var(--main-blue);
 }
 
 .employer {
@@ -66,14 +65,12 @@
     font-weight: 500;
     line-height: 1.1;
     text-align: center;
-    color: var(--main-blue);
 }
 
 .projectName {
     font-weight: 500;
     font-size: 28px;
     text-align: center;
-    color: var(--main-blue);
 }
 
 .sectionBody {
@@ -105,8 +102,9 @@
     
     border-radius: 0 32px 32px 0;
     padding: 0.75% 2% 2% 9.25%;
-    background-color: #C9CBE8;
-    color: var(--main-light);
+    background-color: var(--main-light);
+    /* color: #88AA9C; */
+    color: var(--main-green);
 
     font-size: 27px;
 }
@@ -116,10 +114,10 @@
     position: absolute;
     right: 0;
 
-    padding: 0.75% 5% 2% 2%;
+    padding: 1% 5% 2% 2%;
 
-    background-color: var(--main-light);
-    color: #88AA9C;
+    background-color: #FCD07D;
+    color: var(--main-dark);
 
     font-size: 28px;
 }

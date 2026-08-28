@@ -128,7 +128,7 @@
     justify-content: center;
     overflow: hidden;
     border-radius: 20px;
-    border: 4px solid #FF8F90;
+    border: 5px solid #B4CAC1;
 }
 
 /* Hints that an iframe preview is the actual live site, not a static
@@ -149,7 +149,7 @@
 
     padding: 5px 12px;
     border-radius: 14px;
-    background-color: #FF8F90;
+    background-color: var(--main-green);
     color: var(--main-light);
     font-family: var(--font-afacad-flux);
     font-size: 13px;
@@ -176,8 +176,8 @@
     padding: 12px;
     height: 32%;
 
-    background-color: #B4CAC1;
-    color: var(--main-light);
+    background-color: #FDC5C4;
+    color: #6E71B0;
     /* font-size: 20px; */
     font-weight: 500;
     transition: all var(--transition-length);
@@ -203,7 +203,7 @@
 }
 
 .description a:hover {
-    color: #8286B7;
+    color: var(--main-green);
 }
 
 .projectClosed {
@@ -279,7 +279,7 @@
 
 .openTitle:hover {
     /* color: var(--main-beige); */
-    filter: brightness(0.9);
+    color: #FFB8B9;
     cursor: pointer;
 }
 
@@ -345,7 +345,7 @@
     height: 14px;
     border: none;
     border-radius: 0 0 10px 10px;
-    background-color: #FF8F90;
+    background-color: #B4CAC1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -354,7 +354,7 @@
 }
 
 .expandToggle:hover {
-    background-color: #FFB2B3;
+    background-color: var(--main-green);
 }
 
 .expandToggle::after {

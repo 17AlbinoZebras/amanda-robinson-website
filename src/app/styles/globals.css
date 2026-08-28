@@ -4,14 +4,14 @@
   --font-afacad-flux: 'Afacad Flux Variable', sans-serif;
 
   --background: #F6EBDE;
-  --foreground: #171717;
+  --foreground: #573D5C;
   
   --main-red: #FF6B6C;
   --main-blue: #5B5F97;
   --main-green: #6E9887;
-  --main-yellow: #FFC145;
+  --main-yellow: #FFC552;
   --main-light: #FFFFFB;
-  --main-dark: #270722;
+  --main-dark: #573D5C;
   --main-beige: #F6EBDE;
 
   /* Shared by sliders.module.css (.allSliders' own height) and

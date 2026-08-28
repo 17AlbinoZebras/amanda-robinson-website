@@ -38,9 +38,9 @@ const sliderPaths = {
 
 export const sliderColors = {
     red: {base: "var(--main-red)", mask: "var(--main-blue)", outline: "#B4CAC1", label: "#FFB2B3"},
-    yellow: {base: "var(--main-yellow)", mask: "var(--main-red)", outline: "var(--main-light)", label: "#FFE8BA"},
+    yellow: {base: "var(--main-yellow)", mask: "var(--main-red)", outline: "#A9ACD6", label: "#FFE8BA"},
     // For green and blue sliderRects, swap base and label colors
-    green: {base: "var(--main-green)", mask: "var(--main-light)", outline: "#A9ACD6", label: "#A6BFB8"},
+    green: {base: "var(--main-green)", mask: "var(--main-light)", outline: "#FCD07D", label: "#A6BFB8"},
     blue: {base: "var(--main-blue)", mask: "#FFE8BA", outline: "#FFB2B3", label: "#A9ACD6"}
 }
 
@@ -370,7 +370,7 @@ export function YellowSlider({width, height, className, style, strokeWidth, slid
         className: [styles.sliderBorder, styles.borderYellow, strokeVisible ? styles.strokeVisible : '', className].filter(Boolean).join(" "),
     })
     const orb = YellowOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline, strokeOpacity: strokeVisible ? 1 : 0})
-    const icon = < FontAwesomeIcon icon={isActive ? sliderIcons.home : sliderIcons.yellow} className={styles.sliderIcon} style={{color: colors.outline, backgroundColor: colors.mask}} />
+    const icon = < FontAwesomeIcon icon={isActive ? sliderIcons.home : sliderIcons.yellow} className={styles.sliderIcon} style={{color: colors.label, backgroundColor: colors.mask}} />
 
     return Slider(width, height, rect, orb, "left", strokeSize, {labelText: isActive ? "Home" : "About Me", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, icon, isOpen, setIsOpen, sliderRef)
 }

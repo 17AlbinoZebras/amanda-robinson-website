@@ -49,7 +49,7 @@
     /* Explicit — this is an <h2> now (was a <span>), and h2's UA-default
        bold would otherwise change its appearance. */
     font-weight: 400;
-    color: #FDC5C4;
+    color: #FFB8B9;
     text-align: center;
 }
 

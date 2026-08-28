@@ -192,11 +192,11 @@
 }
 
 .borderYellow {
-    --outline-color: var(--main-light);
+    --outline-color: #A9ACD6;
 }
 
 .borderGreen {
-    --outline-color: #A9ACD6;
+    --outline-color: #FCD07D;
 }
 
 .borderBlue {

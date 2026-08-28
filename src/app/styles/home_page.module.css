@@ -64,8 +64,8 @@
 }
 
 .blurb {
-    background-color: var(--main-yellow);
-    color: #FEFAF0;
+    background-color: #FFC95C;
+    color: var(--main-blue);
     font-size: 30px;
     font-weight: 500;
 
@@ -444,7 +444,7 @@
 }
 @keyframes remove-yellow-orb-shadow {
     0%, 50% {
-        filter: drop-shadow(6px -4px var(--main-light));
+        filter: drop-shadow(6px -4px #A9ACD6);
     }
     100% {
         filter: drop-shadow(none);
@@ -452,7 +452,7 @@
 }
 @keyframes remove-green-orb-shadow {
     0%, 50% {
-        filter: drop-shadow(-7px 4px #A9ACD6);
+        filter: drop-shadow(-7px 4px #FCD07D);
     }
     100% {
         filter: drop-shadow(none);
@@ -482,11 +482,11 @@
 }
 
 .orbShadowYellow {
-    filter: drop-shadow(6px -4px var(--main-light));
+    filter: drop-shadow(6px -4px #A9ACD6);
 }
 
 .orbShadowGreen {
-    filter: drop-shadow(-7px 4px #A9ACD6);
+    filter: drop-shadow(-7px 4px #FCD07D);
 }
 
 .orbShadowBlue {

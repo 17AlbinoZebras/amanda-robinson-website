@@ -6,7 +6,7 @@
     flex-direction: column;
     align-items: center;
     /* justify-content: center; */
-    background-color: #FAE4B8;
+    background-color: #FFE8BA;
     font-family: var(--font-afacad-flux);
 }
 
@@ -23,7 +23,7 @@
     /* Explicit — this is an <h1> now (was a <span>), and h1's UA-default
        bold would otherwise change its appearance. */
     font-weight: 400;
-    color: var(--main-red);
+    color: var(--main-blue);
 
     margin-top: 12px;
 }
@@ -51,10 +51,10 @@
     height: 38.5vh;
     border-radius: 24px;
     
-    background-color: #FFC145;
-    color: #FEFAF0;
+    background-color: #FFC95C;
+    color: var(--main-blue);
     font-size: 28px;
-    font-weight: 500;
+    font-weight: 450;
 
     padding: 16px;
 }
@@ -244,7 +244,7 @@
     border-radius: 24px;
 
     background-color: #FEFAF0;
-    color: #FF8F90;
+    color: var(--main-red);
 }
 
 .hobbies ul {
