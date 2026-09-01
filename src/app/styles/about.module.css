@@ -45,7 +45,7 @@
     align-items: center;
     justify-content: center;
 
-    gap: 32px;
+    gap: 36px;
 }
 
 .upperSection {
@@ -209,6 +209,15 @@
     font-weight: 500;
 
     margin-top: 8px;
+}
+
+.subPoints {
+    padding-inline-start: 40px;
+}
+
+.subPoints li::marker {
+    content: '\2727 \00a0';
+    font-weight: 900;
 }
 
 .lowerSection {

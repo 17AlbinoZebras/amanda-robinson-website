@@ -6,10 +6,15 @@ import styles from './styles/about.module.css'
 import { TintedVector } from './mask_functions'
 import Link from 'next/link';
 
+interface details {
+    point: string,
+    subPoints?: string[]
+}
+
 interface activity {
     org: string;
     role?: string;
-    details?: string[];
+    details?: details[];
 }
 
 interface hobby {
@@ -17,12 +22,20 @@ interface hobby {
     photos?: {src: string, alt: string, caption?: JSX.Element}[]
 }
 
+const ayoPillars = (<ul>
+        <li>Leadership</li>
+        <li>Professionalism</li>
+        <li>Growth and Future Growth</li>
+        <li>Respect for Theatre and for the Theatre Community</li>
+        <li>Work for the Betterment of Theatre</li>
+    </ul>)
+
 const activities: activity[] = [
-    {org: 'Alpha Gamma Delta Sorority', role: 'Interim VP New Member Experience', details: ['Planned and executed bid day to welcome all our new members', 'Organized and ran pledge-ins for new members']},
-    {org: 'Masque Theatre', role: 'VP Props & Costumes', details: ['Managed and maintained the props and costumes closet all 3 years', 'Created documentation for all positions in both departments']},
-    {org: 'Women\'s Club Rugby', role: 'PR Officer', details: ['Took photos and made posts for our games', 'Designed instagram posts to inspire prospective new members to join the team']},
-    {org: 'Alpha Psi Omega Honor Society', role: 'Member'},
-    {org: 'Student Alumni Society', role: 'Member'}
+    {org: 'Alpha Gamma Delta Sorority', role: 'Interim VP New Member Experience', details: [{point: 'Planned and executed bid day to welcome all our new members'}, {point: 'Organized and ran pledge-ins for new members'}]},
+    {org: 'Masque Theatre', role: 'VP Props & Costumes', details: [{point: 'Managed and maintained the props and costumes closet all 3 years'}, {point: 'Created documentation for all positions in both departments'}]},
+    {org: 'Women\'s Club Rugby', role: 'PR Officer', details: [{point: 'Took photos and made posts for our games'}, {point: 'Designed instagram posts to inspire prospective new members to join the team'}]},
+    {org: 'Alpha Psi Omega Honor Society', role: 'Member', details: [{point: 'Embody the five pillars of Alpha Psi Omega: ', subPoints: ['Leadership', 'Professionalism', 'Growth and Future Growth', 'Respect for Theatre and for the Theatre Community', 'Work for the Betterment of Theatre']}]},
+    {org: 'Student Alumni Society', role: 'Member', details: [{point: 'Plan and run campus wide events involving students, faculty, and alumni to uphold campus traditions'}]}
 ]
 
 const hobbies: hobby[] = [
@@ -184,7 +197,11 @@ export default function About() {
                         {displayedActivity && (
                             <ul className={styles.activityPreview}>
                                 {displayedActivity.details?.map((item) => (
-                                    <li key={item}>{item}</li>
+                                    <li key={item.point}>{item.point}
+                                    {item.subPoints && <ul className={styles.subPoints}>{item.subPoints.map((point) => (
+                                        <li key={point}>{point}</li>
+                                        ))}</ul>}
+                                    </li>
                                 ))}
                             </ul>
                         )}
