@@ -4,6 +4,7 @@ import React, { JSX, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import styles from './styles/about.module.css'
 import { TintedVector } from './mask_functions'
+import Link from 'next/link';
 
 interface activity {
     org: string;
@@ -147,6 +148,16 @@ export default function About() {
     }
     useLayoutEffect(remeasure, [displayedActivity, displayedHobby])
 
+    // Without this, resizing the viewport while the box is open never
+    // re-triggers the effect above (it's only keyed on displayedActivity/
+    // displayedHobby, which don't change) — so the same text reflowing
+    // taller at a narrower width left the box stuck at its old, now too-short
+    // measured height, with content spilling past its edges.
+    useEffect(() => {
+        window.addEventListener('resize', remeasure)
+        return () => window.removeEventListener('resize', remeasure)
+    }, [])
+
     return (
         <div className={styles.page}>
             <TintedVector src="/masks/Yellow-Memphis.svg" color='#FBDDA1' width='100vw' height='100vh' repeat='y' maskSize='cover' className={styles.aboutBackground}/>
@@ -159,7 +170,7 @@ export default function About() {
                         <img src="about/AmandaHeadshot8ML.jpg" alt="Amanda Robinson smiling in front of a brick wall" className={styles.headshot}></img>
                     </div>
                     <p className={styles.mainDescription}>
-                        I&#39;m Amanda Robinson, a California native and a third year Computer Science student at WPI. I&#39;ve been using software to solve problems for as long as I can remember. What began as a love of coding and logic puzzles has grown into a passion for building thoughtful, creative products that tackle challenging real-world problems.
+                        I&#39;m Amanda Robinson, a California native and a third year Computer Science student at WPI. I&#39;ve been using software to solve problems for as long as I can remember. What began as a love of coding and logic puzzles has grown into a passion for building thoughtful, creative products that tackle challenging real-world problems. For more about my skills and experience, visit my <Link href='/resume' className={styles.resumeLink}>resume</Link>!
                     </p>
                 </div>
                 <div className={`${styles.preview} ${(activeActivity || activeHobby) ? styles.previewOpen : ''}`} style={{height: (activeActivity || activeHobby) ? `${measuredHeight}px` : '0px'}}>
