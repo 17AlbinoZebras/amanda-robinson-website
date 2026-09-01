@@ -12,7 +12,18 @@ export default function Footer() {
 
     return (
         <footer className={styles.footer}>
-            <TintedVector src="/masks/cow-blobs.svg" color='#F9F3EB' repeat="x" maskSize="50%" className={styles.footerBackground}/>
+            {/* maskSize is an explicit "Wpx Hpx" (not a single percentage) — a
+                lone percentage only sets mask-size's width axis, leaving
+                height as an implied "auto" that's supposed to derive from the
+                vector's own aspect ratio; that implicit derivation isn't
+                reliably honored for mask-image the way it is for a real
+                background-image (same root cause as resume.tsx's background
+                "zoom" bug — see its own comment). 490px is 50% of
+                cow-blobs.svg's own NATURAL_SIZE (980x980.02, mask_functions.tsx)
+                — i.e. half its original artwork size, not half of .footer or
+                the viewport — so the tile stays a fixed physical size
+                regardless of either of those. */}
+            <TintedVector src="/masks/cow-blobs.svg" color='#F9F3EB' repeat="x" maskSize="490px 490px" className={styles.footerBackground}/>
             <div className={styles.centerSection}>
                 <a href='mailto:amanda@danivan.com'>amanda@danivan.com</a>
                 <p className={styles.externalLinks}><a href='https://github.com/17AlbinoZebras' target="_blank" rel="noopener noreferrer">GitHub</a> | <a href='https://www.linkedin.com/in/amanda-n-robinson/' target="_blank" rel="noopener noreferrer">LinkedIn</a></p>

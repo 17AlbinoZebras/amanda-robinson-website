@@ -8,12 +8,27 @@
     /* justify-content: center; */
     background-color: #B4CAC1;
     font-family: var(--font-afacad-flux);
+    /* Guarantees at least 36px between this page's own content and the
+       footer (a sibling right after this element, not a child of it) —
+       relying on an inner element's own trailing margin instead would be
+       fragile page-to-page, so this lives on the outermost container
+       instead, applying unconditionally regardless of how tall the content
+       ends up being. */
+    padding-bottom: 36px;
 }
 
 .resumeBackground {
+    /* !important needed because TintedVector always renders its width/height
+       props as an inline style on this same element — inline styles beat
+       any class rule regardless of specificity, so without this, the
+       width='100vw' height='100vh' props in resume.tsx would keep pinning
+       the background to exactly one viewport's height, never growing to
+       match .page's actual height (including the 36px footer-gap padding
+       now added there). Same fix already applied to
+       about/education/home/footer's backgrounds. */
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .heading {
@@ -37,17 +52,51 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 55%;
-    height: 85vh;
+    /* The bounding box — .pdfContainer below (resume_pdf_viewer.tsx) reads
+       this element's own rendered clientWidth/clientHeight in JS to compute
+       how large to draw the PDF, so its actual size is derived from
+       whatever's set here rather than duplicating these numbers there. */
+    width: min(816px, 50%);
+    height: 92.5vh;
+    /* Animates both dimensions on the expand/collapse toggle (.resumeExpanded
+       below) — width/height specifically, not a blanket "all", since this
+       also transitions on hover indirectly through .downloadButton/
+       .expandButton's own opacity and shouldn't re-trigger this box's own
+       motion for that. */
+    transition: width 700ms, height 700ms;
+    /* Border lives on this FIXED viewport (not on the scrolling content
+       inside it, .pdfFrame below) — that way it stays visible on all 4
+       sides regardless of scroll position, including a bottom edge right
+       where the content is visibly cut off. That cut-off is itself the cue
+       that there's more to scroll to; a border only appearing after
+       scrolling all the way to the actual end of the content wouldn't help
+       with that. overflow:hidden is what clips the scrolling content inside
+       to these rounded corners as it passes underneath them. */
+    border: 8px solid var(--main-red);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+/* Wider AND auto-height (not just wider) — the goal is to show the whole
+   resume with no inner scroll at all, so this grows to whatever height its
+   content (both PDF pages) actually needs instead of staying capped at
+   92.5vh. If that ends up taller than the viewport, the outer PAGE scrolls
+   to see the rest, same as scrolling any other normal page — .expandButton
+   below is what stays reachable to collapse back in that case, not this box
+   itself. */
+.resumeExpanded {
+    width: min(1200px, 85%);
+    max-width: 65%;
+    height: auto;
 }
 
 .downloadButton {
     position: absolute;
     z-index: 1;
-    font-size: 28px;
-    color: var(--main-red);
-    left: 3.5%;
-    top: 2.5%;
+    font-size: 26px;
+    color: var(--main-dark);
+    left: 1.5%;
+    top: 1.5%;
     background-color: var(--main-yellow);
     border-radius: 12px;
     width: 40px;
@@ -55,19 +104,135 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    opacity: 0.8;
+    transition: opacity 200ms, filter 200ms;
 }
 
 .downloadButton:hover {
-    filter: brightness(0.95)
+    opacity: 1;
+    /* filter: brightness(0.925) */
 }
 
-.resume iframe {
-    position: relative;
-    top: 0;
-    left: 0;
+/* position AND right are both set inline from resume.tsx, not here — see
+   that file's own comment for the full reasoning. Briefly: position (fixed
+   while "pinned" near the viewport's own bottom edge, or absolute —
+   relative to .page — once "locked" to a page coordinate) needed JS because
+   CSS position:sticky was tried twice and never correctly released once
+   scrolled past .resume's own end in a real browser, a known rough edge
+   combining sticky with CSS Grid placement/alignment; right is JS-computed
+   too now (previously a calc() formula duplicating .resume's own width
+   rules, which needed manual updates here every time those rules changed)
+   so it just reads .resume's real rendered right edge directly instead.
+   This is still a sibling of .resume, not nested inside it, regardless of
+   mode — .resume's own overflow:hidden (needed to clip the scrolling PDF
+   content to its rounded corners) would also clip a position:fixed
+   descendant, not just normal-flow ones. */
+.expandButton {
+    z-index: 100;
+    font-size: 22px;
+    color: var(--main-light);
+    background-color: var(--main-blue);
+    border: none;
+    border-radius: 12px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 300ms;
+}
+
+.expandButton:hover {
+    opacity: 1;
+}
+
+/* .pdfContainer fills .resume so resume_pdf_viewer.tsx's ref measures the
+   full available width; the resume PDF is actually 2 pages, both rendered
+   at full box-width now, which is almost always taller than .resume's
+   fixed 85vh — overflow-y:auto is what turns that into a scrollable view
+   instead of clipping or squeezing both pages down to fit one static
+   screen. */
+.pdfContainer {
     width: 100%;
     height: 100%;
-    max-width: 816px;
-    /* max-height: 600px; */
-    border: none;
+    overflow-y: auto;
+    display: flex;
+    justify-content: center;
+    /* Without this, flex's default align-items:stretch forces .pdfFrame
+       (the flex item) to match this container's own height exactly — since
+       .pdfFrame also clips via overflow:hidden, that combination was
+       silently cropping the stack down to fit instead of letting it grow
+       taller than the container and actually need to scroll. flex-start
+       lets .pdfFrame size to its real (taller, 2-page) content instead. */
+    align-items: flex-start;
+    /* Explicit, always-visible scrollbar (not left to the OS default) — on
+       macOS with "show scroll bars: when scrolling" (the trackpad default),
+       a plain native scrollbar is invisible except while actively
+       scrolling, which combined with the content already looking cut off
+       at the bottom edge (the other scroll cue) could still leave it
+       ambiguous that this box scrolls at all. scrollbar-color/-width cover
+       Firefox; the ::-webkit-scrollbar rules below cover Chrome/Safari/Edge
+       — together a real cross-browser pair, not a fallback for each other. */
+    scrollbar-width: auto;
+    /* color-mix (not the plain opacity property) — opacity doesn't apply
+       reliably to scrollbar pseudo-elements across browsers, since they're
+       painted outside the normal layout/paint pipeline opacity hooks into;
+       baking the transparency into the color itself works everywhere. */
+    scrollbar-color: color-mix(in srgb, var(--main-green) 75%, transparent) transparent;
+}
+
+.pdfContainer::-webkit-scrollbar {
+    width: 10px;
+}
+
+.pdfContainer::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.pdfContainer::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--main-green) 75%, transparent);
+    border-radius: 8px;
+}
+
+/* The scrolling content itself — no border/radius/overflow of its own now
+   (that moved to .resume, the fixed frame around it — see its own comment).
+   The <Page>s inside stack directly in normal flow with nothing between
+   them, so this still reads as one continuous document, just scrolling
+   underneath a fixed border instead of carrying its own. */
+.pdfFrame {
+    /* Cancels the few px of descender whitespace inline-level content (each
+       page's own canvas) would otherwise leave beneath itself — same
+       category of gap as the old iframe issue, just a much smaller,
+       ordinary CSS one this time. */
+    line-height: 0;
+    /* Explicit (not left to shrink-wrap its canvas children, which is what
+       display:inline-block alone would normally do) — the canvas rule right
+       below makes each page's canvas width:100% of ITS parent (this
+       element), so this needs its own real width for that percentage to
+       resolve against; shrink-wrapping a child that's itself sized as 100%
+       of this box would be circular. 100% of .pdfContainer is exactly
+       .resume's own current width already, so this still ends up the same
+       size it would have anyway — just arrived at directly instead of via
+       the canvas's own (now overridden) intrinsic size. */
+    width: 100%;
+}
+
+/* react-pdf pins each page's <canvas> to a fixed inline px width/height
+   matching whatever pageWidth resume_pdf_viewer.tsx last rendered it at —
+   without this, the canvas stays exactly that size (a static island)
+   through the whole 300ms .resume width transition on the expand toggle,
+   only jumping to the new size once the debounced re-render finally
+   catches up ~150ms after the box stops moving, reading as an abrupt snap
+   completely disconnected from the box's own smooth motion.
+   width/height:100%/auto here (overriding react-pdf's inline style, hence
+   !important) makes the existing raster stretch fluidly with .pdfFrame's
+   own width for the whole animation instead — cheap, smooth, native image
+   scaling doing the visual work during the transition — and the debounced
+   re-render still swaps in a freshly sharp raster at the real resolution
+   once things settle, rather than being the only thing moving at all. */
+.pdfFrame canvas {
+    width: 100% !important;
+    height: auto !important;
 }
