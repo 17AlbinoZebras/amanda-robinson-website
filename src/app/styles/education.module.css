@@ -8,6 +8,13 @@
     /* justify-content: center; */
     background-color: #666AA3;
     font-family: var(--font-afacad-flux);
+    /* Guarantees at least 36px between this page's own content and the
+       footer (a sibling right after this element, not a child of it) —
+       relying on an inner element's own trailing margin instead would be
+       fragile page-to-page, so this lives on the outermost container
+       instead, applying unconditionally regardless of how tall the content
+       ends up being (including when a course description is open here). */
+    padding-bottom: 36px;
 }
 
 .educationBackground {
@@ -58,7 +65,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 35vh;
+    height: 32.5vh;
 }
 
 .overview {
@@ -102,7 +109,7 @@
     font-size: 24px;
     font-weight: 500;
 
-    gap: 44px;
+    gap: 36px;
 
     width: 80vw;
 
@@ -122,15 +129,15 @@
 .course {
     display: flex;
     width: 200px;
-    height: 100px;
+    height: 112px;
     padding: 16px;
     border-radius: 32px;
     align-items: center;
     justify-content: center;
 
     text-align: center;
-    background-color: #A9ACD6;
-    color: #FFE8BA;
+    background-color: #8286B7;
+    color: #FEFAF0;
 
     cursor: pointer;
 }
@@ -140,7 +147,7 @@
 }
 
 .activeCourse {
-    font-weight: 800;
+    font-weight: 700;
 }
 
 /* height is set via an inline style (education.tsx measures
@@ -214,7 +221,7 @@
 }
 
 .courseDescriptionText {
-    transition: transform 0.7s ease;
+    transition: transform 0.8s ease;
 }
 
 /* translateY(var(--slide-distance)), not translateY(100%) — see

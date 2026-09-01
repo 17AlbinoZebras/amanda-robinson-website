@@ -9,7 +9,7 @@ export default function Experience() {
     const sfptiRoleInfo = <h3 className={styles.roleInfo}>{sfptiRoleTitle} | {sfptiDateRange}</h3>
     return (
         <div className={styles.page}>
-            <TintedVector src="/masks/Green-Memphis.svg" color='#729E8C' width='100vw' height='100vh' maskSize='cover' className={styles.experienceBackground}/>
+            <TintedVector src="/masks/Green-Memphis.svg" color='#79A090' width='100vw' height='100vh' maskSize='cover' className={styles.experienceBackground}/>
             <header>
                 <h1 className={styles.heading}>Work Experience</h1>
             </header>

@@ -6,14 +6,29 @@
     flex-direction: column;
     /* align-items: center; */
     /* justify-content: center; */
-    background-color: #78A693;
+    background-color: var(--main-green);
     font-family: var(--font-afacad-flux);
+    /* Guarantees at least 36px between this page's own content and the
+       footer (a sibling right after this element, not a child of it) — this
+       page especially needs its own explicit guarantee rather than relying
+       on an inner element's trailing margin, since .mainBody's own cards
+       are position:absolute and so don't contribute to this container's
+       flow height at all. */
+    padding-bottom: 36px;
 }
 
 .experienceBackground {
+    /* !important needed because TintedVector always renders its width/height
+       props as an inline style on this same element — inline styles beat
+       any class rule regardless of specificity, so without this, the
+       width='100vw' height='100vh' props in experience.tsx would keep
+       pinning the background to exactly one viewport's height, never
+       growing to match .page's actual height (including the 36px
+       footer-gap padding now added there). Same fix already applied to
+       about/education/home/footer's backgrounds. */
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .heading {
@@ -141,9 +156,11 @@
 .sectionRight .sectionBody {
     padding-right: 7%;
     line-height: 1.55;
+    padding-top: 1%;
 }
 
 .sectionRight .roleInfo {
+    margin-top: -0.5%;
     padding-left: 10%;
 }
 

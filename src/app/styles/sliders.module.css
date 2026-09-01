@@ -312,7 +312,7 @@
 
 .bounceSlider {
     display: inline-block;
-    animation: slider-bounce 3s ease 8.5s infinite;
+    animation: slider-bounce 3s ease 8s infinite;
     /* Promotes this to its own compositor layer up front, instead of the
        browser deciding whether to do that only once the animation is already
        running. Without it, an infinitely-repeating transform animation on a

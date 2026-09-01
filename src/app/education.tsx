@@ -133,6 +133,22 @@ export default function Education() {
                 settleImmediately(prevActiveCourse)
             }
             setSlideDirection(courseRow(activeCourse) === 1 ? 'up' : 'down')
+            // Seeds a real (nonzero) starting distance for the incoming
+            // layer's very first mount below. Without this, on the FIRST
+            // switch of a page load slideDistance is still its initial 0 —
+            // the incomingCourse-keyed layout effect that normally computes
+            // it hasn't run yet, since incomingCourse has never been
+            // non-null before now — so the incoming element mounts reading
+            // --slide-distance: 0px, i.e. already in its settled position,
+            // and the slide collapses into an instant overlap instead of
+            // animating in. Every later switch already carries over a real
+            // value left from the previous one, which is exactly why this
+            // only ever shows up on the first switch. measuredHeight (the
+            // currently displayed/outgoing course's own already-measured
+            // height) is a reasonable stand-in — the effect below
+            // immediately refines it to the real max(outgoing, incoming)
+            // distance before this paints.
+            setSlideDistance(measuredHeight)
             setIncomingCourse(activeCourse)
             setSlideSettled(false)
             inFlightRef.current = true
@@ -165,6 +181,21 @@ export default function Education() {
             setMeasuredHeight(innerRef.current.scrollHeight)
         }
     }, [displayedCourse])
+
+    // Without this, resizing the viewport while a course is open never
+    // re-triggers the effect above (it's only keyed on displayedCourse,
+    // which doesn't change) — so the same description text reflowing taller
+    // at a narrower width left the box stuck at its old, now too-short
+    // measured height, with content spilling past its edges.
+    useEffect(() => {
+        const remeasure = () => {
+            if (innerRef.current) {
+                setMeasuredHeight(innerRef.current.scrollHeight)
+            }
+        }
+        window.addEventListener('resize', remeasure)
+        return () => window.removeEventListener('resize', remeasure)
+    }, [])
 
     // Triggers the incoming layer's slide-in, and — just as importantly —
     // re-measures the box's target height against the INCOMING course right

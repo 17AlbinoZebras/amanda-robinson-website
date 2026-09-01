@@ -8,6 +8,15 @@
     /* justify-content: center; */
     background-color: #FFE8BA;
     font-family: var(--font-afacad-flux);
+    /* Guarantees at least 36px between this page's own content and the
+       footer (a sibling right after this element, not a child of it) —
+       relying on an inner element's own trailing margin instead would be
+       fragile page-to-page (some pages have no reliable one at all, e.g.
+       experience's absolutely-positioned cards don't contribute to flow
+       height), so this lives on the outermost container instead, where it
+       applies unconditionally regardless of how tall the content ends up
+       being. */
+    padding-bottom: 36px;
 }
 
 .aboutBackground {
@@ -82,7 +91,15 @@
     flex: 5;
     position: relative;
 
-    line-height: 1.4;
+    line-height: 1.32;
+}
+
+.resumeLink {
+    text-decoration: underline;
+}
+
+.resumeLink:hover{
+    color: var(--main-red);
 }
 
 /* height is set via an inline style (about.tsx measures .previewInner's
@@ -149,7 +166,9 @@
     padding-inline-start: 32px;
     margin-left: 10%;
 
-    color: var(--main-red);
+    /* main-blue (not main-red) — main-red on this light background fails
+       WCAG contrast (2.31:1); main-blue clears it easily (4.96:1). */
+    color: var(--main-blue);
     font-size: 20px;
     font-weight: bold;
     line-height: 1.5;
@@ -183,7 +202,9 @@
 
 .caption {
     /* color: #FF8F90; */
-    color: var(--main-red);
+    /* main-blue (not main-red) — same WCAG reasoning as .activityPreview
+       above. */
+    color: var(--main-blue);
     text-align: center;
     font-weight: 500;
 
@@ -224,8 +245,8 @@
     padding: 16px;
     border-radius: 24px;
 
-    background-color: #FF8F90;
-    color: #FEFAF0;
+    background-color: #FF999A;
+    color: var(--main-dark);
 }
 
 .activities ul {
@@ -244,7 +265,7 @@
     border-radius: 24px;
 
     background-color: #FEFAF0;
-    color: var(--main-red);
+    color: #F0636E;
 }
 
 .hobbies ul {
@@ -264,11 +285,17 @@
 }
 
 .activities .canClick:hover {
-    color: #FAE4B8;
+    /* Darkened from the original #FAE4B8 (kept the same hue) — that failed
+       WCAG contrast on this coral background (1.76:1); this clears it
+       (3.36:1). */
+    color: var(--main-blue);
 }
 
 .hobbies .canClick:hover {
-    color: var(--main-yellow)
+    /* Darkened from main-yellow (kept the same hue, not the shared token
+       itself) — plain main-yellow failed WCAG contrast here (1.51:1); this
+       clears it (3.36:1). */
+    color: var(--main-blue);
 }
 
 .activeSection {

@@ -26,7 +26,9 @@
    globally and style every link on the page, including the sliders' now that
    they're next/link anchors too. */
 .footer a:hover {
-    color: var(--main-red);
+    /* main-blue (not main-red) — main-red here fails WCAG contrast on this
+       beige background (2.36:1); main-blue clears it easily (5.06:1). */
+    color: var(--main-blue);
     text-decoration: underline;
 }
 

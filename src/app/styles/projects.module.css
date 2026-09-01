@@ -8,12 +8,27 @@
     /* justify-content: center; */
     background-color: #FDC5C4;
     font-family: var(--font-afacad-flux);
+    /* Guarantees at least 36px between this page's own content and the
+       footer (a sibling right after this element, not a child of it) —
+       relying on an inner element's own trailing margin instead would be
+       fragile page-to-page, so this lives on the outermost container
+       instead, applying unconditionally regardless of how tall the content
+       ends up being. */
+    padding-bottom: 36px;
 }
 
 .projectsBackground {
+    /* !important needed because TintedVector always renders its width/height
+       props as an inline style on this same element — inline styles beat
+       any class rule regardless of specificity, so without this, the
+       width='100vw' height='100vh' props in projects.tsx would keep pinning
+       the background to exactly one viewport's height, never growing to
+       match .page's actual height once a project's own content (or the
+       36px footer-gap padding) makes the page taller. Same fix already
+       applied to about/education/home/footer's backgrounds. */
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .heading {
@@ -79,6 +94,7 @@
        otherwise change its appearance vs. its two siblings. */
     font-weight: 400;
     color: var(--main-light);
+    white-space: nowrap;
     text-align: center;
     transition: font-size var(--transition-length), transform var(--transition-length);
 }
@@ -149,7 +165,7 @@
 
     padding: 5px 12px;
     border-radius: 14px;
-    background-color: var(--main-green);
+    background-color: #587B6D;
     color: var(--main-light);
     font-family: var(--font-afacad-flux);
     font-size: 13px;
@@ -177,7 +193,8 @@
     height: 32%;
 
     background-color: #FDC5C4;
-    color: #6E71B0;
+    /* color: #6E71B0; */
+    color: var(--main-blue);
     /* font-size: 20px; */
     font-weight: 500;
     transition: all var(--transition-length);
@@ -203,7 +220,7 @@
 }
 
 .description a:hover {
-    color: var(--main-green);
+    color: #48806E;
 }
 
 .projectClosed {
@@ -267,25 +284,42 @@
     padding: 12px;
 }
 
-.intervle {
-    background-color: #A9ACD6;
-    font-size: 24px;
-    line-height: 1.4;
-}
-
 .openTitle {
     text-decoration: underline;
 }
 
 .openTitle:hover {
     /* color: var(--main-beige); */
-    color: #FFB8B9;
+    /* color: #FFB8B9; */
+    color: #B4CAC1;
     cursor: pointer;
+}
+
+.intervle {
+    background-color: #8F90C7;
+    font-size: 24px;
+    line-height: 1.4;
 }
 
 .intervle img {
     object-fit: cover;
     transform: scale(1.1) translate(0, 3.5%);
+}
+
+/* .intervle .openTitle {
+    color: var(--main-dark);
+} */
+
+.intervle .openTitle:hover {
+    color: #464974;
+}
+
+.shopcomp .openTitle:hover {
+    color: #FFC7C7;
+}
+
+.heatmap .openTitle:hover {
+    color: #9CB9AD;
 }
 
 .preview {
@@ -380,7 +414,7 @@
 }
 
 .shopcomp {
-    background-color: #8286B7;
+    background-color: #7578AF;
     font-size: 20px;
     line-height: 1.375;
 }
@@ -396,7 +430,7 @@
 .heatmap {
     background-color: var(--main-blue);
     font-size: 24px;
-    line-height: 1.4;
+    line-height: 1.6;
 }
 
 
