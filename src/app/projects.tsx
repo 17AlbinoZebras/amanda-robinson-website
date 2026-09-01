@@ -233,13 +233,13 @@ export default function Projects() {
                                     load time on every visit regardless of
                                     whether they were ever opened. */}
                                 {activeProject === 'intervle' && (
-                                    <iframe ref={intervleIframeRef} src="https://intervle-wordle-game.vercel.app/" title="Intervle: A Wordle Spin-off" className={styles.webPreview} width="600" height="370"/>
+                                    <iframe ref={intervleIframeRef} src="https://intervle.fun/" title="Intervle: A Wordle Spin-off" className={styles.webPreview} width="600" height="370"/>
                                 )}
                                 <span className={`${styles.interactiveHint} ${showInteractiveHint ? '' : styles.interactiveHintHidden}`}>Try it live!</span>
                             </div>
                             <button type="button" className={styles.expandToggle} onClick={toggleExpandPreview} aria-label={previewExpanded ? 'Show description' : 'Expand preview'}/>
                         </div>
-                        <div className={styles.description}><p>My first real web design project back in 2023, <a href='https://intervle-wordle-game.vercel.app/' target="_blank" rel="noopener noreferrer">Intervle</a> is a responsive web game inspired by everybody&#39;s favorite word puzzle, Wordle, but with a lexicographic twist. Results indicate alphabetical distance from the target word in either direction for each letter position.<br/>Technologies: HTML, CSS, JavaScript (Bootstrap)</p></div>
+                        <div className={styles.description}><p>My first real web design project back in 2023, <a href='https://intervle.fun/' target="_blank" rel="noopener noreferrer">Intervle</a> is a responsive web game inspired by everybody&#39;s favorite word puzzle, Wordle, but with a lexicographic twist. Results indicate alphabetical distance from the target word in either direction for each letter position.<br/>Technologies: HTML, CSS, JavaScript (Bootstrap)</p></div>
                     </div>
                 </div>
                 <div
