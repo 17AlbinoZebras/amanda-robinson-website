@@ -251,7 +251,16 @@
         transform: translate(17vw, 2vh);
     }
     75%, 100% {
-        transform: translate(-50%, calc(10vh + var(--slider-height) / 2 - var(--orb-size) / 2)) scale(calc(var(--slider-height) / var(--orb-size)));
+        /* + var(--landing-x-adjust, 0px) / (--landing-y-adjust, 0vh) — no-ops
+           on desktop (the var is undefined there, so the 0px/0vh fallback
+           applies) but on mobile cancels out .redOrb's own repositioned
+           starting anchor (see that media query below) so the landing math
+           still targets the real slider orb's actual position rather than
+           drifting by however far the starting anchor moved. See this
+           file's own top-of-file ORB ANIMATIONS comment for why the ±50%
+           trick needs anchor 0 to begin with — this is what restores that
+           for any anchor. */
+        transform: translate(calc(-50% + var(--landing-x-adjust, 0px)), calc(10vh + var(--slider-height) / 2 - var(--orb-size) / 2 + var(--landing-y-adjust, 0vh))) scale(calc(var(--slider-height) / var(--orb-size)));
         opacity: 1;
     }
 }
@@ -273,7 +282,9 @@
         transform: translate(-13.75vw, -2.5vh);
     }
     75%, 100% {
-        transform: translate(50%, calc(10vh + var(--slider-height) / 2 - var(--orb-size) / 2)) scale(calc(var(--slider-height) / var(--orb-size)));
+        /* See move-red-orb's own comment on --landing-x-adjust/
+           --landing-y-adjust. */
+        transform: translate(calc(50% + var(--landing-x-adjust, 0px)), calc(10vh + var(--slider-height) / 2 - var(--orb-size) / 2 + var(--landing-y-adjust, 0vh))) scale(calc(var(--slider-height) / var(--orb-size)));
         opacity: 1;
     }
 }
@@ -295,7 +306,9 @@
         transform: translate(5.5vw, -8vh);
     }
     75%, 100% {
-        transform: translate(-50%, calc(-10vh - var(--slider-height) / 2 + var(--orb-size) / 2)) scale(calc(var(--slider-height) / var(--orb-size)));
+        /* See move-red-orb's own comment on --landing-x-adjust/
+           --landing-y-adjust. */
+        transform: translate(calc(-50% + var(--landing-x-adjust, 0px)), calc(-10vh - var(--slider-height) / 2 + var(--orb-size) / 2 + var(--landing-y-adjust, 0vh))) scale(calc(var(--slider-height) / var(--orb-size)));
         opacity: 1;
     }
 }
@@ -317,7 +330,9 @@
         transform: translate(-8.25vw, -3vh);
     }
     75%, 100% {
-        transform: translate(50%, calc(-10vh - var(--slider-height) / 2 + var(--orb-size) / 2)) scale(calc(var(--slider-height) / var(--orb-size)));
+        /* See move-red-orb's own comment on --landing-x-adjust/
+           --landing-y-adjust. */
+        transform: translate(calc(50% + var(--landing-x-adjust, 0px)), calc(-10vh - var(--slider-height) / 2 + var(--orb-size) / 2 + var(--landing-y-adjust, 0vh))) scale(calc(var(--slider-height) / var(--orb-size)));
         opacity: 1;
     }
 }
@@ -533,23 +548,70 @@
    phones under ~470px) is split evenly on both sides instead of piling up on the
    right, which reads as more intentional than a lopsided cutoff. */
 @media (max-width: 700px) {
+    /* --orb-size overrides (not a smaller clamp() floor in the base rules
+       above) — the clamp()s already bottom out at their current floors
+       (180/280/230/195) well before 700px, so lowering the floor itself
+       would also reshape the desktop-adjacent curve leading up to it;
+       overriding the custom property directly here only touches this
+       breakpoint. Roughly a 25% cut across all four, keeping their relative
+       proportions to each other the same as the floors they replace. */
     .redOrb {
-        left: calc((100vw - 472px) / 2);
+        --orb-size: 135px;
+        left: calc((100vw - 357px) / 2);
         top: 2vh;
+        /* --landing-x/y-adjust cancel this box's own left/top anchor above
+           so move-red-orb's landing math (see its own comment) still lands
+           on the real slider orb's actual position instead of drifting by
+           however far this starting anchor sits from (0, 0) — measured
+           directly against the rendered .topSlider.slideLeft orb: its
+           center sits at a constant x = -25px (independent of viewport
+           width — the slider itself docks flush against the true screen
+           edge via left:0, not a percentage of anything) and
+           y = 10vh + 70px (70 = this breakpoint's --slider-height/2),
+           which is exactly what move-red-orb's own formula already targets
+           when the anchor is (0, 0) — so --landing-y-adjust here is simply
+           the negative of this box's own top offset, and --landing-x-adjust
+           solves anchorLeft + adjust = -25px for this box's own left
+           formula above. */
+        --landing-x-adjust: calc(-25px - (100vw - 357px) / 2);
+        --landing-y-adjust: -2vh;
     }
     .yellowOrb {
+        --orb-size: 210px;
         top: -2.5vh;
         right: auto;
-        left: calc((100vw - 472px) / 2 + 192px);
+        left: calc((100vw - 357px) / 2 + 147px);
+        /* Same idea as .redOrb above, but solved for this box's own anchor
+           and its move-yellow-orb's "+50%" (not "-50%") landing translate —
+           see move-red-orb's comment for the general reasoning. Measured
+           target: x = 100vw + 25px (the mirror of red's -25px, off the
+           right edge instead — still viewport-width-relative since the real
+           slider itself docks via right:0), y = same 10vh + 70px as red
+           (both are top-row sliders). */
+        --landing-x-adjust: calc(100vw + 25px - ((100vw - 357px) / 2 + 147px) - 210px);
+        --landing-y-adjust: 2.5vh;
     }
     .greenOrb {
+        --orb-size: 175px;
         bottom: 8vh;
-        left: calc((100vw - 437px) / 2);
+        left: calc((100vw - 332px) / 2);
+        /* Same idea again, for the bottom row — move-green-orb's landing
+           translate is negative (moving up from a bottom: anchor).
+           Measured target: x = -25px (mirrors red — same left edge), y =
+           90vh - 70px (mirrors red's 10vh + 70px about the vertical
+           center). */
+        --landing-x-adjust: calc(-25px - (100vw - 332px) / 2);
+        --landing-y-adjust: 8vh;
     }
     .blueOrb {
+        --orb-size: 145px;
         bottom: 3vh;
         right: auto;
-        left: calc((100vw - 437px) / 2 + 242px);
+        left: calc((100vw - 332px) / 2 + 187px);
+        /* Measured target: x = 100vw + 25px (mirrors yellow), y = 90vh -
+           70px (mirrors green). */
+        --landing-x-adjust: calc(100vw + 25px - ((100vw - 332px) / 2 + 187px) - 145px);
+        --landing-y-adjust: 3vh;
     }
 }
 
@@ -710,5 +772,13 @@
            column with an auto-height parent that resolves to nothing
            useful, so size to its own content instead. */
         height: auto;
+    }
+
+    /* Every other page's own equivalent body-text class already gets a
+       mobile-only reduction (about's .activityPreview, education's
+       .courseDescriptionInner, projects' .description) — .bodyText was the
+       one left at its full desktop 26px here. */
+    .bodyText {
+        font-size: 20px;
     }
 }

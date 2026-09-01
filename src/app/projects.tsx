@@ -226,16 +226,37 @@ export default function Projects() {
                     <div className={`${styles.projectContent} ${previewExpanded ? styles.previewExpanded : ''}`}>
                         <div className={styles.preview}>
                             <div className={styles.previewMedia} onMouseEnter={handlePreviewMouseEnter} onMouseLeave={handlePreviewMouseLeave}>
-                                {/* Only mounted while this is the open panel —
-                                    an <iframe> loads a whole separate page/app,
-                                    not just an image, so the other two sitting
-                                    around unmounted-but-loaded was real wasted
-                                    load time on every visit regardless of
-                                    whether they were ever opened. */}
-                                {activeProject === 'intervle' && (
-                                    <iframe ref={intervleIframeRef} src="https://intervle.fun/" title="Intervle: A Wordle Spin-off" className={styles.webPreview} width="600" height="370"/>
+                                {/* Same mobile fallback as Heatmap below, and
+                                    for the same reason: Intervle is a real
+                                    Wordle-style game meant to be played with a
+                                    keyboard on a full-size layout — a shrunk
+                                    iframe on a phone is either broken or just
+                                    not a usable way to actually play it. A
+                                    static screenshot plus a real link out
+                                    (opens the actual site full-size, in its
+                                    own tab) reads as an intentional prompt to
+                                    try it rather than a broken embed. */}
+                                {isMobile ? (
+                                    <>
+                                        <img src="/projects/intervle.jpg" alt="Screenshot of the Intervle word game" className={styles.mobilePreviewImage}/>
+                                        <a href="https://intervle.fun/" target="_blank" rel="noopener noreferrer" className={styles.openLiveDemoButton}>Open the live demo</a>
+                                    </>
+                                ) : (
+                                    <>
+                                        {/* Only mounted while this is the open
+                                            panel — an <iframe> loads a whole
+                                            separate page/app, not just an
+                                            image, so the other two sitting
+                                            around unmounted-but-loaded was
+                                            real wasted load time on every
+                                            visit regardless of whether they
+                                            were ever opened. */}
+                                        {activeProject === 'intervle' && (
+                                            <iframe ref={intervleIframeRef} src="https://intervle.fun/" title="Intervle: A Wordle Spin-off" className={styles.webPreview} width="600" height="370"/>
+                                        )}
+                                        <span className={`${styles.interactiveHint} ${showInteractiveHint ? '' : styles.interactiveHintHidden}`}>Try it live!</span>
+                                    </>
                                 )}
-                                <span className={`${styles.interactiveHint} ${showInteractiveHint ? '' : styles.interactiveHintHidden}`}>Try it live!</span>
                             </div>
                             <button type="button" className={styles.expandToggle} onClick={toggleExpandPreview} aria-label={previewExpanded ? 'Show description' : 'Expand preview'}/>
                         </div>

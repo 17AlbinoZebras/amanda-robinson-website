@@ -236,3 +236,31 @@
     width: 100% !important;
     height: auto !important;
 }
+
+@media (max-width: 700px) {
+    /* 38px matches every other page's own mobile .heading override
+       (about/education/experience/projects). */
+    .heading {
+        font-size: 38px;
+    }
+
+    /* .resume's desktop width — min(816px, 50%) — resolves to under 190px on
+       a typical phone width, far too narrow to render a legible resume PDF
+       at all. 90vw mirrors the ~88-90vw other pages already use for their
+       own main content boxes at this breakpoint. */
+    .resume {
+        width: 90vw;
+    }
+
+    /* .resumeExpanded's own desktop values — min(1200px, 85%) further capped
+       to max-width:65% — would resolve to an even narrower ~244px on
+       mobile, the opposite of what "expand" is supposed to do there. 95vw
+       (and no separate max-width cap — there's no wider desktop-only
+       constraint left to re-apply at this width) is as wide as it can go
+       while still leaving a sliver of the page's own background visible on
+       both sides. */
+    .resumeExpanded {
+        width: 95vw;
+        max-width: 95vw;
+    }
+}

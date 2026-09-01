@@ -279,13 +279,19 @@
        inset of the entire slider rather than a fix narrowly scoped to the
        orb: anything that ever pokes out (now or later) gets pulled back by
        the same fixed amount, automatically, with no separate per-part
-       tuning required. */
+       tuning required.
+
+       25px (not the original 55px) — 55px was tuned to clear mobile
+       content's own margin entirely, but that left barely any orb sliver
+       visible at all; 25px is a middle ground that still keeps clear of
+       scrolled text while letting noticeably more of the orb poke back
+       into view than that. */
     .slideLeft {
-        transform: translateX(calc(-100% - 55px));
+        transform: translateX(calc(-100% - 25px));
     }
 
     .slideRight {
-        transform: translateX(calc(100% + 55px));
+        transform: translateX(calc(100% + 25px));
     }
 }
 

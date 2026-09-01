@@ -200,13 +200,34 @@
 
     .sectionLeft {
         padding: 20px 6vw 24px 8vw;
+        /* .sectionBody's own text has no font-size of its own — it inherits
+           whatever's set here — so this is what actually shrinks it, not a
+           separate .sectionBody override. */
+        font-size: 20px;
     }
 
     .sectionRight {
         padding: 20px 8vw 24px 6vw;
+        font-size: 21px;
     }
 
     .sectionRight .sectionBody {
         padding-right: 0;
+    }
+
+    .roleInfo {
+        font-size: 16px;
+    }
+
+    .employer {
+        font-size: 20px;
+    }
+
+    .projectName {
+        font-size: 22px;
+    }
+
+    .sectionBody li::marker {
+        font-size: 18px;
     }
 }
