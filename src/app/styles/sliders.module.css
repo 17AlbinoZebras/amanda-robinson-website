@@ -66,8 +66,17 @@
     transform: translate(-50%, -50%) scale(80%);
 }
 
+/* .sliderOpen (alongside :hover/:focus-visible) — a mouse gets the centered,
+   full-scale icon via real :hover, but touch has no hover at all; the
+   two-tap mobile flow (sliders.tsx's handleClick) uses .sliderOpen, a JS-
+   tracked class, to represent "opened by a first tap" instead. Without this
+   here, a slider a touch user just tapped open would sit fully slid into
+   view with its icon still stuck in the small, off-center "closed" position
+   — visually inconsistent with what hovering the same slider looks like on
+   desktop. */
 .slider:hover .orbWrapperRight .sliderIcon,
-.slider:focus-visible .orbWrapperRight .sliderIcon {
+.slider:focus-visible .orbWrapperRight .sliderIcon,
+.sliderOpen .orbWrapperRight .sliderIcon {
     margin-left: 0;
     transform: translate(-50%, -50%) scale(100%);
 }
@@ -78,9 +87,35 @@
 }
 
 .slider:hover .orbWrapperLeft .sliderIcon,
-.slider:focus-visible .orbWrapperLeft .sliderIcon {
+.slider:focus-visible .orbWrapperLeft .sliderIcon,
+.sliderOpen .orbWrapperLeft .sliderIcon {
     margin-left: 0;
     transform: translate(-50%, -50%) scale(100%);
+}
+
+@media (max-width: 700px) {
+    /* Closed-state icon shift only — the margin-left:0 centered/full-scale
+       rules above (hover/focus-visible/.sliderOpen) are untouched, since
+       those already read fine on mobile once actually opened; this is
+       specifically about how much of the icon shows through the sliver
+       while CLOSED. The desktop 20% shift only clears about 62% of the
+       icon's own width past the viewport edge at this breakpoint's
+       geometry — measured directly against the rendered icon and the real
+       screen edge, not derived from the orb's own math (the icon's
+       position already accounts for padding/scale in a way that's simpler
+       to just read back off the DOM than re-derive here). 40% clears the
+       icon fully with a real (~8px, not a razor-thin sub-2px) margin to
+       spare, without changing how far the orb/slider itself sits (still
+       governed by .slideLeft/.slideRight's own mobile inset above) or
+       risking the sliver overlapping page content the way reducing that
+       inset instead would. */
+    .orbWrapperRight .sliderIcon {
+        margin-left: 40%;
+    }
+
+    .orbWrapperLeft .sliderIcon {
+        margin-left: -40%;
+    }
 }
 
 .sliderLabel {

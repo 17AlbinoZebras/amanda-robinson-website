@@ -713,17 +713,34 @@
     }
 
     .overviewBackground {
-        /* Stretches to cover .overview's now content-driven height instead
-           of staying pinned to the first 100vh. Not circular: .overview's
-           auto height resolves from its in-flow children only
-           (.overviewContent) before this absolutely positioned sibling
-           sizes itself against it. */
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        width: auto;
-        height: auto;
+        /* --overview-real-height (home_page.tsx's useMeasuredHeight, set on
+           .overview itself and inherited down to this child) — NOT the more
+           obvious top:0/left:0/right:0/bottom:0 stretch-to-fill (tried
+           first, and genuinely wrong in a real browser, not just
+           theoretically iffy): that only reliably resolves against a
+           containing block with a truly definite height, and .overview's
+           mobile height is auto (floored by min-height:100vh, but taller
+           once .overviewContent's real stacked-on-mobile content exceeds
+           that) — confirmed directly against a real rendered page that this
+           left the background stuck at exactly 100vh regardless of how much
+           taller .overview's actual content made it, the same class of
+           auto-height stretch bug already hit (and fixed the same way —
+           measure with JS, don't lean on CSS alone for it) for the resume
+           box and the footer background elsewhere in this codebase.
+           !important — same reason the base (desktop) rule's own 100vh
+           silently relies on matching TintedVector's own height='100vh'
+           prop rather than truly overriding it: that prop always renders as
+           an inline style, which beats a plain class rule regardless of
+           specificity. Desktop's value happening to match the inline style
+           masked this; this rule sets a genuinely DIFFERENT value, so it
+           needs !important to actually win — confirmed directly: without
+           it, the custom property above computed correctly but the
+           inline height='100vh' still won over this rule's own height,
+           leaving the background stuck at 100vh regardless. */
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: var(--overview-real-height, 100vh) !important;
     }
 
     .upperSection {

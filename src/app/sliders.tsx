@@ -1,5 +1,5 @@
 'use client'
-import React, { CSSProperties, JSX, useEffect, useRef, useState } from 'react'
+import React, { CSSProperties, JSX, useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import { ClippedVector, SizeValue } from './mask_functions';
 
@@ -169,7 +169,40 @@ type LabelProps = {
     labelStyle?: CSSProperties;
 }
 
+// (hover: hover) is the standards-based way to ask "can this device's
+// PRIMARY input mechanism actually hover" — true for mouse/trackpad, false
+// for touch, regardless of viewport width (unlike a max-width check: a
+// touch tablet in landscape can easily be wider than the site's own mobile
+// breakpoint, and would still have no real hover). Used to gate
+// onMouseEnter/onMouseLeave entirely on non-hover devices — see the
+// hoverHandlers comment in Slider() below for why that's the fix, not just
+// a nice-to-have. true first (assumes hover-capable) since there's no
+// matchMedia during SSR — matches every other measure-after-mount hook in
+// this codebase in spirit, just defaulting toward "don't change existing
+// desktop behavior" rather than toward mobile.
+// useLayoutEffect (not useEffect) — matches useScaleToFit's own reasoning
+// in home_page.tsx: this needs to settle to its real value before the
+// FIRST paint a user could conceivably tap during, not just "soon after".
+// A useEffect-based correction still runs well before a human can
+// physically react to a first frame, but the whole point of this hook is
+// closing the exact race it exists to prevent — worth the belt-and-suspenders
+// here specifically, even though every other measure-after-mount hook in
+// this codebase uses plain useEffect.
+function useHoverCapable() {
+    const [hoverCapable, setHoverCapable] = useState(true)
+    useLayoutEffect(() => {
+        const mql = window.matchMedia('(hover: hover)')
+        setHoverCapable(mql.matches)
+        const handleChange = (e: MediaQueryListEvent) => setHoverCapable(e.matches)
+        mql.addEventListener('change', handleChange)
+        return () => mql.removeEventListener('change', handleChange)
+    }, [])
+    return hoverCapable
+}
+
 function Slider(width: string, height: string, rect: React.ReactNode, orb: React.ReactNode, orbSide: "left" | "right", orbStrokeWidth: SizeValue, { labelText, labelStyle }: LabelProps, sliderClassName?: string, sliderStyle?: CSSProperties, href?: string, icon?: JSX.Element, isOpen?: boolean, onOpenChange?: (open: boolean) => void, sliderRef?: React.Ref<HTMLAnchorElement>) {
+    const hoverCapable = useHoverCapable()
+
     // Custom properties don't get React's automatic px-suffixing for numbers
     // (that only applies to known CSS properties), so a bare number needs "px"
     // appended explicitly here.
@@ -216,10 +249,11 @@ function Slider(width: string, height: string, rect: React.ReactNode, orb: React
     // "just open" instead of "navigate" — necessary for touch, which has no
     // real hover to open the slider before a tap: without this, a tap would
     // both open AND immediately navigate in the same gesture, so a touch
-    // user could never actually see the slider before leaving the page. On
-    // a real mouse this is a no-op in practice, since hovering already sets
-    // isOpen to true before a click can ever fire, so the click always
-    // reaches the `else` branch and navigates immediately — same as before.
+    // user could never actually see the slider before leaving the page. This
+    // depends on isOpen genuinely still being false at the start of a tap,
+    // which is exactly what hoverCapable (below) guarantees — see its own
+    // comment for why that's not as automatic as it sounds on an actual
+    // touch device.
     const handleClick = (e: React.MouseEvent) => {
         if (!isOpen) {
             e.preventDefault()
@@ -242,9 +276,28 @@ function Slider(width: string, height: string, rect: React.ReactNode, orb: React
         }
     }
 
+    // hoverCapable (see its own definition below) gates onMouseEnter/
+    // onMouseLeave specifically — not the whole hoverHandlers object, since
+    // onFocus/onBlur/onClick all still need to work identically on every
+    // input type (keyboard focus and clicks aren't hover, and exist
+    // regardless of whether the device has a mouse). Leaving
+    // onMouseEnter/onMouseLeave OUT entirely on a non-hover device (rather
+    // than, say, checking hoverCapable inside them) matters specifically
+    // because mobile browsers synthesize a mouseenter/mouseover immediately
+    // before a tap's click, to support hover-dependent UI exactly like this
+    // one — if onMouseEnter were still wired up at all, that synthetic event
+    // would flip isOpen to true DURING the tap, before handleClick's own `if
+    // (!isOpen)` check ever runs, letting the very first tap both open and
+    // navigate in one gesture (confirmed: this is what was actually
+    // happening before hoverCapable existed). With onMouseEnter never
+    // attached in the first place on such a device, nothing but
+    // handleClick's own logic can ever set isOpen, so its check is reading
+    // a value only IT controls.
     const hoverHandlers = {
-        onMouseEnter: () => onOpenChange?.(true),
-        onMouseLeave: () => onOpenChange?.(false),
+        ...(hoverCapable && {
+            onMouseEnter: () => onOpenChange?.(true),
+            onMouseLeave: () => onOpenChange?.(false),
+        }),
         onFocus: handleFocus,
         onBlur: () => onOpenChange?.(false),
         onClick: handleClick,

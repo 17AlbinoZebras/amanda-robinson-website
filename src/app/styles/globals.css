@@ -68,11 +68,12 @@
   :root {
     /* Sliders render at height*2 width (SLIDER_WIDTH_RATIO in sliders.tsx) —
        at the desktop ~250px default that's ~500px wide, wider than an entire
-       phone screen. 140px keeps an open slider (~280px) comfortably inside a
-       375-430px viewport. Everything sized off --slider-height (cqh-based
-       label fonts, the orbs' scaleToSliderHeight) scales down with it
-       automatically — no separate overrides needed elsewhere. */
-    --slider-height: 140px;
+       phone screen. 120px (down from an earlier 140px) keeps an open slider
+       (~240px) comfortably inside a 375-430px viewport, with a bit more
+       headroom than 140px left. Everything sized off --slider-height
+       (cqh-based label fonts, the orbs' scaleToSliderHeight) scales down
+       with it automatically — no separate overrides needed elsewhere. */
+    --slider-height: 120px;
   }
 }
 

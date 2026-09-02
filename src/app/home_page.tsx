@@ -33,11 +33,44 @@ function useScaleToFit<T extends HTMLElement>(cssVar: string) {
     return ref
 }
 
+// Measures .overview's own rendered height and writes it back as a custom
+// property on that same element — home_page.module.css's mobile
+// .overviewBackground rule reads it back via var() to size itself, instead
+// of the more obvious top:0/left:0/right:0/bottom:0 "stretch to fill"
+// technique (tried first): that only reliably resolves against a
+// containing block with a genuinely DEFINITE height, and .overview's mobile
+// height is auto (min-height:100vh, but actually taller once
+// .overviewContent's real, stacked-on-mobile content exceeds that) — a real
+// browser was confirmed (not just suspected) to leave .overviewBackground
+// stuck at exactly 100vh regardless of how much taller .overview's own
+// content actually made it, the same category of auto-height stretch bug
+// already hit (and fixed the same way — measure, don't rely on CSS
+// alone) for the resume box and the footer background elsewhere in this
+// codebase. Runs unconditionally (not gated to mobile) since it's cheap and
+// the resulting property is simply unused by desktop's own
+// .overviewBackground rule.
+function useMeasuredHeight<T extends HTMLElement>(cssVar: string) {
+    const ref = useRef<T>(null)
+
+    useLayoutEffect(() => {
+        const measure = () => {
+            if (!ref.current) return
+            ref.current.style.setProperty(cssVar, `${ref.current.getBoundingClientRect().height}px`)
+        }
+        measure()
+        window.addEventListener('resize', measure)
+        return () => window.removeEventListener('resize', measure)
+    }, [cssVar])
+
+    return ref
+}
+
 function OverviewSection() {
     const contentRef = useScaleToFit<HTMLDivElement>('--overview-scale')
+    const overviewRef = useMeasuredHeight<HTMLDivElement>('--overview-real-height')
 
     return (
-        <div className={styles.overview}>
+        <div className={styles.overview} ref={overviewRef}>
             {/* Outside .overviewContent on purpose — this is a full-bleed 100vw/100vh
                 backdrop, so it shouldn't shrink along with the scaled content. */}
             <TintedVector src="/masks/Green-Memphis.svg" color='#D4D5E9' width='100vw' height='100vh' maskSize="cover" className={styles.overviewBackground}/>
