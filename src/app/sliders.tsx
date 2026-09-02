@@ -261,46 +261,50 @@ function Slider(width: string, height: string, rect: React.ReactNode, orb: React
         }
     }
 
-    // Lets a touch user drag/swipe a closed slider open instead of only being
-    // able to tap it — matches the "slider" name more literally, and reads
-    // as a more natural touch gesture than a tap for something that visually
-    // slides. This is pure gesture DETECTION, not a live finger-following
-    // drag: rather than continuously updating a transform to track the
-    // touch position (which would mean reimplementing the open/closed
+    // Lets a touch user drag/swipe a slider open OR closed instead of only
+    // being able to tap it — matches the "slider" name more literally, and
+    // reads as a more natural touch gesture than a tap for something that
+    // visually slides. This is pure gesture DETECTION, not a live finger-
+    // following drag: rather than continuously updating a transform to track
+    // the touch position (which would mean reimplementing the open/closed
     // transform by hand, fighting the existing CSS transition and the
     // hover/.sliderOpen states it already has to agree with), a swipe past a
-    // real minimum distance in the OPENING direction just calls the same
-    // onOpenChange(true) a first tap already does — the existing CSS
+    // real minimum distance just calls the same onOpenChange(...) a tap (or,
+    // for closing, a tap outside — see the pointerdown listener in
+    // RedSlider/YellowSlider/etc.) already does — the existing CSS
     // transition still handles the actual animation, so this only ever adds
     // a new way to TRIGGER that same state change, not a second animation
     // system to keep in sync with the first.
     const touchStartRef = useRef<{ x: number; y: number } | null>(null)
-    const SWIPE_OPEN_THRESHOLD = 24
+    const SWIPE_THRESHOLD = 24
 
     const handleTouchStart = (e: React.TouchEvent) => {
         touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
     }
 
     const handleTouchMove = (e: React.TouchEvent) => {
-        // Already open, or no in-progress touch to measure from (e.g. a
-        // second finger joining a gesture already handled) — nothing to do.
-        if (isOpen || !touchStartRef.current || !dockSide) return
+        if (!touchStartRef.current || !dockSide) return
         const dx = e.touches[0].clientX - touchStartRef.current.x
         const dy = e.touches[0].clientY - touchStartRef.current.y
         // Requires the drag to be BOTH past a real minimum distance (so
         // ordinary tap jitter never triggers this) AND more horizontal than
         // vertical (so a vertical page-scroll that happens to start on the
         // slider's own small visible sliver doesn't get hijacked into
-        // opening it instead of scrolling).
-        if (Math.abs(dx) < SWIPE_OPEN_THRESHOLD || Math.abs(dx) < Math.abs(dy)) return
+        // opening/closing it instead of scrolling).
+        if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) < Math.abs(dy)) return
         // A left-docked slider (off-screen to the left) opens by dragging
-        // RIGHTWARD, toward the screen's interior; a right-docked one opens
-        // dragging LEFTWARD — the mirror image.
-        const isOpeningDrag = dockSide === 'left' ? dx > 0 : dx < 0
-        if (!isOpeningDrag) return
+        // RIGHTWARD, toward the screen's interior, and closes dragging back
+        // LEFTWARD, toward off-screen; a right-docked one is the mirror
+        // image throughout. wouldOpen === isOpen means the drag is heading
+        // further INTO the current state (e.g. dragging further open while
+        // already open) — nothing to change either way, so only a drag that
+        // actually crosses toward the OTHER state does anything.
+        const isDraggingRight = dx > 0
+        const wouldOpen = dockSide === 'left' ? isDraggingRight : !isDraggingRight
+        if (wouldOpen === isOpen) return
         e.preventDefault()
         touchStartRef.current = null
-        onOpenChange?.(true)
+        onOpenChange?.(wouldOpen)
     }
 
     const handleTouchEnd = () => {
