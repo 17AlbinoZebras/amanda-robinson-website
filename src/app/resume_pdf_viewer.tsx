@@ -72,6 +72,15 @@ export default function ResumePdfViewer() {
                     file="/AmandaRobinsonResume.pdf"
                     onLoadSuccess={({ numPages }) => setNumPages(numPages)}
                     className={styles.pdfFrame}
+                    // Without this, react-pdf shows nothing at all while the
+                    // pdf.js library itself (and its separate worker script)
+                    // downloads, parses, and initializes — the actual bulk of
+                    // "takes a while to load" for a file this small (73KB):
+                    // the PDF's own bytes aren't the bottleneck, the renderer
+                    // is. A real loading state doesn't make that faster, but
+                    // it means the page doesn't just look broken/blank for
+                    // that stretch.
+                    loading={<p className={styles.pdfLoading}>Loading resume…</p>}
                 >
                     {Array.from({ length: numPages }, (_, i) => (
                         <Page
@@ -80,6 +89,15 @@ export default function ResumePdfViewer() {
                             width={pageWidth}
                             renderTextLayer={false}
                             renderAnnotationLayer={false}
+                            // Was capped at 1.5 (down from react-pdf's own
+                            // default of the real window.devicePixelRatio) to
+                            // cut canvas rasterization work on high-DPI
+                            // screens — reverted, confirmed visibly blurry in
+                            // practice on a real device. This is read text on
+                            // a resume, where looking noticeably soft is a
+                            // worse tradeoff than the render-time savings;
+                            // left at react-pdf's own default (full device
+                            // sharpness) instead.
                         />
                     ))}
                 </Document>

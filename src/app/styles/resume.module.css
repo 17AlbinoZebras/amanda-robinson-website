@@ -154,6 +154,13 @@
    fixed 85vh — overflow-y:auto is what turns that into a scrollable view
    instead of clipping or squeezing both pages down to fit one static
    screen. */
+.pdfLoading {
+    color: var(--main-dark);
+    font-size: 20px;
+    font-weight: 500;
+    padding-top: 40%;
+}
+
 .pdfContainer {
     width: 100%;
     height: 100%;

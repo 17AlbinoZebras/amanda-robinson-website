@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import styles from './styles/projects.module.css'
 import { TintedVector } from './mask_functions'
@@ -119,29 +119,73 @@ export default function Projects() {
         shopcomp: useRef<HTMLParagraphElement>(null),
         heatmap: useRef<HTMLParagraphElement>(null),
     }
-    const [descriptionHeights, setDescriptionHeights] = useState({ intervle: 0, shopcomp: 0, heatmap: 0 })
-    useLayoutEffect(() => {
+    // A baseline height every description starts at, rather than jumping
+    // straight to its full measured height the instant a project opens (or
+    // the page loads) — reported as reading "really tall" right away with no
+    // sense of motion. Only one project is ever open/visible at a time, so
+    // one shared value (not one per project) is enough; only the ACTIVE
+    // project's own div ever has this applied in a way that's visible (see
+    // the JSX below).
+    const DEFAULT_DESCRIPTION_HEIGHT = 190
+    const [descriptionHeight, setDescriptionHeight] = useState(DEFAULT_DESCRIPTION_HEIGHT)
+
+    // Resets to the baseline the instant a different project becomes active
+    // — a PLAIN useEffect (not useLayoutEffect), specifically so this
+    // baseline actually gets painted on screen before the "grow if the real
+    // content needs more" effect below ever runs. A layout effect commits
+    // before the browser paints at all, which was the actual bug: measuring
+    // and applying the real (often taller) height synchronously, in the same
+    // tick activeProject changed, meant the very first frame anyone ever saw
+    // was already at full height — nothing to animate from, so .description's
+    // own height transition had nothing to visibly do.
+    useEffect(() => {
+        setDescriptionHeight(DEFAULT_DESCRIPTION_HEIGHT)
+    }, [activeProject])
+
+    useEffect(() => {
         const ref = (descriptionTextRefs as Record<string, React.RefObject<HTMLParagraphElement | null>>)[activeProject]
         if (!ref?.current) return
         const el = ref.current
         // .description's own 12px padding (all sides) isn't part of the <p>'s
         // own scrollHeight, so it's added back here — same technique as
         // education.tsx's own incomingRef/innerPadding measurement, for the
-        // same reason.
-        const measure = () => setDescriptionHeights((prev) => ({ ...prev, [activeProject]: el.scrollHeight + 24 }))
-        measure()
+        // same reason. max(...) with the baseline is what makes this only
+        // ever GROW past the default, never shrink below it, even for a
+        // short description that would technically fit smaller.
+        const measure = () => setDescriptionHeight(Math.max(DEFAULT_DESCRIPTION_HEIGHT, el.scrollHeight + 24))
+        // Deferred, not called synchronously here — the reset effect above
+        // and this one both fire in the same post-commit batch, with no
+        // paint in between; measuring immediately would land the grown
+        // height in that same first frame, same "nothing to animate from"
+        // problem as useLayoutEffect had.
+        //
+        // 1050ms (--transition-length's own 1s, plus a small buffer) — NOT
+        // a short delay like 50ms. .project's own width animates over that
+        // same 1s when a project opens (its flex:1 sliver growing to
+        // flex:10), and .description reflows continuously throughout that,
+        // same as any text box getting wider. A short delay fires while
+        // that's still very much in progress, measuring at whatever
+        // in-between (too-narrow) width happens to be current at that
+        // instant — confirmed directly this produces a genuinely wrong,
+        // inflated height (588px measured for a description that only
+        // actually needs ~217px once the panel is fully open) — and,
+        // confirmed just as directly, the ResizeObserver below does NOT
+        // reliably correct it afterward despite existing for exactly that
+        // purpose. Waiting out the width transition before ever measuring
+        // once sidesteps the race entirely, rather than trying to out-time
+        // or correct it after the fact. requestAnimationFrame looks like the
+        // more obvious "wait a beat" tool but was confirmed to be the wrong
+        // one instead: rAF callbacks are suspended for as long as a tab is
+        // backgrounded/hidden (true in real browsers generally, not just a
+        // testing quirk), which would leave this stuck at the default
+        // indefinitely if the page ever loads in a background tab; a
+        // setTimeout keeps firing regardless.
+        const timeoutId0 = window.setTimeout(measure, 1050)
         window.addEventListener('resize', measure)
-        // .project's own width animates over --transition-length (1s) when a
-        // project opens (its flex:1 sliver growing to flex:10) — .description
-        // reflows continuously throughout that, same as any text box getting
-        // wider, so a single measure() right when activeProject changes can
-        // still catch it mid-transition, at some in-between width. A
-        // ResizeObserver instead fires on every real size change and settle-
-        // debounces (same 150ms pattern resume_pdf_viewer.tsx already uses
-        // for its own width-driven remeasure, for the same reason: this
-        // element's transitioning continuously for close to a second, and
-        // only the FINAL settled width's measurement is the one that should
-        // actually stick).
+        // Ongoing safety net for any LATER resize (e.g. the viewport itself
+        // resizing while a project is already open) — debounced the same way
+        // resume_pdf_viewer.tsx's own width-driven remeasure already is, so
+        // only the settled end-state of a resize actually sticks.
         let timeoutId: number
         const observer = new ResizeObserver(() => {
             clearTimeout(timeoutId)
@@ -149,6 +193,7 @@ export default function Projects() {
         })
         observer.observe(el)
         return () => {
+            clearTimeout(timeoutId0)
             clearTimeout(timeoutId)
             observer.disconnect()
             window.removeEventListener('resize', measure)
@@ -334,7 +379,7 @@ export default function Projects() {
                             </div>
                             <button type="button" className={styles.expandToggle} onClick={toggleExpandPreview} aria-label={previewExpanded ? 'Show description' : 'Expand preview'}/>
                         </div>
-                        <div className={styles.description} style={isMobile ? undefined : {height: previewExpanded ? '0px' : `${descriptionHeights.intervle}px`}}><p ref={descriptionTextRefs.intervle}>My first real web design project back in 2023, <a href='https://intervle.fun/' target="_blank" rel="noopener noreferrer">Intervle</a> is a responsive web game inspired by everybody&#39;s favorite word puzzle, Wordle, but with a lexicographic twist. Results indicate alphabetical distance from the target word in either direction for each letter position.<br/>Technologies: HTML, CSS, JavaScript (Bootstrap)</p></div>
+                        <div className={styles.description} style={isMobile ? undefined : {height: previewExpanded ? '0px' : `${descriptionHeight}px`}}><p ref={descriptionTextRefs.intervle}>My first real web design project back in 2023, <a href='https://intervle.fun/' target="_blank" rel="noopener noreferrer">Intervle</a> is a responsive web game inspired by everybody&#39;s favorite word puzzle, Wordle, but with a lexicographic twist. Results indicate alphabetical distance from the target word in either direction for each letter position.<br/>Technologies: HTML, CSS, JavaScript (Bootstrap)</p></div>
                     </div>
                 </div>
                 <div
@@ -378,7 +423,7 @@ export default function Projects() {
                             </div>
                             <button type="button" className={styles.expandToggle} onClick={toggleExpandPreview} aria-label={previewExpanded ? 'Show description' : 'Expand preview'}/>
                         </div>
-                        <div className={styles.description} style={isMobile ? undefined : {height: previewExpanded ? '0px' : `${descriptionHeights.shopcomp}px`}}><p ref={descriptionTextRefs.shopcomp}>Shopcomp is a full-stack grocery comparison web app with an AWS backend, enabling users to upload/manage receipts, maintain shopping lists, and compute best-price options from historical purchase data using a MySQL relational schema. In my team, I was responsible for the shopping list and calculation functionality shown above for our Software Engineering final project. Additionally, I designed and refactored database schema and developed complex queries.<br/>Technologies: Next.js, React, TypeScript, AWS Amplify/Cognito, AWS CDK, MySQL</p></div>
+                        <div className={styles.description} style={isMobile ? undefined : {height: previewExpanded ? '0px' : `${descriptionHeight}px`}}><p ref={descriptionTextRefs.shopcomp}>Shopcomp is a full-stack grocery comparison web app with an AWS backend, enabling users to upload/manage receipts, maintain shopping lists, and compute best-price options from historical purchase data using a MySQL relational schema. In my team, I was responsible for the shopping list and calculation functionality shown above for our Software Engineering final project. Additionally, I designed and refactored database schema and developed complex queries.<br/>Technologies: Next.js, React, TypeScript, AWS Amplify/Cognito, AWS CDK, MySQL</p></div>
                     </div>
                 </div>
                 <div
@@ -430,7 +475,7 @@ export default function Projects() {
                             </div>
                             <button type="button" className={styles.expandToggle} onClick={toggleExpandPreview} aria-label={previewExpanded ? 'Show description' : 'Expand preview'}/>
                         </div>
-                        <div className={styles.description} style={isMobile ? undefined : {height: previewExpanded ? '0px' : `${descriptionHeights.heatmap}px`}}><p ref={descriptionTextRefs.heatmap}>A <a href='https://patient-heatmap-public.vercel.app/' target="_blank" rel="noopener noreferrer">dynamic heatmap</a> representation of hospital outreach statistics based on a variety of data. This application was used by the South Florida Proton Therapy Institute to identify areas to prioritize outreach. This version is fully generated data for sample purposes.<br/>Technologies: Typescript, React, Next.js, Leaflet, GeoJSON, Google Places API</p></div>
+                        <div className={styles.description} style={isMobile ? undefined : {height: previewExpanded ? '0px' : `${descriptionHeight}px`}}><p ref={descriptionTextRefs.heatmap}>A <a href='https://patient-heatmap-public.vercel.app/' target="_blank" rel="noopener noreferrer">dynamic heatmap</a> representation of hospital outreach statistics based on a variety of data. This application was used by the South Florida Proton Therapy Institute to identify areas to prioritize outreach. This version is fully generated data for sample purposes.<br/>Technologies: Typescript, React, Next.js, Leaflet, GeoJSON, Google Places API</p></div>
                     </div>
                 </div>
             </div>

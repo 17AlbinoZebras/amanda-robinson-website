@@ -1,6 +1,7 @@
 'use client'
 
 import React, { JSX, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 
 import styles from './styles/about.module.css'
 import { TintedVector } from './mask_functions'
@@ -189,7 +190,42 @@ export default function About() {
             <div className={styles.mainContent}>
                 <div className={styles.upperSection}>
                     <div className={styles.mainPhoto}>
-                        <img src="about/AmandaHeadshot8ML.jpg" alt="Amanda Robinson smiling in front of a brick wall" className={styles.headshot}></img>
+                        {/* Was a plain <img> — the source file is a real
+                            3247x4871 photo (4.6MB), and a plain <img> has no
+                            way to request anything smaller: the full-size
+                            original was what actually downloaded regardless
+                            of this box's own ~200-350px rendered width, which
+                            is the real reason this was slow to load. next/image
+                            (already used the same way for the home page's own
+                            headshot) generates and serves a properly
+                            downscaled, modern-format (WebP/AVIF where
+                            supported) version sized to what's actually
+                            displayed, and lazy-loads it by default. width/
+                            height here are the SOURCE file's real intrinsic
+                            dimensions (used for aspect-ratio math, not the
+                            display size) — sizes is what tells Next.js the
+                            real display size to generate for.
+                            87vw/25vw (not .mainPhoto's own literal
+                            ~60vw-mobile/~17vw-desktop rendered width) —
+                            .headshot's own transform: scale(1.45) below
+                            enlarges the rendered image by 1.45x for its
+                            crop/positioning, so the box's raw rendered size
+                            understates how much actual resolution is needed;
+                            sizing the request for the box alone (tried first)
+                            visibly blurred once a properly-downscaled image
+                            was what got upscaled 1.45x, instead of the old
+                            plain <img>'s full-resolution original absorbing
+                            it unnoticed. ~1.45x'd here (60→87, 17→25) keeps
+                            the requested image sharp enough to survive that
+                            same scale-up. */}
+                        <Image
+                            src="/about/AmandaHeadshot8ML.jpg"
+                            alt="Amanda Robinson smiling in front of a brick wall"
+                            width={3247}
+                            height={4871}
+                            sizes="(max-width: 700px) 87vw, 25vw"
+                            className={styles.headshot}
+                        />
                     </div>
                     <p className={styles.mainDescription}>
                         I&#39;m Amanda Robinson, a California native and a third year Computer Science student at WPI. I&#39;ve been using software to solve problems for as long as I can remember. What began as a love of coding and logic puzzles has grown into a passion for building thoughtful, creative products that tackle challenging real-world problems. For more about my skills and experience, visit my <Link href='/resume' className={styles.resumeLink}>resume</Link>!
