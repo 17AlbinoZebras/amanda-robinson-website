@@ -91,15 +91,32 @@
 .sectionBody {
     padding-inline-start: 24px;
     line-height: 1.35;
+
+    list-style: none;
 }
 
 .sectionBody li {
     margin-bottom: 1%;
+    position: relative;
 }
 
-.sectionBody li::marker {
-    content: '\2726 \00a0';
-    font-size: 24px;
+/* Plain CSS-drawn star instead of a Unicode glyph on ::marker — see
+   about.module.css's .activityPreview star rules for the full reasoning
+   (font-glyph coverage and Safari's ::marker content support are both too
+   unreliable to depend on; this reportedly went missing on an actual
+   phone). currentColor keeps this matching whichever color this text
+   already inherits — .sectionLeft's main-green or .sectionRight's
+   main-dark — automatically, with no separate color per side to maintain. */
+.sectionBody li::before {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 0.6em;
+    width: 12px;
+    height: 12px;
+    transform: translateY(-50%);
+    background-color: currentColor;
+    clip-path: polygon(91.7% 50%, 61.8% 38.2%, 50% 8.3%, 38.2% 38.2%, 8.3% 50%, 38.2% 61.8%, 50% 91.7%, 61.8% 61.8%);
 }
 
 .sfpti1 {
@@ -227,7 +244,12 @@
         font-size: 22px;
     }
 
-    .sectionBody li::marker {
-        font-size: 18px;
+    .sectionBody li::before {
+        /* Scaled down to match the mobile text's own smaller size (was a
+           font-size drop on the old ::marker; this is the equivalent for
+           the star's own fixed box). */
+        width: 9px;
+        height: 9px;
+        left: -16px;
     }
 }

@@ -75,22 +75,18 @@
     justify-content: center;
     overflow: hidden;
 
-    /* width/height stay 25% (the ORIGINAL badge size, not shrunk) — mobile's
-       own margin-left: 40%/-40% below shifts this whole badge by a fixed
-       fraction of its container, tuned by eye specifically against this 25%
-       footprint, so changing the badge's own width here would throw that
-       mobile tuning off (confirmed: an earlier attempt that also shrank
-       width to 20% made the closed-state sliver clear LESS of the icon on
-       mobile, not more). */
-    width: 25%;
-    height: 25%;
+    /* 40% (up again from 32%) — another real size increase per request.
+       Requires re-tuning both the closed-state margin-left shifts below
+       (moved CLOSER to center this time — see their own comments — so more
+       of the badge overlaps the orb instead of hanging past its edge) and
+       mobile's edge-clearance value, re-verified directly against the
+       actual rendered result each time rather than assumed. */
+    width: 40%;
+    height: 40%;
 
-    /* 9% — trims the glyph for breathing room from the circle's edge
-       without touching the badge's own footprint, so the mobile shift needs
-       no retuning. Safely a positive content area now (25% - 9% - 9% = 7%):
-       box-sizing:border-box (set globally) subtracts padding from a plain
-       div's own width the normal, predictable way. */
-    padding: 9%;
+    /* Still 4% of the badge's container width — content area scales up
+       proportionally with the badge itself (40% - 4% - 4% = 32%). */
+    padding: 4%;
 
     border-radius: 50%;
 
@@ -101,11 +97,14 @@
    area .sliderIcon's own padding leaves it, with no sizing/background/
    radius of its own to fight over. */
 .sliderIconGlyph {
-    width: 100%;
-    height: 100%;
+    width: 80%;
+    height: 80%;
 }
 
 .orbWrapperRight .sliderIcon {
+    /* 12% (down from 20%) — pulls the badge back toward the orb's own
+       center, so more of it sits overlapping the orb instead of hanging
+       past its edge, per request. */
     margin-left: 20%;
     transform: translate(-50%, -50%) scale(80%);
 }

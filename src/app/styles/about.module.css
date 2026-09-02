@@ -175,11 +175,43 @@
     font-weight: bold;
     line-height: 1.5;
     font-size: 24px;
+
+    list-style: none;
 }
 
-.activityPreview li::marker {
-    content: '\2726 \00a0';
-    font-size: 20px;
+/* Was content: '\2726 \00a0' on ::marker — a Unicode dingbat (✦) rendered
+   through whatever font ends up applying to the marker box. That's fragile
+   in two independent ways: the site's own custom webfonts almost certainly
+   don't include a Miscellaneous Symbols glyph like this at all, leaving it
+   to fall back through the font stack — a fallback that isn't guaranteed to
+   land on a font with this specific glyph on every platform; and Safari's
+   support for ::marker's own content property has historically been shakier
+   than for regular text, especially on iOS. Confirmed (or at least strongly
+   suspected) as the cause of it going missing on an actual phone, which
+   isn't reproducible in this sandbox's own browser to verify directly.
+   A plain CSS-drawn shape sidesteps both risks entirely — no font/glyph
+   involved anywhere. background-color: currentColor (not a hardcoded color)
+   is what keeps this automatically matching whatever color this text
+   context already used to inherit for the marker, with no separate
+   per-usage color to maintain. ">" scopes this to DIRECT children only, so
+   it doesn't also apply to .subPoints' own nested <li>s (a different
+   marker, '\2727', left alone — not part of what was reported broken). */
+.activityPreview > li {
+    position: relative;
+}
+
+.activityPreview > li::before {
+    content: '';
+    position: absolute;
+    left: -28px;
+    top: 0.5em;
+    width: 14px;
+    height: 14px;
+    transform: translateY(-50%);
+    background-color: currentColor;
+    /* A plain 4-point star (matching ✦'s own silhouette), specified as a
+       polygon so no external asset or font glyph is needed at all. */
+    clip-path: polygon(91.7% 50%, 61.8% 38.2%, 50% 8.3%, 38.2% 38.2%, 8.3% 50%, 38.2% 61.8%, 50% 91.7%, 61.8% 61.8%);
 }
 
 .previewSegment {
@@ -287,11 +319,29 @@
 
     line-height: 1.5;
     margin-top: 4px;
+
+    list-style: none;
 }
 
-.hobbies li::marker {
-    content: '\2726 \00a0';
-    font-size: 22px;
+/* Plain CSS-drawn star instead of a Unicode glyph on ::marker — see
+   .activityPreview's own star rules above for why (font-glyph coverage and
+   Safari's ::marker content support are both too unreliable to depend on;
+   this reportedly went missing on an actual phone). currentColor keeps this
+   matching .hobbies' own color (#F0636E) automatically. */
+.hobbies li {
+    position: relative;
+}
+
+.hobbies li::before {
+    content: '';
+    position: absolute;
+    left: -28px;
+    top: 0.5em;
+    width: 15px;
+    height: 15px;
+    transform: translateY(-50%);
+    background-color: currentColor;
+    clip-path: polygon(91.7% 50%, 61.8% 38.2%, 50% 8.3%, 38.2% 38.2%, 8.3% 50%, 38.2% 61.8%, 50% 91.7%, 61.8% 61.8%);
 }
 
 .canClick {
@@ -348,6 +398,8 @@
     .mainDescription {
         flex: none;
         width: 100%;
+
+        text-align: center;
     }
 
     .lowerSection {
@@ -398,5 +450,24 @@
     .activityPreview {
         margin-left: 0;
         font-size: 20px;
+    }
+
+    .sectionTitle {
+        text-align: center;
+    }
+
+    .activities {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+
+    .hobbies {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
 }

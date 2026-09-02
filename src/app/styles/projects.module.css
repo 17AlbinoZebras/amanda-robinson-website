@@ -387,6 +387,14 @@
     zoom: 0.625;
 }
 
+/* Same cancellation as the base .shopcomp video rule above, for the
+   expanded-preview state specifically — .previewExpanded .webPreview's own
+   zoom would otherwise still apply here (a different selector, so the base
+   rule's own zoom: 1 doesn't already cover this case). */
+.previewExpanded .shopcomp video {
+    zoom: 1;
+}
+
 /* A small pill tab that sticks out from the preview's bottom edge — flat top
    (tucked under the preview's own border) and rounded bottom corners, same
    shape language as a sidebar collapse tab, just rotated 90deg (horizontal
@@ -448,6 +456,24 @@
     border-radius: 20px;
     max-width: 100%;
     /* transition: all var(--transition-length); */
+    /* Cancels .webPreview's own zoom: 0.45/0.625 (below) — .shopcomp video's
+       higher selector specificity wins that property. zoom scales the WHOLE
+       element, including a native <video>'s own controls — shrinking their
+       real rendered size along with the content, which is what made them
+       hard to actually tap/click (their hit-targets shrank too, not just
+       their appearance). zoom was also the direct cause of a real layout
+       bug: percentage width/height combined with zoom don't reliably
+       resolve against this element's actual container, and confirmed
+       directly that the video's own rendered box was coming out taller than
+       .previewMedia's box (which clips via overflow:hidden) — reading as a
+       big blank gap below the visible content, with the controls bar stuck
+       out past where the visible video content ended.
+       object-fit: cover + object-position (already set above) is the
+       correct, purpose-built way to get a "zoomed in / cropped to the
+       relevant area" look for a plain <video> instead — it scales and crops
+       the video's own VISUAL FRAME to fill this box exactly, without
+       touching the native controls' real size or hit-targets at all. */
+    zoom: 1;
 }
 
 .heatmap {
