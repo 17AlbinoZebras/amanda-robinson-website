@@ -148,25 +148,6 @@
     opacity: 1;
 }
 
-/* Receives resume.tsx's own pinch-zoom/pan transform (translate + scale) —
-   kept as a separate wrapper OUTSIDE .pdfContainer (not applied to
-   .pdfContainer itself) so the transform never fights with .pdfContainer's
-   own native vertical scroll: this element doesn't scroll at all, it just
-   gets visually transformed as one unit, and .resume's own overflow:hidden
-   (unchanged) clips whatever that transform pushes past the frame's edges.
-   touch-action: pan-y (not the default auto, and not none) is what actually
-   lets a plain single-finger swipe still scroll .pdfContainer natively at
-   scale 1 — the browser handles that gesture entirely on its own, cheaply —
-   while a two-finger pinch is NOT a pan-y gesture, so it's still delivered
-   to resume.tsx's own touchmove handler for the custom zoom math instead of
-   being swallowed by the browser's default page-zoom. */
-.pdfZoomWrapper {
-    width: 100%;
-    height: 100%;
-    touch-action: pan-y;
-    transform-origin: center center;
-}
-
 /* .pdfContainer fills .resume so resume_pdf_viewer.tsx's ref measures the
    full available width; the resume PDF is actually 2 pages, both rendered
    at full box-width now, which is almost always taller than .resume's

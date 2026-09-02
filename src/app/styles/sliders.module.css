@@ -51,15 +51,26 @@
     top: 50%;
     transform: translate(-50%, -50%);
 
-    /* 20%/10% (down from 25%/7.5%) — the icon glyph was reaching right up to
-       the edge of its own circular badge, reading as clipped by the circle's
-       border. Shrinking the icon while growing its padding keeps the badge
-       itself the same size but gives the glyph real breathing room inside
-       it. */
-    width: 20%;
-    height: 20%;
+    /* width/height stay 25% (the ORIGINAL badge size, not shrunk) — mobile's
+       own margin-left: 40%/-40% below shifts this whole badge by a fixed
+       fraction of its container, tuned by eye specifically against this 25%
+       footprint, so changing the badge's own width here would throw that
+       mobile tuning off (confirmed: an earlier attempt that also shrank
+       width to 20% made the closed-state sliver clear LESS of the icon on
+       mobile, not more, and — worse — with padding upped to 10% at that
+       smaller width, the content box computed to 20% - 10% - 10% = a
+       literal 0%-wide box, which is why the icon sometimes vanished
+       completely rather than just looking cramped: percentage padding
+       resolves against the containing block's width, same reference as this
+       element's own percentage width, and box-sizing:border-box subtracts
+       padding from that width to get the content area). 9% (up from 7.5%)
+       is a smaller, positive-content-area nudge instead — trims the glyph
+       itself for breathing room from the circle's edge without touching the
+       badge's own footprint at all, so the mobile shift needs no retuning. */
+    width: 25%;
+    height: 25%;
 
-    padding: 10%;
+    padding: 9%;
 
     border-radius: 50%;
 

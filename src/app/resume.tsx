@@ -25,29 +25,6 @@ const ResumePdfViewer = dynamic(() => import('./resume_pdf_viewer'), { ssr: fals
 // the page" modes below.
 const BUTTON_OFFSET = 56
 
-const MAX_ZOOM = 3
-
-type GestureState =
-    | { mode: 'none' }
-    | { mode: 'pinch'; startDist: number; startScale: number; startOffset: { x: number; y: number } }
-    | { mode: 'pan'; startTouch: { x: number; y: number }; startOffset: { x: number; y: number } }
-
-function touchDistance(t1: React.Touch, t2: React.Touch) {
-    return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY)
-}
-
-// Keeps panning bounded to how far the zoomed content actually overflows its
-// own frame — at scale 1 that's 0 either way (no zoom, nothing to pan), and
-// it grows with scale so a bigger zoom allows a proportionally bigger pan.
-function clampOffset(scale: number, offset: { x: number; y: number }, rect: DOMRect) {
-    const maxX = (rect.width * (scale - 1)) / 2
-    const maxY = (rect.height * (scale - 1)) / 2
-    return {
-        x: Math.min(maxX, Math.max(-maxX, offset.x)),
-        y: Math.min(maxY, Math.max(-maxY, offset.y)),
-    }
-}
-
 export default function Resume() {
     // Expanded grows .resume both wider and to its full natural (auto)
     // height, so the whole resume renders at once with no inner scroll —
@@ -133,93 +110,6 @@ export default function Resume() {
         }
     }, [])
 
-    // Pinch-to-zoom + drag-to-pan, scoped to the PDF itself (.pdfZoomWrapper
-    // below) rather than the page — .resume's own overflow:hidden clips the
-    // zoomed/panned content to its normal frame, and .resume's own
-    // width/height never change here, so the rest of the page stays exactly
-    // where it was regardless of zoom. This replaces the expand button as
-    // the mobile way to see more detail (that button is hidden on mobile —
-    // see resume.module.css), and works alongside the desktop expand toggle
-    // without conflict (nothing here reacts to mouse input at all, only
-    // touch, so desktop is unaffected).
-    const pdfWrapperRef = useRef<HTMLDivElement>(null)
-    const [zoomScale, setZoomScale] = useState(1)
-    const [zoomOffset, setZoomOffset] = useState({ x: 0, y: 0 })
-    const [isGesturing, setIsGesturing] = useState(false)
-    const gestureRef = useRef<GestureState>({ mode: 'none' })
-
-    // A single finger only ever pans (never scrolls the page underneath) once
-    // already zoomed in — at scale 1 there's nothing to pan, so a lone touch
-    // is left alone entirely and the frame's own native scroll (see
-    // .pdfContainer in resume.module.css) still handles it normally.
-    const handleTouchStart = (e: React.TouchEvent) => {
-        if (!pdfWrapperRef.current) return
-        if (e.touches.length === 2) {
-            setIsGesturing(true)
-            gestureRef.current = {
-                mode: 'pinch',
-                startDist: touchDistance(e.touches[0], e.touches[1]),
-                startScale: zoomScale,
-                startOffset: zoomOffset,
-            }
-        } else if (e.touches.length === 1 && zoomScale > 1) {
-            setIsGesturing(true)
-            gestureRef.current = {
-                mode: 'pan',
-                startTouch: { x: e.touches[0].clientX, y: e.touches[0].clientY },
-                startOffset: zoomOffset,
-            }
-        } else {
-            gestureRef.current = { mode: 'none' }
-        }
-    }
-
-    const handleTouchMove = (e: React.TouchEvent) => {
-        const g = gestureRef.current
-        if (!pdfWrapperRef.current || g.mode === 'none') return
-        const rect = pdfWrapperRef.current.getBoundingClientRect()
-        if (g.mode === 'pinch' && e.touches.length === 2) {
-            // Only claims the gesture once it's genuinely a pinch (2 touches) —
-            // never preventDefault on a plain single-finger scroll.
-            e.preventDefault()
-            const dist = touchDistance(e.touches[0], e.touches[1])
-            const newScale = Math.min(MAX_ZOOM, Math.max(1, g.startScale * (dist / g.startDist)))
-            setZoomScale(newScale)
-            setZoomOffset(clampOffset(newScale, g.startOffset, rect))
-        } else if (g.mode === 'pan' && e.touches.length === 1) {
-            e.preventDefault()
-            const dx = e.touches[0].clientX - g.startTouch.x
-            const dy = e.touches[0].clientY - g.startTouch.y
-            setZoomOffset(clampOffset(zoomScale, { x: g.startOffset.x + dx, y: g.startOffset.y + dy }, rect))
-        }
-    }
-
-    const handleTouchEnd = (e: React.TouchEvent) => {
-        if (e.touches.length === 2) {
-            // Still mid-pinch (e.g. one of 3+ touches lifted) — nothing to do.
-            return
-        }
-        if (e.touches.length === 1 && gestureRef.current.mode === 'pinch') {
-            // Pinch handed off to a single remaining finger — keep going as a
-            // pan instead of dropping the gesture entirely.
-            gestureRef.current = {
-                mode: 'pan',
-                startTouch: { x: e.touches[0].clientX, y: e.touches[0].clientY },
-                startOffset: zoomOffset,
-            }
-            return
-        }
-        gestureRef.current = { mode: 'none' }
-        setIsGesturing(false)
-        // Snaps fully back to 1 rather than leaving it sitting at, say, 1.01
-        // from an imprecise pinch release — 1 reads as "not zoomed" and lets
-        // the frame's native scroll take back over cleanly.
-        if (zoomScale <= 1.02) {
-            setZoomScale(1)
-            setZoomOffset({ x: 0, y: 0 })
-        }
-    }
-
     return (
         <div className={styles.page}>
             {/* maskSize is a fixed "Wpx Hpx" (not 'cover', and not just a
@@ -245,20 +135,7 @@ export default function Resume() {
             </header>
             <div ref={resumeRef} className={`${styles.resume} ${expanded ? styles.resumeExpanded : ''}`}>
                 <a className={styles.downloadButton} href='https://docs.google.com/document/d/1-O_EsqOcbVnY0tlRIP4p0EGaKX2AzlZMeZXaj3E4uS4/export?format=pdf' aria-label="Download resume as PDF">< FontAwesomeIcon icon={fas.faDownload} aria-hidden="true" /></a>
-                <div
-                    ref={pdfWrapperRef}
-                    className={styles.pdfZoomWrapper}
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                    onTouchCancel={handleTouchEnd}
-                    style={{
-                        transform: `translate(${zoomOffset.x}px, ${zoomOffset.y}px) scale(${zoomScale})`,
-                        transition: isGesturing ? 'none' : 'transform 200ms ease',
-                    }}
-                >
-                    <ResumePdfViewer/>
-                </div>
+                <ResumePdfViewer/>
             </div>
             <button
                 className={styles.expandButton}

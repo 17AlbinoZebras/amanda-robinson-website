@@ -54,6 +54,22 @@
     flex-direction: column;
     align-items: center;
     gap: 6.5vh;
+    /* Reserves real, guaranteed space below .lowerSection (the last visible
+       block) before this content box's own bottom edge — this element is
+       centered as a whole within .overview via top:50%/translate(-50%,-50%),
+       so simply growing .overview's own height doesn't reliably put visible
+       breathing room specifically UNDER the boxes: the extra space just
+       splits evenly above and below the centered block, which — combined
+       with .overview's own extra 36px existing for an unrelated reason (see
+       its own comment) — only ever worked out to ~18px below, barely
+       perceptible as a real gap. Padding here instead adds space that
+       travels WITH the content block itself, unconditionally, regardless of
+       how the outer centering math splits anything else. Counted in
+       useScaleToFit's own scrollHeight measurement (home_page.tsx), so a
+       short viewport that needs to shrink this whole block scales the gap
+       down proportionally along with everything else, rather than it
+       eating into the fit budget unaccounted for. */
+    padding-bottom: 24px;
     /* Shrinks the whole section as one unit so it always fits within
        .overview's 100vh instead of needing to scroll — home_page.tsx's
        useScaleToFit measures this element's natural (unscaled) height via
