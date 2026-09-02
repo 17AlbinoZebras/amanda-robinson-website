@@ -325,16 +325,21 @@
         width: 100%;
     }
 
+    .lowerSection {
+        margin-top: 12px;
+    }
+
     .relevantCourses {
         width: 90vw;
         gap: 32px;
+        margin: 22px;
     }
 
     .relevantCourses .row {
         /* Fixed 200x100 pills with no wrap meant 4 pills needed ~950px —
            wildly over any phone width. */
         flex-wrap: wrap;
-        gap: 20px;
+        gap: 28px;
     }
 
     .course {
@@ -376,6 +381,6 @@
     }
 
     .relevantCourses .row {
-        gap: 12px;
+        gap: 16px;
     }
 }

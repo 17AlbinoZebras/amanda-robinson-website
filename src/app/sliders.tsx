@@ -200,7 +200,7 @@ function useHoverCapable() {
     return hoverCapable
 }
 
-function Slider(width: string, height: string, rect: React.ReactNode, orb: React.ReactNode, orbSide: "left" | "right", orbStrokeWidth: SizeValue, { labelText, labelStyle }: LabelProps, sliderClassName?: string, sliderStyle?: CSSProperties, href?: string, icon?: JSX.Element, isOpen?: boolean, onOpenChange?: (open: boolean) => void, sliderRef?: React.Ref<HTMLAnchorElement>) {
+function Slider(width: string, height: string, rect: React.ReactNode, orb: React.ReactNode, orbSide: "left" | "right", orbStrokeWidth: SizeValue, { labelText, labelStyle }: LabelProps, sliderClassName?: string, sliderStyle?: CSSProperties, href?: string, icon?: JSX.Element, isOpen?: boolean, onOpenChange?: (open: boolean) => void, sliderRef?: React.Ref<HTMLAnchorElement>, dockSide?: "left" | "right") {
     const hoverCapable = useHoverCapable()
 
     // Custom properties don't get React's automatic px-suffixing for numbers
@@ -261,6 +261,52 @@ function Slider(width: string, height: string, rect: React.ReactNode, orb: React
         }
     }
 
+    // Lets a touch user drag/swipe a closed slider open instead of only being
+    // able to tap it — matches the "slider" name more literally, and reads
+    // as a more natural touch gesture than a tap for something that visually
+    // slides. This is pure gesture DETECTION, not a live finger-following
+    // drag: rather than continuously updating a transform to track the
+    // touch position (which would mean reimplementing the open/closed
+    // transform by hand, fighting the existing CSS transition and the
+    // hover/.sliderOpen states it already has to agree with), a swipe past a
+    // real minimum distance in the OPENING direction just calls the same
+    // onOpenChange(true) a first tap already does — the existing CSS
+    // transition still handles the actual animation, so this only ever adds
+    // a new way to TRIGGER that same state change, not a second animation
+    // system to keep in sync with the first.
+    const touchStartRef = useRef<{ x: number; y: number } | null>(null)
+    const SWIPE_OPEN_THRESHOLD = 24
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        touchStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+    }
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        // Already open, or no in-progress touch to measure from (e.g. a
+        // second finger joining a gesture already handled) — nothing to do.
+        if (isOpen || !touchStartRef.current || !dockSide) return
+        const dx = e.touches[0].clientX - touchStartRef.current.x
+        const dy = e.touches[0].clientY - touchStartRef.current.y
+        // Requires the drag to be BOTH past a real minimum distance (so
+        // ordinary tap jitter never triggers this) AND more horizontal than
+        // vertical (so a vertical page-scroll that happens to start on the
+        // slider's own small visible sliver doesn't get hijacked into
+        // opening it instead of scrolling).
+        if (Math.abs(dx) < SWIPE_OPEN_THRESHOLD || Math.abs(dx) < Math.abs(dy)) return
+        // A left-docked slider (off-screen to the left) opens by dragging
+        // RIGHTWARD, toward the screen's interior; a right-docked one opens
+        // dragging LEFTWARD — the mirror image.
+        const isOpeningDrag = dockSide === 'left' ? dx > 0 : dx < 0
+        if (!isOpeningDrag) return
+        e.preventDefault()
+        touchStartRef.current = null
+        onOpenChange?.(true)
+    }
+
+    const handleTouchEnd = () => {
+        touchStartRef.current = null
+    }
+
     // Mirrors the hover handlers below so keyboard-tab users get the same
     // slide-open reveal a mouse hover gives — without this, Tab landing on a
     // closed slider left it visually off-screen with no way to see what it
@@ -301,6 +347,9 @@ function Slider(width: string, height: string, rect: React.ReactNode, orb: React
         onFocus: handleFocus,
         onBlur: () => onOpenChange?.(false),
         onClick: handleClick,
+        onTouchStart: handleTouchStart,
+        onTouchMove: handleTouchMove,
+        onTouchEnd: handleTouchEnd,
     }
 
     // The whole slider (rect, orb, and label together) is the click target,
@@ -391,7 +440,7 @@ export function RedSlider({width, height, className, style, strokeWidth, sliderC
         </div>
     )
 
-    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: isActive ? "Home" : "Projects", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, icon, isOpen, setIsOpen, sliderRef)
+    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: isActive ? "Home" : "Projects", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, icon, isOpen, setIsOpen, sliderRef, "left")
 }
 
 export function YellowSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle, pathname}: SliderProps) {
@@ -433,7 +482,7 @@ export function YellowSlider({width, height, className, style, strokeWidth, slid
         </div>
     )
 
-    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: isActive ? "Home" : "About Me", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, icon, isOpen, setIsOpen, sliderRef)
+    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: isActive ? "Home" : "About Me", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, icon, isOpen, setIsOpen, sliderRef, "right")
 }
 
 export function GreenSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle, pathname}: SliderProps) {
@@ -476,7 +525,7 @@ export function GreenSlider({width, height, className, style, strokeWidth, slide
         </div>
     )
 
-    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: isActive ? "Home" : "Experience", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, icon, isOpen, setIsOpen, sliderRef)
+    return Slider(width, height, rect, orb, "right", strokeSize, {labelText: isActive ? "Home" : "Experience", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, icon, isOpen, setIsOpen, sliderRef, "left")
 }
 
 export function BlueSlider({width, height, className, style, strokeWidth, sliderClassName, sliderStyle, pathname}: SliderProps) {
@@ -518,7 +567,7 @@ export function BlueSlider({width, height, className, style, strokeWidth, slider
         </div>
     )
 
-    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: isActive ? "Home" : "Education", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, icon, isOpen, setIsOpen, sliderRef)
+    return Slider(width, height, rect, orb, "left", strokeSize, {labelText: isActive ? "Home" : "Education", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, icon, isOpen, setIsOpen, sliderRef, "right")
 }
 
 

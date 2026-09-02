@@ -373,6 +373,10 @@
 }
 
 @media (max-width: 700px) {
+    .page {
+        padding-bottom: 0px;
+    }
+
     .heading {
         font-size: 38px;
     }
@@ -406,7 +410,7 @@
         flex-direction: column;
         height: auto;
         width: 88vw;
-        gap: 24px;
+        gap: 32px;
     }
 
     .activities,
@@ -421,6 +425,7 @@
            of the desktop 75% (of .mainContent, itself already narrower on
            mobile). */
         width: 90%;
+        margin-top: -24px;
     }
 
     .hobbyPreview {
