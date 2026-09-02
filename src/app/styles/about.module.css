@@ -62,7 +62,9 @@
     
     background-color: #FFC95C;
     color: var(--main-blue);
-    font-size: 28px;
+    /* 26px (down from 28px) — matches the home page overview section's own
+       body text scale (.bodyText in home_page.module.css). */
+    font-size: 26px;
     font-weight: 450;
 
     padding: 16px;
@@ -207,6 +209,7 @@
     color: var(--main-blue);
     text-align: center;
     font-weight: 500;
+    font-size: 22px;
 
     margin-top: 8px;
 }
@@ -232,7 +235,9 @@
     height: 37vh;
     width: 67.5vw;
 
-    font-size: 27px;
+    /* 26px (down from 27px) — matches the home page overview section's own
+       body text scale, same reasoning as .upperSection above. */
+    font-size: 26px;
 
     margin-bottom: 32px;
 }

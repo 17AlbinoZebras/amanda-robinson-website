@@ -173,7 +173,16 @@ export default function About() {
 
     return (
         <div className={styles.page}>
-            <TintedVector src="/masks/Yellow-Memphis.svg" color='#FBDDA1' width='100vw' height='100vh' repeat='y' maskSize='cover' className={styles.aboutBackground}/>
+            {/* maskSize was 'cover' with repeat='y' — 'cover' already fills
+                the box with a single scaled-up instance, leaving no room for
+                repeat='y' to ever actually kick in. Yellow-Memphis.svg
+                (1494x750, ~2:1) needed a big scale-up to cover this box's
+                usual (shorter, relatively wider) aspect ratio, reading as too
+                zoomed in. An explicit, smaller "Wpx Hpx" tile (same aspect
+                ratio) lets repeat (now both axes, not just 'y' — a single
+                axis alone would leave the sides bare) actually tile it,
+                still with zero gaps, just visibly smaller/calmer. */}
+            <TintedVector src="/masks/Yellow-Memphis.svg" color='#FBDDA1' width='100vw' height='100vh' repeat maskSize="996px 500px" className={styles.aboutBackground}/>
             <header>
                 <h1 className={styles.heading}>About Me</h1>
             </header>

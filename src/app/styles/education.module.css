@@ -164,7 +164,20 @@
 .courseDescription {
     width: 90%;
     overflow: hidden;
-    transition: height 1s;
+    /* -18px margin (half of .relevantCourses' own 36px gap) cancels half of
+       each of the two 36px gaps this sits between while collapsed (height:0
+       doesn't remove ITS OWN gap contribution on either side, so a closed
+       description used to leave a full extra 36px-ish gap visible between
+       the 2nd and 3rd rows, with no course open at all). margin:0 once open
+       (.courseDescriptionOpen below) restores the normal single gap on both
+       sides. Same technique as about.module.css's .preview/.previewOpen,
+       for the exact same reason. */
+    margin: -18px 0;
+    transition: height 1s, margin 1s;
+}
+
+.courseDescriptionOpen {
+    margin: 0;
 }
 
 /* While switching directly between two open courses, the box's height needs
@@ -299,12 +312,16 @@
     }
 
     .overview {
-        flex-direction: column;
+        flex-direction: row;
         width: 90vw;
         padding: 24px 20px;
     }
 
     .column {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
         width: 100%;
     }
 

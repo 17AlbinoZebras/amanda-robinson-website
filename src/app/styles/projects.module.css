@@ -60,7 +60,11 @@
     position: relative;
     display: flex;
     flex-direction: row;
-    height: 81.5vh;
+    /* min-height (not a hard height) — 81.5vh is the usual floor, but a long
+       description (see .description below) can need more than that fits in;
+       letting the row grow past it is what lets the whole box "expand" for
+       longer text instead of clipping it. */
+    min-height: 81.5vh;
     width: 75vw;
 
     --transition-length: 1s;
@@ -69,7 +73,14 @@
 .project {
     position: relative;
     border-radius: 32px;
-    height: 100%;
+    /* height: 100% (a % of .projects) removed — .description below now
+       reports its own real, JS-measured content height instead of a fixed
+       fraction, so nothing here needs a definite height to divide up
+       anymore. Leaving this unset lets flexbox's default align-items:stretch
+       size every .project (open or closed) to match the row's own natural
+       height instead, which itself now grows to fit whichever project's
+       content (description included) actually needs the most room — see
+       .projects' own min-height comment. */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -121,7 +132,10 @@
     margin-top: 4px;
     gap: 22px;
     align-items: center;
-    height: 95%;
+    /* height: 95% (of .project) removed along with .project's own height —
+       see its comment. auto here just sizes to the real content (preview +
+       description) instead of a fraction of a number that no longer exists. */
+    height: auto;
     transition: all var(--transition-length) 0.5s;
 }
 
@@ -190,8 +204,17 @@
     width: 92.5%;
     border-radius: 20px;
     padding: 12px;
-    height: 32%;
-
+    /* height was a fixed 32% (of .projectContent) — capping every
+       description to the same fraction regardless of how much text it
+       actually had, which clipped the longer ones. projects.tsx now
+       measures each description's real content height with JS and sets it
+       here as an explicit height style (same technique as about.tsx's
+       .preview / education.tsx's .courseDescription, both already in this
+       codebase, for the same reason: height:auto can't be transitioned, but
+       a real measured px number can — needed so the previewExpanded
+       collapse-to-0 toggle below still animates smoothly). Only applied on
+       desktop — mobile's own height:auto + min-height rule further down
+       already has no clipping problem of its own, so it's left alone. */
     background-color: #FDC5C4;
     /* color: #6E71B0; */
     color: var(--main-blue);
@@ -345,11 +368,11 @@
    .webPreview (100%/100% of .preview) scales the embedded video/iframe up
    proportionally with it, no separate adjustment needed there. */
 .previewExpanded .description {
-    /* height: 0 alone is enough to fully collapse this, padding included —
-       box-sizing: border-box is set globally (globals.css's "* { ... }"
-       rule), so height always caps the box's total rendered size regardless
-       of padding. */
-    height: 0;
+    /* height is no longer set here — projects.tsx's own inline style now
+       drives it (0px while expanded, the real measured content height
+       otherwise), since an inline style always wins over a class rule
+       regardless of specificity and this needs to compose with that same
+       per-project measured value, not just a flat 0. */
     opacity: 0;
     pointer-events: none;
 }
@@ -561,25 +584,33 @@
 
     .openLiveDemoButton {
         position: absolute;
-        bottom: 12px;
-        left: 50%;
-        transform: translateX(-50%);
+        /* Bottom-right corner (matching .interactiveHint's own desktop
+           position, same green) instead of centered-bottom — a full-width
+           centered bar sat right across the middle of the screenshot; a
+           corner pill blocks much less of it. */
+        bottom: 10px;
+        right: 10px;
 
-        padding: 10px 20px;
+        padding: 7px 14px;
         border-radius: 999px;
 
-        background-color: var(--main-blue);
+        /* Matches .interactiveHint's "Try it live!" badge color (desktop's
+           equivalent hint) instead of main-blue, so both read as the same
+           "this is interactive" affordance. */
+        background-color: #587B6D;
         color: var(--main-light);
         font-family: var(--font-afacad-flux);
-        font-size: 14px;
+        font-size: 12px;
         font-weight: 600;
         text-decoration: none;
+        opacity: 0.92;
 
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        transition: filter 200ms;
+        transition: filter 200ms, opacity 200ms;
     }
 
     .openLiveDemoButton:hover {
         filter: brightness(1.1);
+        opacity: 1;
     }
 }

@@ -9,7 +9,12 @@ export default function Experience() {
     const sfptiRoleInfo = <h3 className={styles.roleInfo}>{sfptiRoleTitle} | {sfptiDateRange}</h3>
     return (
         <div className={styles.page}>
-            <TintedVector src="/masks/Green-Memphis.svg" color='#79A090' width='100vw' height='100vh' maskSize='cover' className={styles.experienceBackground}/>
+            {/* See home_page.tsx's OverviewSection for the same fix on the
+                same source SVG — 'cover' was scaling Green-Memphis.svg up a
+                lot to fill this usually-wide box, reading as too zoomed in.
+                An explicit, smaller "Wpx Hpx" tile + repeat tiles it instead,
+                still with zero gaps, just visibly smaller/calmer. */}
+            <TintedVector src="/masks/Green-Memphis.svg" color='#79A090' width='100vw' height='100vh' maskSize="1004px 500px" repeat className={styles.experienceBackground}/>
             <header>
                 <h1 className={styles.heading}>Work Experience</h1>
             </header>

@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import styles from './styles/projects.module.css'
 import { TintedVector } from './mask_functions'
@@ -80,6 +80,80 @@ export default function Projects() {
     // project was left in.
     const [previewExpanded, setPreviewExpanded] = useState(false)
     useEffect(() => setPreviewExpanded(false), [activeProject])
+
+    // Each description's real content height, measured with JS — same
+    // technique as about.tsx's .preview / education.tsx's .courseDescription,
+    // both already in this codebase for the same reason: .description used
+    // to be a fixed 32% of .projectContent, which clipped whichever
+    // description didn't fit that one-size-fits-all fraction.
+    //
+    // Only the ACTIVE project is measured (not all three, despite all three
+    // staying mounted) — a closed project's .project is a thin flex:1
+    // sliver, not the wide flex:10 an open one gets, so its .description
+    // would measure at that sliver's own narrow width. Text wraps into many
+    // more lines at that width, producing a scrollHeight wildly taller than
+    // what the same text actually needs once that project opens at full
+    // width — confirmed directly: measuring all three up front on mount (the
+    // first version of this) left an opened project's box sized for its
+    // OWN closed-sliver-width wrapping, showing a huge empty gap below the
+    // real (much shorter, correctly-wrapped) text. Re-measuring specifically
+    // when a project BECOMES active, once it's actually rendered at its
+    // real open width, avoids that entirely — a still-closed project's own
+    // stale/wrong value never matters, since it stays invisible either way
+    // (clipped by its own closed ancestor, .projectClosed .projectContent's
+    // height:0 + overflow:hidden).
+    // Refs point at the inner <p> (the actual text), not the outer padded
+    // .description div — measuring the outer div itself is self-referential
+    // once it has an explicit height applied (which it always does, from the
+    // very first render on): scrollHeight on a box that's already tall
+    // enough to contain its content with room to spare just reports that
+    // box's OWN current height back, not the content's true minimum size, so
+    // a first wrong (inflated) measurement could never shrink back down on a
+    // later remeasure — confirmed directly, this was a second real bug on
+    // top of the narrow-sliver one above. The <p> itself never gets an
+    // explicit height set (only the outer div does), so its own scrollHeight
+    // always genuinely reflects its current content/width, with no such
+    // feedback loop.
+    const descriptionTextRefs = {
+        intervle: useRef<HTMLParagraphElement>(null),
+        shopcomp: useRef<HTMLParagraphElement>(null),
+        heatmap: useRef<HTMLParagraphElement>(null),
+    }
+    const [descriptionHeights, setDescriptionHeights] = useState({ intervle: 0, shopcomp: 0, heatmap: 0 })
+    useLayoutEffect(() => {
+        const ref = (descriptionTextRefs as Record<string, React.RefObject<HTMLParagraphElement | null>>)[activeProject]
+        if (!ref?.current) return
+        const el = ref.current
+        // .description's own 12px padding (all sides) isn't part of the <p>'s
+        // own scrollHeight, so it's added back here — same technique as
+        // education.tsx's own incomingRef/innerPadding measurement, for the
+        // same reason.
+        const measure = () => setDescriptionHeights((prev) => ({ ...prev, [activeProject]: el.scrollHeight + 24 }))
+        measure()
+        window.addEventListener('resize', measure)
+        // .project's own width animates over --transition-length (1s) when a
+        // project opens (its flex:1 sliver growing to flex:10) — .description
+        // reflows continuously throughout that, same as any text box getting
+        // wider, so a single measure() right when activeProject changes can
+        // still catch it mid-transition, at some in-between width. A
+        // ResizeObserver instead fires on every real size change and settle-
+        // debounces (same 150ms pattern resume_pdf_viewer.tsx already uses
+        // for its own width-driven remeasure, for the same reason: this
+        // element's transitioning continuously for close to a second, and
+        // only the FINAL settled width's measurement is the one that should
+        // actually stick).
+        let timeoutId: number
+        const observer = new ResizeObserver(() => {
+            clearTimeout(timeoutId)
+            timeoutId = window.setTimeout(measure, 150)
+        })
+        observer.observe(el)
+        return () => {
+            clearTimeout(timeoutId)
+            observer.disconnect()
+            window.removeEventListener('resize', measure)
+        }
+    }, [activeProject])
 
     const toggleExpandPreview = (e: React.MouseEvent) => {
         // Stops the click from also bubbling up to .project's own onClick —
@@ -260,7 +334,7 @@ export default function Projects() {
                             </div>
                             <button type="button" className={styles.expandToggle} onClick={toggleExpandPreview} aria-label={previewExpanded ? 'Show description' : 'Expand preview'}/>
                         </div>
-                        <div className={styles.description}><p>My first real web design project back in 2023, <a href='https://intervle.fun/' target="_blank" rel="noopener noreferrer">Intervle</a> is a responsive web game inspired by everybody&#39;s favorite word puzzle, Wordle, but with a lexicographic twist. Results indicate alphabetical distance from the target word in either direction for each letter position.<br/>Technologies: HTML, CSS, JavaScript (Bootstrap)</p></div>
+                        <div className={styles.description} style={isMobile ? undefined : {height: previewExpanded ? '0px' : `${descriptionHeights.intervle}px`}}><p ref={descriptionTextRefs.intervle}>My first real web design project back in 2023, <a href='https://intervle.fun/' target="_blank" rel="noopener noreferrer">Intervle</a> is a responsive web game inspired by everybody&#39;s favorite word puzzle, Wordle, but with a lexicographic twist. Results indicate alphabetical distance from the target word in either direction for each letter position.<br/>Technologies: HTML, CSS, JavaScript (Bootstrap)</p></div>
                     </div>
                 </div>
                 <div
@@ -304,7 +378,7 @@ export default function Projects() {
                             </div>
                             <button type="button" className={styles.expandToggle} onClick={toggleExpandPreview} aria-label={previewExpanded ? 'Show description' : 'Expand preview'}/>
                         </div>
-                        <div className={styles.description}><p>Shopcomp is a full-stack grocery comparison web app with an AWS backend, enabling users to upload/manage receipts, maintain shopping lists, and compute best-price options from historical purchase data using a MySQL relational schema. In my team, I was responsible for the shopping list and calculation functionality shown above for our Software Engineering final project. Additionally, I designed and refactored database schema and developed complex queries.<br/>Technologies: Next.js, React, TypeScript, AWS Amplify/Cognito, AWS CDK, MySQL</p></div>
+                        <div className={styles.description} style={isMobile ? undefined : {height: previewExpanded ? '0px' : `${descriptionHeights.shopcomp}px`}}><p ref={descriptionTextRefs.shopcomp}>Shopcomp is a full-stack grocery comparison web app with an AWS backend, enabling users to upload/manage receipts, maintain shopping lists, and compute best-price options from historical purchase data using a MySQL relational schema. In my team, I was responsible for the shopping list and calculation functionality shown above for our Software Engineering final project. Additionally, I designed and refactored database schema and developed complex queries.<br/>Technologies: Next.js, React, TypeScript, AWS Amplify/Cognito, AWS CDK, MySQL</p></div>
                     </div>
                 </div>
                 <div
@@ -356,7 +430,7 @@ export default function Projects() {
                             </div>
                             <button type="button" className={styles.expandToggle} onClick={toggleExpandPreview} aria-label={previewExpanded ? 'Show description' : 'Expand preview'}/>
                         </div>
-                        <div className={styles.description}><p>A <a href='https://patient-heatmap-public.vercel.app/' target="_blank" rel="noopener noreferrer">dynamic heatmap</a> representation of hospital outreach statistics based on a variety of data. This application was used by the South Florida Proton Therapy Institute to identify areas to prioritize outreach. This version is fully generated data for sample purposes.<br/>Technologies: Typescript, React, Next.js, Leaflet, GeoJSON, Google Places API</p></div>
+                        <div className={styles.description} style={isMobile ? undefined : {height: previewExpanded ? '0px' : `${descriptionHeights.heatmap}px`}}><p ref={descriptionTextRefs.heatmap}>A <a href='https://patient-heatmap-public.vercel.app/' target="_blank" rel="noopener noreferrer">dynamic heatmap</a> representation of hospital outreach statistics based on a variety of data. This application was used by the South Florida Proton Therapy Institute to identify areas to prioritize outreach. This version is fully generated data for sample purposes.<br/>Technologies: Typescript, React, Next.js, Leaflet, GeoJSON, Google Places API</p></div>
                     </div>
                 </div>
             </div>

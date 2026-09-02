@@ -51,11 +51,16 @@
     top: 50%;
     transform: translate(-50%, -50%);
 
-    width: 25%;
-    height: 25%;
+    /* 20%/10% (down from 25%/7.5%) — the icon glyph was reaching right up to
+       the edge of its own circular badge, reading as clipped by the circle's
+       border. Shrinking the icon while growing its padding keeps the badge
+       itself the same size but gives the glyph real breathing room inside
+       it. */
+    width: 20%;
+    height: 20%;
 
-    padding: 7.5%;
-    
+    padding: 10%;
+
     border-radius: 50%;
 
     transition: margin-left 550ms, transform 550ms;

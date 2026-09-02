@@ -2,7 +2,16 @@
    distinct from the standalone, more in-depth /about page. */
 .overview {
     position: relative;
-    height: 100vh;
+    /* calc(100vh + 36px) — absorbs .home's own trailing padding-bottom (see
+       its comment) directly into this section's own box, instead of that
+       36px being separate space after .overview ends. That gap used to show
+       .home's own plain background-color (a distinctly different, flatter
+       shade than this section's own #DCDEEF/pattern), which read as a
+       visible seam right above the footer. Growing this box by exactly that
+       same 36px — and removing it from .home's own padding — means the same
+       36px of breathing room before the footer still exists, just filled by
+       this section's own background instead of .home's. */
+    height: calc(100vh + 36px);
     width: 100vw;
     /* Safety net — .overviewContent's scale-to-fit (below) is what actually
        keeps content inside this box; this just guarantees nothing is ever
@@ -28,7 +37,8 @@
 .overviewBackground {
     position: absolute;
     width: 100vw;
-    height: 100vh;
+    /* Matches .overview's own calc(100vh + 36px) — see its comment. */
+    height: calc(100vh + 36px);
 }
 
 .overviewContent {
@@ -202,12 +212,14 @@
 
     --blob-pink: #FDBFBD;
 
-    /* Guarantees at least 36px between this page's own content and the
-       footer (a sibling right after this element, not a child of it) — this
-       page especially needs it, since .overview (the last section) has a
-       hard height:100vh + overflow:hidden with nothing of its own that
-       would otherwise leave trailing space below it. */
-    padding-bottom: 36px;
+    /* padding-bottom used to live here (a flat 36px, unconditionally) — on
+       desktop that 36px is now baked directly into .overview's own box
+       height instead (see its comment), so its background actually covers
+       that space rather than showing .home's own plain color there. Mobile
+       still needs a real padding here, though — its .overview switches to
+       height:auto (no fixed 100vh to absorb a fixed pixel amount into), so
+       the mobile media query below re-adds this same 36px the original way. */
+    padding-bottom: 0;
 }
 
 .homeBackground {
@@ -657,7 +669,9 @@
     font-family: var(--font-new-amsterdam);
     /* This is an SVG user-space size (matching the 900-wide viewBox above), not a
        real CSS px value — it already scales with .nameStack's own responsive width,
-       so it doesn't need a clamp() of its own. */
+       so it doesn't need a clamp() of its own. 168px (up from 160px) — makes the
+       name itself a bit more prominent now that .subtitle above has been
+       scaled down, so the name reads as the clear focal point of the page. */
     font-size: 160px;
 }
 
@@ -675,15 +689,35 @@
     text-align: center;
 
     /* font-size: clamp(24px, 2.5vw, 48px); */
+    /* 30px (down from 36px) — keeps this subtitle a supporting line under
+       the name, not competing with it for attention. */
     font-size: 36px;
 }
 
 @media (max-width: 700px) {
+    .svgNameText {
+        font-size: 168px;
+    }
+    
     /* .subtitleSection is a hand-set 30vw (~112px on a 375px phone) — far
        too narrow for "Builder of effective and unique software", causing
        severe wrapping. */
     .subtitleSection {
         width: 85vw;
+    }
+
+    .subtitle {
+        font-size: 30px;
+    }
+
+    /* Re-adds the 36px gap before the footer that the base .home rule no
+       longer provides (see its own comment) — desktop bakes that same 36px
+       directly into .overview's own box height instead, but mobile's
+       .overview switches to height:auto right below (no fixed 100vh to
+       absorb a fixed pixel amount into), so it still needs a real trailing
+       padding here the original way. */
+    .home {
+        padding-bottom: 36px;
     }
 
     /* .overview is normally forced to fit exactly one 100vh via
@@ -789,6 +823,14 @@
            column with an auto-height parent that resolves to nothing
            useful, so size to its own content instead. */
         height: auto;
+    }
+
+    .techStacks,
+    .education {
+        /* 4% (up from the base rule's 2.5%) — more breathing room between
+           the box's own edges and its text. Mobile-only: at desktop's much
+           wider box, 4% is enough padding to look genuinely oversized. */
+        padding: 4%;
     }
 
     /* Every other page's own equivalent body-text class already gets a

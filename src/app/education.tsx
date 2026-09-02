@@ -12,6 +12,21 @@ interface course {
     description: string;
 }
 
+// Matches the site's one existing responsive breakpoint (mirrors
+// projects.tsx's own useIsMobile). The alternating 1/2 row layout below is
+// mobile-only — desktop reverts to the original flat 4-then-3 split.
+function useIsMobile() {
+    const [isMobile, setIsMobile] = useState(false)
+    useEffect(() => {
+        const mql = window.matchMedia('(max-width: 700px)')
+        setIsMobile(mql.matches)
+        const handleChange = (e: MediaQueryListEvent) => setIsMobile(e.matches)
+        mql.addEventListener('change', handleChange)
+        return () => mql.removeEventListener('change', handleChange)
+    }, [])
+    return isMobile
+}
+
 const classes: course[] = [
         {title: "Algorithms", code: "CS2223", url: "https://www.wpi.edu/academics/calendar-courses/course-descriptions/3776/computer-science#CS-2223", description: "Building on a fundamental knowledge of data structures, data abstraction techniques, and mathematical tools, a number of examples of algorithm design and analysis worst case and average case will be developed. Topics include greedy algorithms, divide-and-conquer, dynamic programming, heuristics, and probabilistic algorithms. Problems will be drawn from areas such as sorting, graph theory, and string processing. The influence of the computational model on algorithm design will be discussed. Students will be expected to perform analysis on a variety of algorithms."},
         {title: "Software Engineering", code: "CS3733", url: "https://www.wpi.edu/academics/calendar-courses/course-descriptions/3776/computer-science#CS-3733", description: "This course introduces the fundamental principles of software engineering. Modern software development techniques and life cycles are emphasized. Topics include requirements analysis and specification, analysis and design, architecture, implementation, testing and quality, configuration management, and project management. Students will be expected to complete a project that employs techniques from the topics studied."},
@@ -23,6 +38,7 @@ const classes: course[] = [
     ]
 
 export default function Education() {
+    const isMobile = useIsMobile()
     const [hoveredCourseCode, setHoveredCourseCode] = useState<string | null>(null);
 
     const [activeCourse, setActiveCourse] = useState<course | null>(null)
@@ -79,7 +95,11 @@ export default function Education() {
     // previously open, since the box sits between the two rows and this way
     // the motion always matches which side of it you clicked on.
     const [slideDirection, setSlideDirection] = useState<'up' | 'down'>('up')
-    const courseRow = (c: course) => (classes.findIndex((x) => x.code === c.code) < 4 ? 0 : 1)
+    // Split point differs by layout: mobile's alternating 1/2 rows put the
+    // description after the first 3 courses (row of 1 + row of 2); desktop's
+    // original flat split puts it after 4. See the JSX below for the actual
+    // row grouping either way.
+    const courseRow = (c: course) => (classes.findIndex((x) => x.code === c.code) < (isMobile ? 3 : 4) ? 0 : 1)
     // At the end of a slide, the outgoing element's slide-out class comes off
     // in the same instant its text updates to the new course — since it was
     // sitting off-screen, removing that class would normally itself
@@ -245,6 +265,38 @@ export default function Education() {
         }
     }, [incomingCourse])
 
+    // Renders one row of course pills — shared between the mobile alternating
+    // 1/2 grouping and desktop's original flat 4-then-3 grouping below, so
+    // the actual pill markup/handlers only live in one place.
+    const renderRow = (row: course[], key: React.Key) => (
+        <div className={styles.row} key={key}>
+            {row.map((course) => (
+                <div
+                    key={course.code}
+                    className={styles.course}
+                    onMouseEnter={() => setHoveredCourseCode(course.code)}
+                    onMouseLeave={() => setHoveredCourseCode(null)}
+                    onFocus={(e) => e.target === e.currentTarget && setHoveredCourseCode(course.code)}
+                    onBlur={(e) => e.target === e.currentTarget && setHoveredCourseCode(null)}
+                    onClick={() => changeActiveCourse(course)}
+                    onKeyDown={handleCourseKeyDown(course)}
+                    role="button"
+                    tabIndex={0}
+                    aria-expanded={activeCourse === course}
+                    aria-label={course.title}
+                >
+                    <div className={`${styles.courseTitle} ${activeCourse === course ? styles.activeCourse : ''}`}>{hoveredCourseCode === course.code ? course.code : course.title}</div>
+                </div>
+            ))}
+        </div>
+    )
+
+    // Mobile: alternating rows of 1 and 2 courses (1, 2, [description], 1, 2, 1
+    // — 7 total), description between the 2nd and 3rd rows, per request.
+    // Desktop: the original flat 4-then-3 split.
+    const beforeDescriptionRows = isMobile ? [[classes[0]], [classes[1], classes[2]]] : [classes.slice(0, 4)]
+    const afterDescriptionRows = isMobile ? [[classes[3]], [classes[4], classes[5]], [classes[6]]] : [classes.slice(4)]
+
     return (
         <div className={styles.page}>
             <TintedVector src="/masks/Blue-Squiggles.svg" color='#61659B' width='100vw' height='100vh' repeat="y" maskSize='cover' className={styles.educationBackground}/>
@@ -254,8 +306,8 @@ export default function Education() {
             <div className={styles.upperSection}>
                 <div className={styles.overview}>
                     <div className={styles.column}>
-                        <b>Worcester Polytechnic Institute</b>
-                        <p>Expected Graduation: May 2028</p>
+                        <b style={{textAlign: 'center'}}>Worcester Polytechnic Institute</b>
+                        <p style={{textAlign: 'center'}}>Expected Graduation: May 2028</p>
                     </div>
                     <div className={styles.column}>
                         <p>B.S. Computer Science</p>
@@ -266,26 +318,7 @@ export default function Education() {
             <div className={styles.lowerSection}>
                 <h2 className={styles.subHeading}>Relevant Courses</h2>
                 <div className={styles.relevantCourses}>
-                    <div className={styles.row}>
-                        {classes.slice(0, 4).map((course) => (
-                            <div
-                                key={course.code}
-                                className={styles.course}
-                                onMouseEnter={() => setHoveredCourseCode(course.code)}
-                                onMouseLeave={() => setHoveredCourseCode(null)}
-                                onFocus={(e) => e.target === e.currentTarget && setHoveredCourseCode(course.code)}
-                                onBlur={(e) => e.target === e.currentTarget && setHoveredCourseCode(null)}
-                                onClick={() => changeActiveCourse(course)}
-                                onKeyDown={handleCourseKeyDown(course)}
-                                role="button"
-                                tabIndex={0}
-                                aria-expanded={activeCourse === course}
-                                aria-label={course.title}
-                            >
-                                <div className={`${styles.courseTitle} ${activeCourse === course ? styles.activeCourse : ''}`}>{hoveredCourseCode === course.code ? course.code : course.title}</div>
-                            </div>
-                        ))}
-                    </div>
+                    {beforeDescriptionRows.map((row, i) => renderRow(row, i))}
                     <div className={`${styles.courseDescription} ${activeCourse ? styles.courseDescriptionOpen : ''} ${incomingCourse ? styles.courseDescriptionSliding : ''}`} style={{height: activeCourse ? `${measuredHeight}px` : '0px'}}>
                         <div ref={innerRef} className={styles.courseDescriptionInner} style={{'--slide-distance': `${slideDistance}px`} as React.CSSProperties}>
                             <p className={`${styles.courseDescriptionText} ${incomingCourse ? (slideDirection === 'up' ? styles.slideOutUp : styles.slideOutDown) : ''} ${suppressReset ? styles.noTransition : ''}`}>{displayedCourse?.description}</p>
@@ -299,26 +332,7 @@ export default function Education() {
                             )}
                         </div>
                     </div>
-                    <div className={styles.row}>
-                        {classes.slice(4).map((course) => (
-                            <div
-                                key={course.code}
-                                className={styles.course}
-                                onMouseEnter={() => setHoveredCourseCode(course.code)}
-                                onMouseLeave={() => setHoveredCourseCode(null)}
-                                onFocus={(e) => e.target === e.currentTarget && setHoveredCourseCode(course.code)}
-                                onBlur={(e) => e.target === e.currentTarget && setHoveredCourseCode(null)}
-                                onClick={() => changeActiveCourse(course)}
-                                onKeyDown={handleCourseKeyDown(course)}
-                                role="button"
-                                tabIndex={0}
-                                aria-expanded={activeCourse === course}
-                                aria-label={course.title}
-                            >
-                                <div className={`${styles.courseTitle} ${activeCourse === course ? styles.activeCourse : ''}`}>{hoveredCourseCode === course.code ? course.code : course.title}</div>
-                            </div>
-                        ))}
-                    </div>
+                    {afterDescriptionRows.map((row, i) => renderRow(row, i))}
                 </div>
             </div>
         </div>

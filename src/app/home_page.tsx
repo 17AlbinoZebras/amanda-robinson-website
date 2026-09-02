@@ -73,7 +73,17 @@ function OverviewSection() {
         <div className={styles.overview} ref={overviewRef}>
             {/* Outside .overviewContent on purpose — this is a full-bleed 100vw/100vh
                 backdrop, so it shouldn't shrink along with the scaled content. */}
-            <TintedVector src="/masks/Green-Memphis.svg" color='#D4D5E9' width='100vw' height='100vh' maskSize="cover" className={styles.overviewBackground}/>
+            {/* maskSize was 'cover' — the minimum scale needed to fill this
+                box with zero gaps, preserving aspect ratio. Green-Memphis.svg
+                is close to a 2:1 rectangle (942.91x469.31) but this box is
+                usually shorter/wider than that relative to its own width, so
+                'cover' had to scale the artwork up a lot (matching the box's
+                height, cropping width) — reading as too zoomed in. An
+                explicit, smaller "Wpx Hpx" tile (same aspect ratio) plus
+                repeat tiles it instead of cropping a single oversized
+                instance — still zero gaps (repeat covers infinitely in both
+                directions), just a visibly smaller, calmer repeat. */}
+            <TintedVector src="/masks/Green-Memphis.svg" color='#D4D5E9' width='100vw' height='calc(100vh + 36px)' maskSize="1004px 500px" repeat className={styles.overviewBackground}/>
             <div className={styles.overviewContent} ref={contentRef}>
                 <div className={styles.upperSection}>
                     <div className={styles.blurb}>
@@ -162,7 +172,15 @@ export default function HomePage() {
 
     return (
         <div className={styles.home}>
-            <TintedVector src="/masks/cow-blobs.svg" color='#F7EEE3' repeat maskSize="70%" className={styles.homeBackground}/>
+            {/* Explicit "Wpx Hpx" (not the old "70%") — cow-blobs.svg is
+                itself a dense pre-drawn pattern of many small blobs baked
+                into one tile, so a lone "70%" (which resolves against this
+                element's own, often 1000px+, rendered box) still tiled that
+                busy artwork small and dense. 420px is a deliberately bigger
+                tile — same idea as footer.tsx's own maskSize bump — so each
+                repeat reads as fewer, larger, calmer shapes instead of a busy
+                micro-pattern. */}
+            <TintedVector src="/masks/cow-blobs.svg" color='#F7EEE3' repeat maskSize="840px 840px" className={styles.homeBackground}/>
             <div className={styles.orbs}>
                 <div className={`${styles.redOrb} ${playIntro ? styles.redOrbIntro : ''}`} ref={redOrbRef}>
                     <RedOrb size={`${redOrbWidth}px`} className={`${styles.orbShadowRed} ${playIntro ? styles.orbShadowRedIntro : ''}`} />
