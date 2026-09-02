@@ -475,7 +475,23 @@
     .projects {
         flex-direction: column;
         width: 90vw;
-        height: 80vh;
+        /* min-height (not a hard height) — same fix as the desktop .projects
+           rule above, and for the same reason: a fixed height caps the
+           column at 80vh regardless of how tall the open panel's real
+           content actually is, and — worse on mobile specifically — iOS
+           Safari computes vh units against the LARGEST possible viewport
+           (toolbars collapsed), not whatever's actually visible right now,
+           so 80vh there can be taller than the real visible space even
+           before accounting for content height. .projectOpen's own
+           min-height:fit-content below already makes the open panel grow to
+           fit; without also loosening the column's own fixed height, that
+           growth had nowhere to go — the excess either clipped or, since
+           .projects itself has no overflow:hidden of its own, silently
+           overflowed past its box with no layout effect on the footer
+           that follows, which is what let the footer visually land on top
+           of it: .page's own auto height was still measured off .projects'
+           fixed 80vh box, not its true overflowed extent. */
+        min-height: 80vh;
     }
 
     .project {

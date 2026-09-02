@@ -228,13 +228,13 @@
 
     --blob-pink: #FDBFBD;
 
-    /* padding-bottom used to live here (a flat 36px, unconditionally) — on
-       desktop that 36px is now baked directly into .overview's own box
-       height instead (see its comment), so its background actually covers
-       that space rather than showing .home's own plain color there. Mobile
-       still needs a real padding here, though — its .overview switches to
-       height:auto (no fixed 100vh to absorb a fixed pixel amount into), so
-       the mobile media query below re-adds this same 36px the original way. */
+    /* padding-bottom used to live here (a flat 36px, unconditionally) — that
+       36px is now baked directly into .overview's own box instead, on BOTH
+       desktop (a taller calc(100vh + 36px), see .overview's own comment) and
+       mobile (padding-bottom: 36px on .overview's own mobile override, since
+       that version is height:auto rather than a fixed number a calc() could
+       extend) — either way, .overview's own background now actually covers
+       that space instead of showing .home's plain color there. */
     padding-bottom: 0;
 }
 
@@ -726,16 +726,6 @@
         font-size: 30px;
     }
 
-    /* Re-adds the 36px gap before the footer that the base .home rule no
-       longer provides (see its own comment) — desktop bakes that same 36px
-       directly into .overview's own box height instead, but mobile's
-       .overview switches to height:auto right below (no fixed 100vh to
-       absorb a fixed pixel amount into), so it still needs a real trailing
-       padding here the original way. */
-    .home {
-        padding-bottom: 36px;
-    }
-
     /* .overview is normally forced to fit exactly one 100vh via
        useScaleToFit (home_page.tsx) shrinking .overviewContent with
        transform: scale() — a deliberate desktop fix so nothing needs to
@@ -750,6 +740,18 @@
         height: auto;
         min-height: 100vh;
         overflow: visible;
+        /* Bakes the 36px gap-before-the-footer directly into THIS section's
+           own box (as padding, since height here is auto/content-driven —
+           unlike desktop's fixed calc(100vh + 36px), a plain height number
+           can't be "added onto" an auto value) instead of leaving it as
+           .home's own separate padding-bottom (which is what this used to
+           be, and is exactly why the gap kept showing .home's plain
+           background instead of this section's — .home doesn't get that
+           padding back here at all now; see its own comment on desktop's
+           equivalent fix, and the mobile .overviewBackground rule right
+           below, which reads --overview-real-height off THIS element,
+           padding included). */
+        padding-bottom: 36px;
     }
 
     .overviewContent {

@@ -45,11 +45,35 @@
     left: calc(100cqw - 50cqh - var(--stroke-width));
 }
 
+/* This is a plain <div> badge now (sliders.tsx), not the <svg> icon itself —
+   CSS padding on an SVG root element doesn't reliably behave like padding on
+   a normal box across browsers (some keep the rendered layout box pinned at
+   exactly the specified width/height regardless of padding, rather than
+   growing it or reliably insetting the content the way a div's padding
+   would), so the padding-based "shrink the glyph for breathing room" fix
+   tried directly on the <svg> may not actually have been doing anything —
+   confirmed as the likely reason icons still read as touching their badge's
+   edge even after that change. A real div badge with a plain, fully-fitted
+   glyph child (.sliderIconGlyph below) sidesteps the ambiguity entirely:
+   ordinary CSS box model, no SVG-root edge cases.
+   overflow: hidden is what actually makes border-radius clip the glyph now
+   (it didn't do anything on the bare <svg> before, since border-radius
+   alone only rounds an element's own background/border painting — it never
+   clips a child's content, and the glyph WAS that same element's own SVG
+   content before). Needed too: a perfectly square icon inscribed corner-to-
+   corner in this box would otherwise poke past the circular badge at the
+   corners, since a circle inscribed in a square only touches its edges at
+   each side's midpoint — this is what actually clips that overflow now. */
 .sliderIcon {
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 
     /* width/height stay 25% (the ORIGINAL badge size, not shrunk) — mobile's
        own margin-left: 40%/-40% below shifts this whole badge by a fixed
@@ -57,24 +81,28 @@
        footprint, so changing the badge's own width here would throw that
        mobile tuning off (confirmed: an earlier attempt that also shrank
        width to 20% made the closed-state sliver clear LESS of the icon on
-       mobile, not more, and — worse — with padding upped to 10% at that
-       smaller width, the content box computed to 20% - 10% - 10% = a
-       literal 0%-wide box, which is why the icon sometimes vanished
-       completely rather than just looking cramped: percentage padding
-       resolves against the containing block's width, same reference as this
-       element's own percentage width, and box-sizing:border-box subtracts
-       padding from that width to get the content area). 9% (up from 7.5%)
-       is a smaller, positive-content-area nudge instead — trims the glyph
-       itself for breathing room from the circle's edge without touching the
-       badge's own footprint at all, so the mobile shift needs no retuning. */
+       mobile, not more). */
     width: 25%;
     height: 25%;
 
+    /* 9% — trims the glyph for breathing room from the circle's edge
+       without touching the badge's own footprint, so the mobile shift needs
+       no retuning. Safely a positive content area now (25% - 9% - 9% = 7%):
+       box-sizing:border-box (set globally) subtracts padding from a plain
+       div's own width the normal, predictable way. */
     padding: 9%;
 
     border-radius: 50%;
 
     transition: margin-left 550ms, transform 550ms;
+}
+
+/* The actual icon glyph — a plain child that just fills whatever content
+   area .sliderIcon's own padding leaves it, with no sizing/background/
+   radius of its own to fight over. */
+.sliderIconGlyph {
+    width: 100%;
+    height: 100%;
 }
 
 .orbWrapperRight .sliderIcon {

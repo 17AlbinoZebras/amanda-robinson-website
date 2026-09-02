@@ -385,7 +385,11 @@ export function RedSlider({width, height, className, style, strokeWidth, sliderC
     })
     const orb = RedOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline, strokeOpacity: strokeVisible ? 1 : 0})
 
-    const icon = < FontAwesomeIcon icon={isActive ? sliderIcons.home : sliderIcons.red} className={styles.sliderIcon} style={{color: colors.outline, backgroundColor: colors.mask}} />
+    const icon = (
+        <div className={styles.sliderIcon} style={{backgroundColor: colors.mask}}>
+            <FontAwesomeIcon icon={isActive ? sliderIcons.home : sliderIcons.red} className={styles.sliderIconGlyph} style={{color: colors.outline}} />
+        </div>
+    )
 
     return Slider(width, height, rect, orb, "right", strokeSize, {labelText: isActive ? "Home" : "Projects", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, icon, isOpen, setIsOpen, sliderRef)
 }
@@ -423,7 +427,11 @@ export function YellowSlider({width, height, className, style, strokeWidth, slid
         className: [styles.sliderBorder, styles.borderYellow, strokeVisible ? styles.strokeVisible : '', className].filter(Boolean).join(" "),
     })
     const orb = YellowOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline, strokeOpacity: strokeVisible ? 1 : 0})
-    const icon = < FontAwesomeIcon icon={isActive ? sliderIcons.home : sliderIcons.yellow} className={styles.sliderIcon} style={{color: colors.label, backgroundColor: colors.mask}} />
+    const icon = (
+        <div className={styles.sliderIcon} style={{backgroundColor: colors.mask}}>
+            <FontAwesomeIcon icon={isActive ? sliderIcons.home : sliderIcons.yellow} className={styles.sliderIconGlyph} style={{color: colors.label}} />
+        </div>
+    )
 
     return Slider(width, height, rect, orb, "left", strokeSize, {labelText: isActive ? "Home" : "About Me", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.label}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, icon, isOpen, setIsOpen, sliderRef)
 }
@@ -462,7 +470,11 @@ export function GreenSlider({width, height, className, style, strokeWidth, slide
     })
     const orb = GreenOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline, strokeOpacity: strokeVisible ? 1 : 0})
     
-    const icon = < FontAwesomeIcon icon={isActive ? sliderIcons.home : sliderIcons.green} className={styles.sliderIcon} style={{color: colors.outline, backgroundColor: colors.mask}} />
+    const icon = (
+        <div className={styles.sliderIcon} style={{backgroundColor: colors.mask}}>
+            <FontAwesomeIcon icon={isActive ? sliderIcons.home : sliderIcons.green} className={styles.sliderIconGlyph} style={{color: colors.outline}} />
+        </div>
+    )
 
     return Slider(width, height, rect, orb, "right", strokeSize, {labelText: isActive ? "Home" : "Experience", labelStyle: {fontFamily: "var(--font-idiqlat)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, icon, isOpen, setIsOpen, sliderRef)
 }
@@ -500,7 +512,11 @@ export function BlueSlider({width, height, className, style, strokeWidth, slider
         className: [styles.sliderBorder, styles.borderBlue, strokeVisible ? styles.strokeVisible : '', className].filter(Boolean).join(" "),
     })
     const orb = BlueOrb({size: height, className, style, strokeWidth: strokeSize, strokeColor: colors.outline, strokeOpacity: strokeVisible ? 1 : 0})
-    const icon = < FontAwesomeIcon icon={isActive ? sliderIcons.home : sliderIcons.blue} className={styles.sliderIcon} style={{color: colors.outline, backgroundColor: colors.mask}} />
+    const icon = (
+        <div className={styles.sliderIcon} style={{backgroundColor: colors.mask}}>
+            <FontAwesomeIcon icon={isActive ? sliderIcons.home : sliderIcons.blue} className={styles.sliderIconGlyph} style={{color: colors.outline}} />
+        </div>
+    )
 
     return Slider(width, height, rect, orb, "left", strokeSize, {labelText: isActive ? "Home" : "Education", labelStyle: {fontFamily: "var(--font-new-amsterdam)", color: colors.mask, backgroundColor: colors.base}}, sliderClassName, sliderStyle, isActive ? "/" : ownHref, icon, isOpen, setIsOpen, sliderRef)
 }
