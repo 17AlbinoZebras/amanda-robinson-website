@@ -209,6 +209,14 @@
     font-size: 20px;
 }
 
+/* Opt-in, wider box for a single standout photo (e.g. Theater's group
+   photo) — .previewSegment's own 60% cap is sized for up to 3 photos
+   sharing .hobbyPreview's row; a lone photo can afford to read much
+   bigger without crowding anything else out. */
+.previewSegmentLarge {
+    max-width: 85%;
+}
+
 .previewImg {
     width: 100%;
     height: 100%;

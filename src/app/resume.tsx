@@ -129,7 +129,7 @@ export default function Resume() {
                 — both dimensions are now fixed regardless of the page's own
                 height, and repeat still tiles the resulting constant-size
                 tile to cover whatever height is actually needed. */}
-            <TintedVector src="/masks/Red-Squiggles.svg" color='#c7d6d1' width='100vw' height='100vh' repeat maskSize="1200px 600px" className={styles.resumeBackground}/>
+            <TintedVector src="/masks/Red-Squiggles.svg" color='#B4CAC1' width='100vw' height='100vh' repeat maskSize="1200px 600px" className={styles.resumeBackground}/>
             <header>
                 <h1 className={styles.heading}>Resume</h1>
             </header>

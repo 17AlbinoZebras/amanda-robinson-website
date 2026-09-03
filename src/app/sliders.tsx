@@ -52,6 +52,13 @@ const sliderIcons = {
     home: fas.faHouse
 }
 
+// Pages where every slider's stroke stays visible regardless of hover/open
+// state — the home page (where none of the 4 sliders is ever "active", so
+// without this none would show a stroke at all) and the resume page
+// (requested directly: the sliders sit over .resume's plain, low-contrast
+// background there, and were hard to make out unstroked).
+const ALWAYS_STROKE_PATHS = ['/', '/resume']
+
 // ORBS
 
 function Orb({orbProps: {size, className, style, strokeWidth, strokeColor, strokeOpacity}, maskProps: {shapeColor, src, maskColor, maskClassName}}: {orbProps: OrbProps, maskProps: MaskProps}) {
@@ -425,7 +432,7 @@ export function RedSlider({width, height, className, style, strokeWidth, sliderC
     // open/hovered — strokeSize itself stays constant either way (see
     // ClippedVector's strokeOpacity) so opening/closing never shifts layout,
     // just fades the stroke's visibility in and out.
-    const strokeVisible = isActive || pathname === '/' || isOpen
+    const strokeVisible = isActive || ALWAYS_STROKE_PATHS.includes(pathname) || isOpen
     const strokeSize = activeStrokeSize
 
     // The rect only wants a stroke on its top/bottom edges (not the sides), which
@@ -472,7 +479,7 @@ export function YellowSlider({width, height, className, style, strokeWidth, slid
         return () => document.removeEventListener('pointerdown', handleOutside)
     }, [isOpen])
 
-    const strokeVisible = isActive || pathname === '/' || isOpen
+    const strokeVisible = isActive || ALWAYS_STROKE_PATHS.includes(pathname) || isOpen
     const strokeSize = activeStrokeSize
 
     const rect = YellowSliderRect({
@@ -514,7 +521,7 @@ export function GreenSlider({width, height, className, style, strokeWidth, slide
         return () => document.removeEventListener('pointerdown', handleOutside)
     }, [isOpen])
 
-    const strokeVisible = isActive || pathname === '/' || isOpen
+    const strokeVisible = isActive || ALWAYS_STROKE_PATHS.includes(pathname) || isOpen
     const strokeSize = activeStrokeSize
 
     const rect = GreenSliderRect({
@@ -557,7 +564,7 @@ export function BlueSlider({width, height, className, style, strokeWidth, slider
         return () => document.removeEventListener('pointerdown', handleOutside)
     }, [isOpen])
 
-    const strokeVisible = isActive || pathname === '/' || isOpen
+    const strokeVisible = isActive || ALWAYS_STROKE_PATHS.includes(pathname) || isOpen
     const strokeSize = activeStrokeSize
 
     const rect = BlueSliderRect({

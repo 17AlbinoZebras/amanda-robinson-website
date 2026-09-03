@@ -6,7 +6,7 @@
     flex-direction: column;
     align-items: center;
     /* justify-content: center; */
-    background-color: #B4CAC1;
+    background-color: #C7D6D1;
     font-family: var(--font-afacad-flux);
     /* Guarantees at least 36px between this page's own content and the
        footer (a sibling right after this element, not a child of it) —

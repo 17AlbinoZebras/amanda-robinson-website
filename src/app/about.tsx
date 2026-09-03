@@ -23,7 +23,9 @@ interface hobby {
     // width/height are each photo's real source dimensions (used by
     // next/image for aspect-ratio math, not the display size — same
     // distinction as the headshot's own width/height props above it).
-    photos?: {src: string, alt: string, width: number, height: number, caption?: JSX.Element}[]
+    // large opts a single photo into a bigger .previewSegment box and a
+    // higher-resolution/quality next/image request than the default.
+    photos?: {src: string, alt: string, width: number, height: number, caption?: JSX.Element, large?: boolean}[]
 }
 
 const ayoPillars = (<ul>
@@ -48,7 +50,7 @@ const hobbies: hobby[] = [
         {src: "/about/KaylaSeniorPhoto.jpg", alt: "A woman in a white dress standing on a graffiti-covered pier at sunset", width: 5760, height: 3840},
         {src: "/about/Squirrel.jpg", alt: "A squirrel standing on sandy ground", width: 1554, height: 1036}
     ]},
-    {title: "Theater", photos: [{src: "/about/8ML-Exec-Cropped.jpg", alt: "Group photo of the leadership team on the set of 8 Minutes Left", width: 5553, height: 2933, caption: <p className={styles.caption}>The leadership team of <i>8 Minutes Left</i>, which I assistant stage managed.</p>}]},
+    {title: "Theater", photos: [{src: "/about/8ML-Exec-Cropped.jpg", alt: "Group photo of the leadership team on the set of 8 Minutes Left", width: 5553, height: 2933, large: true, caption: <p className={styles.caption}>The leadership team of <i>8 Minutes Left</i>, which I assistant stage managed.</p>}]},
     {title: "Crafts", photos: [{src: "/about/origami-dragon.jpg", alt: "A purple origami dragon", width: 2599, height: 1949}]},
     {title: "Board Games", photos: [{src: "/about/Catan.jpg", alt: "A Settlers of Catan board game set up mid-play, with resource tiles, roads, and cards", width: 4032, height: 3024}]},
     {title: "Learning New Skills", photos: [{src: "/about/stained-glass-snail.jpg", alt: "A stained glass snail ornament in teal and orange", width: 4030, height: 2535, caption: <p className={styles.caption}>My first stained glass project!</p>}]}
@@ -256,7 +258,7 @@ export default function About() {
                         {displayedHobby && (
                             <div className={styles.hobbyPreview}>
                                 {displayedHobby.photos?.map((photo) => (
-                                    <div key={photo.src} className={styles.previewSegment}>
+                                    <div key={photo.src} className={`${styles.previewSegment} ${photo.large ? styles.previewSegmentLarge : ''}`}>
                                         {/* Images load asynchronously — the scrollHeight
                                             measurement above can easily run before they've
                                             arrived (so .previewImg's height:100%, which
@@ -276,14 +278,19 @@ export default function About() {
                                             to the headshot above. width/height are each
                                             photo's real source dimensions (aspect-ratio
                                             math only); sizes tells Next.js the real display
-                                            size to generate for. */}
+                                            size to generate for — bumped for a "large" photo
+                                            since .previewSegmentLarge also renders it wider,
+                                            and quality is raised from next/image's own
+                                            default (75) since it's a bigger box asking for
+                                            more visible detail. */}
                                         <Image
                                             className={styles.previewImg}
                                             src={photo.src}
                                             alt={photo.alt}
                                             width={photo.width}
                                             height={photo.height}
-                                            sizes="(max-width: 700px) 90vw, 25vw"
+                                            sizes={photo.large ? "(max-width: 700px) 90vw, 45vw" : "(max-width: 700px) 90vw, 25vw"}
+                                            quality={photo.large ? 90 : 75}
                                             onLoad={remeasure}
                                         />
                                         { photo.caption }

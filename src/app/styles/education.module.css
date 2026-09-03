@@ -216,6 +216,18 @@
     font-size: 22px;
     font-weight: 400;
 
+    /* Unconditional (not gated behind .courseDescriptionOpen) — padding
+       isn't in this element's own transition list, so toggling it via a
+       class change would apply INSTANTLY rather than animating, snapping
+       the text's position the moment a course opens/closes while the outer
+       box's height is still mid-transition (confirmed directly: closing
+       used to jump the text ~12px the instant you clicked, well before the
+       box had visually finished collapsing). Keeping it constant instead
+       needs no transition at all: .courseDescription's own overflow:hidden
+       + height:0 when closed already clips this element (padding and all)
+       to invisible, the same as before — nothing here ever needs to move. */
+    padding: 12px 16px;
+
     opacity: 0;
     transition: opacity 1s;
 
@@ -224,12 +236,6 @@
 }
 
 .courseDescriptionOpen .courseDescriptionInner {
-    /* Padding lives here (not on .courseDescription) — with overflow:hidden
-       and a 0-height box, padding on this element collapses away with it
-       automatically. If it lived on the outer box instead, the padding
-       would stay a fixed size regardless of height, leaving a visible gap
-       even fully closed. */
-    padding: 12px 16px;
     opacity: 1;
 }
 
