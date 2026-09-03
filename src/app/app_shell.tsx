@@ -54,7 +54,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         if (lastPathnameRef.current === pathname) return
         lastPathnameRef.current = pathname
 
-        if (pathname === '/' && !hasShownIntroRef.current) {
+        // Matches the site's one existing responsive breakpoint (see e.g.
+        // education.tsx/projects.tsx's own useIsMobile). Read directly via
+        // matchMedia (not a separate mobile-tracking hook/state) so this
+        // stays synchronous within the same useLayoutEffect that already
+        // has to run before first paint — a value arriving even one render
+        // later would let the intro's starting position flash in first.
+        const isMobile = window.matchMedia('(max-width: 700px)').matches
+
+        if (pathname === '/' && !hasShownIntroRef.current && !isMobile) {
             setPlayIntro(true)
             hasShownIntroRef.current = true
         } else {
