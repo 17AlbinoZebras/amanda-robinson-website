@@ -260,6 +260,15 @@
    a general trick to reuse elsewhere without rechecking the math. */
 @keyframes move-red-orb {
     0% {
+        /* Matches .redOrbIntro's own transform below — that's what's
+           actually visible during the pre-animation --delay-animation
+           window (this animation has no fill-mode: backwards, so it
+           doesn't apply its own 0% until the delay elapses). Keeping the
+           two in sync avoids a visible jump the instant the fly-out
+           actually starts. This is the desktop value — mobile
+           (max-width: 700px, below) redeclares this whole @keyframes
+           block with its own starting point instead, matching .redOrb's
+           repositioned anchor there. */
         transform: translate(17vw, 2vh);
     }
     75%, 100% {
@@ -291,6 +300,9 @@
 }
 @keyframes move-yellow-orb {
     0% {
+        /* Matches .yellowOrbIntro's own transform below — see
+           move-red-orb's own comment for why (both the sync reasoning and
+           the desktop/mobile split). */
         transform: translate(-13.75vw, -2.5vh);
     }
     75%, 100% {
@@ -315,6 +327,9 @@
 }
 @keyframes move-green-orb {
     0% {
+        /* Matches .greenOrbIntro's own transform below — see
+           move-red-orb's own comment for why (both the sync reasoning and
+           the desktop/mobile split). */
         transform: translate(5.5vw, -8vh);
     }
     75%, 100% {
@@ -339,6 +354,9 @@
 }
 @keyframes move-blue-orb {
     0% {
+        /* Matches .blueOrbIntro's own transform below — see
+           move-red-orb's own comment for why (both the sync reasoning and
+           the desktop/mobile split). */
         transform: translate(-8.25vw, -3vh);
     }
     75%, 100% {
@@ -431,6 +449,15 @@
     pointer-events: none;
 }
 
+/* Re-enabled at every width for now (was gated to min-width: 601px —
+   removed, not deleted for good: the orb locations/travel paths above
+   were just retuned for mobile, and whether the intro actually reads well
+   there with these new positions is still being evaluated. If not, gate
+   these 4 classes behind a media query again rather than reintroducing a
+   separate mobile-disable mechanism.
+   These are the desktop starting positions — mobile (max-width: 700px,
+   below, alongside .redOrb/etc's own repositioned anchors) overrides
+   transform here to match its different starting anchor instead. */
 .redOrbIntro {
     transform: translate(17vw, 2vh);
     opacity: 1;
@@ -527,6 +554,8 @@
     filter: drop-shadow(4px 6px #FFB2B3);
 }
 
+/* Re-enabled at every width for now, same as the matching .*OrbIntro
+   classes above — see that comment. */
 .orbShadowRedIntro {
     animation: remove-red-orb-shadow 6s ease 1 backwards;
 }
@@ -624,6 +653,82 @@
            70px (mirrors green). */
         --landing-x-adjust: calc(100vw + 25px - ((100vw - 332px) / 2 + 187px) - 145px);
         --landing-y-adjust: 3vh;
+    }
+
+    /* Mobile starting positions for the intro's fly-out — overrides the
+       desktop values above, which (measured against .redOrb/etc's own
+       DESKTOP anchor of 0,0) sent orbs flying in from off-screen once
+       .redOrb/etc got their own repositioned mobile anchors above:
+       .redOrbIntro's desktop translate(17vw, 2vh) is relative to red's
+       desktop top:0/left:0 anchor, but red's mobile anchor is already
+       inset (left: calc((100vw - 357px)/2), top: 2vh) — the SAME 17vw/2vh
+       offset from THAT anchor pushed the orb (partly or fully) past the
+       viewport edge instead of just being an artistic starting offset.
+       These 4 values are re-tuned to read well from the new mobile
+       anchors specifically. */
+    .redOrbIntro {
+        transform: translate(0vw, 10vh);
+    }
+
+    .yellowOrbIntro {
+        transform: translate(12vw, 1vh);
+    }
+
+    .greenOrbIntro {
+        transform: translate(-22vw, 7vh);
+    }
+
+    .blueOrbIntro {
+        transform: translate(20vw, -3vh);
+    }
+
+    /* Redeclares each move-*-orb @keyframes wholesale (not just its 0%) —
+       a keyframe step can't be overridden piecemeal by a later rule the
+       way a plain property can; the whole named animation gets replaced
+       for whichever elements match at this breakpoint. 75%/100% here are
+       otherwise IDENTICAL to the desktop versions above — the
+       --landing-x-adjust/--landing-y-adjust custom properties they read
+       are what already do the real work of retargeting the landing spot
+       for .redOrb/etc's mobile anchors (see .redOrb's own comment above);
+       only 0% (the starting point) actually needs a different value here,
+       matching .redOrbIntro's own mobile transform right above — see
+       move-red-orb's desktop comment for why those two always have to
+       agree. */
+    @keyframes move-red-orb {
+        0% {
+            transform: translate(0vw, 10vh);
+        }
+        75%, 100% {
+            transform: translate(calc(-50% + var(--landing-x-adjust, 0px)), calc(10vh + var(--slider-height) / 2 - var(--orb-size) / 2 + var(--landing-y-adjust, 0vh))) scale(calc(var(--slider-height) / var(--orb-size)));
+            opacity: 1;
+        }
+    }
+    @keyframes move-yellow-orb {
+        0% {
+            transform: translate(12vw, 1vh);
+        }
+        75%, 100% {
+            transform: translate(calc(50% + var(--landing-x-adjust, 0px)), calc(10vh + var(--slider-height) / 2 - var(--orb-size) / 2 + var(--landing-y-adjust, 0vh))) scale(calc(var(--slider-height) / var(--orb-size)));
+            opacity: 1;
+        }
+    }
+    @keyframes move-green-orb {
+        0% {
+            transform: translate(-22vw, 7vh);
+        }
+        75%, 100% {
+            transform: translate(calc(-50% + var(--landing-x-adjust, 0px)), calc(-10vh - var(--slider-height) / 2 + var(--orb-size) / 2 + var(--landing-y-adjust, 0vh))) scale(calc(var(--slider-height) / var(--orb-size)));
+            opacity: 1;
+        }
+    }
+    @keyframes move-blue-orb {
+        0% {
+            transform: translate(20vw, -3vh);
+        }
+        75%, 100% {
+            transform: translate(calc(50% + var(--landing-x-adjust, 0px)), calc(-10vh - var(--slider-height) / 2 + var(--orb-size) / 2 + var(--landing-y-adjust, 0vh))) scale(calc(var(--slider-height) / var(--orb-size)));
+            opacity: 1;
+        }
     }
 }
 
