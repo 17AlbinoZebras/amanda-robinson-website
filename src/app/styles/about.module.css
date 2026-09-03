@@ -83,6 +83,7 @@
 
 .headshot {
     position: relative;
+    width: auto;
     max-width: 100%;
     /* Explicit — without this, the element rendered at its own literal HTML
        height ATTRIBUTE (4871px, next/image always sets one matching the

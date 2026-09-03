@@ -20,7 +20,10 @@ interface activity {
 
 interface hobby {
     title: string;
-    photos?: {src: string, alt: string, caption?: JSX.Element}[]
+    // width/height are each photo's real source dimensions (used by
+    // next/image for aspect-ratio math, not the display size — same
+    // distinction as the headshot's own width/height props above it).
+    photos?: {src: string, alt: string, width: number, height: number, caption?: JSX.Element}[]
 }
 
 const ayoPillars = (<ul>
@@ -41,14 +44,14 @@ const activities: activity[] = [
 
 const hobbies: hobby[] = [
     {title: "Photography", photos: [
-        {src: "/about/WakodahatcheeHeron.jpg", alt: "A tricolored heron wading in rippling water"},
-        {src: "/about/KaylaSeniorPhoto.jpg", alt: "A woman in a white dress standing on a graffiti-covered pier at sunset"},
-        {src: "/about/Squirrel.jpg", alt: "A squirrel standing on sandy ground"}
+        {src: "/about/WakodahatcheeHeron.jpg", alt: "A tricolored heron wading in rippling water", width: 5760, height: 3840},
+        {src: "/about/KaylaSeniorPhoto.jpg", alt: "A woman in a white dress standing on a graffiti-covered pier at sunset", width: 5760, height: 3840},
+        {src: "/about/Squirrel.jpg", alt: "A squirrel standing on sandy ground", width: 1554, height: 1036}
     ]},
-    {title: "Theater", photos: [{src: "/about/8ML-Exec-Cropped.jpg", alt: "Group photo of the leadership team on the set of 8 Minutes Left", caption: <p className={styles.caption}>The leadership team of <i>8 Minutes Left</i>, which I assistant stage managed.</p>}]},
-    {title: "Crafts", photos: [{src: "/about/origami-dragon.jpg", alt: "A purple origami dragon"}]},
-    {title: "Board Games", photos: [{src: "/about/Catan.jpg", alt: "A Settlers of Catan board game set up mid-play, with resource tiles, roads, and cards"}]},
-    {title: "Learning New Skills", photos: [{src: "/about/stained-glass-snail.jpg", alt: "A stained glass snail ornament in teal and orange", caption: <p className={styles.caption}>My first stained glass project!</p>}]}
+    {title: "Theater", photos: [{src: "/about/8ML-Exec-Cropped.jpg", alt: "Group photo of the leadership team on the set of 8 Minutes Left", width: 5553, height: 2933, caption: <p className={styles.caption}>The leadership team of <i>8 Minutes Left</i>, which I assistant stage managed.</p>}]},
+    {title: "Crafts", photos: [{src: "/about/origami-dragon.jpg", alt: "A purple origami dragon", width: 2599, height: 1949}]},
+    {title: "Board Games", photos: [{src: "/about/Catan.jpg", alt: "A Settlers of Catan board game set up mid-play, with resource tiles, roads, and cards", width: 4032, height: 3024}]},
+    {title: "Learning New Skills", photos: [{src: "/about/stained-glass-snail.jpg", alt: "A stained glass snail ornament in teal and orange", width: 4030, height: 2535, caption: <p className={styles.caption}>My first stained glass project!</p>}]}
 ]
 
 export default function About() {
@@ -261,8 +264,28 @@ export default function About() {
                                             against, isn't contributing anything yet),
                                             leaving the box stuck too short. onLoad
                                             re-measures once each image's real size is
-                                            known. */}
-                                        <img className={styles.previewImg} src={photo.src} alt={photo.alt} onLoad={remeasure}/>
+                                            known.
+                                            Was a plain <img> — these source files are
+                                            real camera/phone photos up to 20MB (5760x3840),
+                                            and a plain <img> has no way to request anything
+                                            smaller than the full original regardless of
+                                            this box's own few-hundred-px rendered width.
+                                            next/image generates a properly downscaled,
+                                            modern-format version sized to the actual
+                                            display size instead — same fix already applied
+                                            to the headshot above. width/height are each
+                                            photo's real source dimensions (aspect-ratio
+                                            math only); sizes tells Next.js the real display
+                                            size to generate for. */}
+                                        <Image
+                                            className={styles.previewImg}
+                                            src={photo.src}
+                                            alt={photo.alt}
+                                            width={photo.width}
+                                            height={photo.height}
+                                            sizes="(max-width: 700px) 90vw, 25vw"
+                                            onLoad={remeasure}
+                                        />
                                         { photo.caption }
                                     </div>
                                 ))}
