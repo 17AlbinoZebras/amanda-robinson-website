@@ -80,6 +80,7 @@
     font-weight: 500;
 
     width: 50vw;
+    min-height: fit-content;
     padding: 2.5% 10% 2.5% 5%;
     /* .headshotContainer (below) is positioned to deliberately overlap this
        box's top-right corner — this and its width/right-offset are now all
@@ -166,6 +167,7 @@
     border-radius: 24px;
     flex: 2;
     height: 100%;
+    min-height: fit-content;
 }
 
 .techStacks p {
@@ -180,6 +182,7 @@
     flex: 1.3;
     /* height: 100%; */
     height: fit-content;
+    min-height: fit-content;
 }
 
 .sectionTitle {
@@ -192,6 +195,7 @@
 
 .bodyText {
     font-size: 26px;
+    min-height: fit-content;
 }
 
 .education .bodyText {
@@ -235,7 +239,25 @@
 }
 
 .orbs {
-    position: absolute;
+    /* Fixed (not absolute) — matches .slider's own positioning in
+       sliders.module.css, which is deliberately fixed specifically so its
+       vh-based top/bottom offsets are "relative to the viewport regardless
+       of scroll or DOM position" (see that file's own comment). .orbs
+       being absolute (relative to .home, a normal in-flow ancestor) instead
+       meant its own vh-based values COULD resolve against a different
+       effective viewport than the slider's, on real mobile browsers
+       specifically — where the address bar/toolbar dynamically resizing the
+       viewport as it shows/hides is known to resolve vh differently for
+       fixed vs. absolute/static elements (a real WebKit/iOS Safari quirk,
+       not reproducible by just narrowing a desktop browser window, which
+       has no such dynamic chrome at all). Landing math and slider position
+       are only guaranteed to agree if both resolve every vh the same way —
+       matching the positioning scheme exactly sidesteps the ambiguity
+       instead of guessing which specific viewport-unit variant to switch
+       to. Harmless here since .home hasn't scrolled during the few seconds
+       the intro plays, and the orbs fade to opacity: 0 (and pointer-events:
+       none, already set below) well before scrolling would ever matter. */
+    position: fixed;
     width: 100vw;
     height: 100vh;
     pointer-events: none;
@@ -786,6 +808,7 @@
     /* margin-top: clamp(24px, 2.5vw, 56px); */
     margin-top: 48px;
     width: 30vw;
+    min-height: fit-content;
 }
 
 .subtitle {

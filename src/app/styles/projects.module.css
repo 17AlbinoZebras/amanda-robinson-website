@@ -60,6 +60,7 @@
     position: relative;
     display: flex;
     flex-direction: row;
+    height: fit-content;
     /* min-height (not a hard height) — 81.5vh is the usual floor, but a long
        description (see .description below) can need more than that fits in;
        letting the row grow past it is what lets the whole box "expand" for
@@ -201,9 +202,11 @@
 }
 
 .description {
+    min-height: fit-content;
     width: 92.5%;
     border-radius: 20px;
     padding: 12px;
+    margin-bottom: 6px;
     /* height was a fixed 32% (of .projectContent) — capping every
        description to the same fraction regardless of how much text it
        actually had, which clipped the longer ones. projects.tsx now

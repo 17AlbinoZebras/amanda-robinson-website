@@ -38,8 +38,8 @@ const ayoPillars = (<ul>
 
 const activities: activity[] = [
     {org: 'Alpha Gamma Delta Sorority', role: 'Interim VP New Member Experience', details: [{point: 'Planned and executed bid day to welcome all our new members'}, {point: 'Organized and ran pledge-ins for new members'}]},
-    {org: 'Masque Theatre', role: 'VP Props & Costumes', details: [{point: 'Managed and maintained the props and costumes closet all 3 years'}, {point: 'Created documentation for all positions in both departments'}]},
-    {org: 'Women\'s Club Rugby', role: 'PR Officer', details: [{point: 'Took photos and made posts for our games'}, {point: 'Designed instagram posts to inspire prospective new members to join the team'}]},
+    {org: 'Masque Theatre', role: 'VP Props & Costumes', details: [{point: 'Managed and maintained the props and costumes closet for all 3 years'}, {point: 'Created documentation for all positions in both departments'}]},
+    {org: 'Women\'s Club Rugby', role: 'PR Officer', details: [{point: 'Took photos and made posts for our games'}, {point: 'Designed Instagram posts to inspire prospective new members to join the team'}]},
     {org: 'Alpha Psi Omega Honor Society', role: 'Member', details: [{point: 'Embody the five pillars of Alpha Psi Omega: ', subPoints: ['Leadership', 'Professionalism', 'Growth and Future Growth', 'Respect for Theatre and for the Theatre Community', 'Work for the Betterment of Theatre']}]},
     {org: 'Student Alumni Society', role: 'Member', details: [{point: 'Plan and run campus wide events involving students, faculty, and alumni to uphold campus traditions'}]}
 ]

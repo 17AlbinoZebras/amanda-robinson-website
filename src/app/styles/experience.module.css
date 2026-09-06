@@ -49,15 +49,19 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: -5vh;
     justify-content: center;
-    height: 80vh;
+    min-height: 80vh;
     
     font-size: 30px;
+    width: 100%;
 }
 
 .section {
     height: 42.5vh;
+    /* Safety net — this card holds a job's full title/bullet-list content;
+       min-height doesn't override the normal 42.5vh height when content
+       fits, only guarantees the box can't clip its own text if it doesn't. */
+    min-height: fit-content;
     width: 55vw;
 }
 
@@ -90,7 +94,7 @@
 
 .sectionBody {
     padding-inline-start: 24px;
-    line-height: 1.35;
+    padding: 1% 0;
 }
 
 .sectionBody li {
@@ -111,30 +115,39 @@
 }
 
 .sectionLeft {
-    position: absolute;
-    left: 0;
+    position: relative;
     z-index: 1;
+    flex: 1;
     
     border-radius: 0 32px 32px 0;
-    padding: 0.75% 2% 2% 9.25%;
+    padding: 1% 2% 1% 10.5%;
     background-color: var(--main-light);
     /* color: #88AA9C; */
     color: var(--main-green);
 
     font-size: 27px;
+
+    line-height: 1.35;
 }
 
 .sectionRight {
     border-radius: 32px 0 0 32px;
-    position: absolute;
-    right: 0;
+    position: relative;
+    justify-self: flex-end;
+    align-self: flex-end;
 
-    padding: 1% 5% 2% 2%;
+    flex: 1;
+
+    margin-top: -5%;
+
+    padding: 1.5% 5% 1% 3%;
 
     background-color: #FCD07D;
     color: var(--main-dark);
 
     font-size: 28px;
+
+    line-height: 1.55;
 }
 
 .sectionRight .titleSection {
@@ -143,6 +156,7 @@
     align-items: center;
     justify-content: center;
     padding-left: 10%;
+    min-height: fit-content;
 }
 
 /* .sectionRight .sectionTitle {
@@ -155,8 +169,8 @@
 
 .sectionRight .sectionBody {
     padding-right: 7%;
-    line-height: 1.55;
-    padding-top: 1%;
+    line-height: 1.6;
+    /* padding-top: 1%; */
 }
 
 .sectionRight .roleInfo {

@@ -90,6 +90,7 @@
     flex-direction: column;
     width: 45%;
     align-items: center;
+    min-height: fit-content;
 }
 
 .lowerSection {
